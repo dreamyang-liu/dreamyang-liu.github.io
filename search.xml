@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>2TS</title>
+      <title>Learning Two Time-scale Representation for Large Scale Sequential Interaction Data</title>
       <link href="2021/03/26/2TS/"/>
       <url>2021/03/26/2TS/</url>
       
-        <content type="html"><![CDATA[<h1 id="Learning-Two-Time-scale-Representation-for-Large-Scale-Sequential-Interaction-Data"><a href="#Learning-Two-Time-scale-Representation-for-Large-Scale-Sequential-Interaction-Data" class="headerlink" title="Learning Two Time-scale Representation for Large Scale Sequential Interaction Data"></a>Learning Two Time-scale Representation for Large Scale Sequential Interaction Data</h1><h2 id="Core-Ideas"><a href="#Core-Ideas" class="headerlink" title="Core Ideas"></a>Core Ideas</h2><h3 id="Preset"><a href="#Preset" class="headerlink" title="Preset"></a>Preset</h3><ul><li>In a dynamic network, users have interactions with items</li><li>User embedding will influence the embedding of items and the reverse also works</li></ul><h3 id="Idea"><a href="#Idea" class="headerlink" title="Idea"></a>Idea</h3><ul><li>Some active people or hot items seems static in the Graphical Network, which means that we can remove the edges linked to them</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="Core-Ideas"><a href="#Core-Ideas" class="headerlink" title="Core Ideas"></a>Core Ideas</h2><h3 id="Preset"><a href="#Preset" class="headerlink" title="Preset"></a>Preset</h3><ul><li>In a dynamic network, users have interactions with items</li><li>User embedding will influence the embedding of items and the reverse also works</li></ul><h3 id="Idea"><a href="#Idea" class="headerlink" title="Idea"></a>Idea</h3><ul><li>Some active people or hot items seems static in the Graphical Network, which means that we can remove the edges linked to them</li></ul><h2 id="Workflow"><a href="#Workflow" class="headerlink" title="Workflow"></a>Workflow</h2><p>fff</p><script type="math/tex; mode=display">safasfasf</script>]]></content>
       
       
       
@@ -21,7 +21,7 @@
       <link href="2021/03/26/Introduction-to-Graphical-Model/"/>
       <url>2021/03/26/Introduction-to-Graphical-Model/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="Criteria"><a href="#Criteria" class="headerlink" title="Criteria"></a>Criteria</h2><h3 id="MRR-Mean-Reciprocal-Rank"><a href="#MRR-Mean-Reciprocal-Rank" class="headerlink" title="MRR (Mean Reciprocal Rank)"></a>MRR (Mean Reciprocal Rank)</h3><p>第一个结果匹配，分数为1，第二个匹配分数为0.5，第n个匹配分数为1/n，如果没有匹配的句子分数为0。最终的分数为所有得分之和.</p><h2 id="Recall-10"><a href="#Recall-10" class="headerlink" title="Recall @10"></a>Recall @10</h2><p>Recall@10=正样本数/all_positive=5/5=1</p>]]></content>
       
       
       
