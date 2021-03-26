@@ -4,6 +4,32 @@
   
     
     <entry>
+      <title>2TS</title>
+      <link href="2021/03/26/2TS/"/>
+      <url>2021/03/26/2TS/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Learning-Two-Time-scale-Representation-for-Large-Scale-Sequential-Interaction-Data"><a href="#Learning-Two-Time-scale-Representation-for-Large-Scale-Sequential-Interaction-Data" class="headerlink" title="Learning Two Time-scale Representation for Large Scale Sequential Interaction Data"></a>Learning Two Time-scale Representation for Large Scale Sequential Interaction Data</h1><h2 id="Core-Ideas"><a href="#Core-Ideas" class="headerlink" title="Core Ideas"></a>Core Ideas</h2><h3 id="Preset"><a href="#Preset" class="headerlink" title="Preset"></a>Preset</h3><ul><li>In a dynamic network, users have interactions with items</li><li>User embedding will influence the embedding of items and the reverse also works</li></ul><h3 id="Idea"><a href="#Idea" class="headerlink" title="Idea"></a>Idea</h3><ul><li>Some active people or hot items seems static in the Graphical Network, which means that we can remove the edges linked to them</li></ul>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Introduction to Graphical Model</title>
+      <link href="2021/03/26/Introduction-to-Graphical-Model/"/>
+      <url>2021/03/26/Introduction-to-Graphical-Model/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Dynamic Network</title>
       <link href="2021/03/25/Dynamic-Network/"/>
       <url>2021/03/25/Dynamic-Network/</url>
