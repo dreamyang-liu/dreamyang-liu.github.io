@@ -20,13 +20,15 @@
     var CONFIG = {"hostname":"dreamyang-liu.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
+  <meta name="description" content="Binary Exponentiation Binary Exponentiation(for short BE) is a technique that can accelerate the calculation of exponentiation. For a naive exponentiation of \(a^N\), the time complexity is \(O(N)\),">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Binary Exponentiation">
 <meta property="og:url" content="https://dreamyang-liu.github.io/2023/08/06/Binary-Exponentiation/index.html">
 <meta property="og:site_name" content="Tuntun&#39;s Blog">
+<meta property="og:description" content="Binary Exponentiation Binary Exponentiation(for short BE) is a technique that can accelerate the calculation of exponentiation. For a naive exponentiation of \(a^N\), the time complexity is \(O(N)\),">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-08-07T00:41:25.000Z">
-<meta property="article:modified_time" content="2023-08-07T00:41:25.121Z">
+<meta property="article:modified_time" content="2023-08-07T03:23:48.461Z">
 <meta property="article:author" content="Tuntun">
 <meta name="twitter:card" content="summary">
 
@@ -170,8 +172,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2023-08-06 17:41:25" itemprop="dateCreated datePublished" datetime="2023-08-06T17:41:25-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 17:41:25 / Modified: 20:23:48" itemprop="dateCreated datePublished" datetime="2023-08-06T17:41:25-07:00">2023-08-06</time>
             </span>
 
           
@@ -185,7 +188,42 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h2 id="binary-exponentiation">Binary Exponentiation</h2>
+<p>Binary Exponentiation(for short BE) is a technique that can
+accelerate the calculation of exponentiation. For a naive exponentiation
+of <span class="math inline">\(a^N\)</span>, the time complexity is
+<span class="math inline">\(O(N)\)</span>, with BE, the time complexity
+is <span class="math inline">\(O(logN)\)</span>. Let's start with an
+example, <span class="math display">\[
+23 ^ {14} = 23 ^{2 + 4 + 8} = 23 ^ 2 \times 23 ^ 4 \times 23 ^ 8
+\]</span></p>
+<p>Assuming <span class="math inline">\(N\)</span> is a 32-bit integer,
+which means at most we only need to calculate 32 times and see whether
+<span class="math inline">\(a^i\)</span> is included.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">fastPower</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> exp)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (exp == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (exp == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> a;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> <span class="variable">base</span> <span class="operator">=</span> a;</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(exp &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((exp &amp; <span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">            result *= base;</span><br><span class="line">        &#125;</span><br><span class="line">        base *= base;</span><br><span class="line">        exp &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="matrix-binary-exponentiation">Matrix Binary Exponentiation</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Matrix <span class="title function_">matrixFastPower</span><span class="params">(Matrix A, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">	<span class="type">Matrix</span> <span class="variable">ans</span> <span class="operator">=</span> I;</span><br><span class="line">	<span class="keyword">while</span>(n)</span><br><span class="line">	&#123;</span><br><span class="line">	    <span class="keyword">if</span>(n &amp; <span class="number">1</span>)</span><br><span class="line">	        ans = ans * A;</span><br><span class="line">	    A = A * A;</span><br><span class="line">	    n &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Matrix fast power is mainly used for linear recursive counting
+problems, as well as some dynamic programming problems where the state
+transition equation is a linear recursive relationship. There are some
+counting problems where the pattern can be observed by manually deducing
+small cases of n, and guess the recursive relationship. If this
+recursive relationship is linear, then it can be transformed into a
+matrix power problem, which can be accelerated using matrix fast
+power.</p>
+<p><span class="math display">\[
+\begin{bmatrix} f(n) \\ f(n + 1) \end{bmatrix} = A^{n}\begin{bmatrix}
+f(0) \\ f(1) \end{bmatrix} = {\begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 1
+\end{bmatrix}}^{n}\begin{bmatrix} f(0) \\ f(1) \end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+f(n) = 3f(n-1) + 6f(n-2) -7f(n-3)
+\]</span></p>
+<p><span class="math display">\[
+\begin{bmatrix} f(1) \\ f(2) \\ f(3) \end{bmatrix} = \begin{bmatrix} 0
+&amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \\ -7 &amp; 6 &amp; 3
+\end{bmatrix}\begin{bmatrix} f(0) \\ f(1) \\ f(2) \end{bmatrix}
+\]</span></p>
 
     </div>
 
@@ -266,6 +304,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#binary-exponentiation"><span class="nav-number">1.</span> <span class="nav-text">Binary Exponentiation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#matrix-binary-exponentiation"><span class="nav-number">1.1.</span> <span class="nav-text">Matrix Binary Exponentiation</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
