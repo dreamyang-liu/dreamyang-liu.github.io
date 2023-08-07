@@ -29,8 +29,10 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png">
 <meta property="og:image" content="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png">
+<meta property="og:image" content="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png">
+<meta property="og:image" content="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png">
 <meta property="article:published_time" content="2023-08-07T01:07:54.000Z">
-<meta property="article:modified_time" content="2023-08-07T04:23:45.502Z">
+<meta property="article:modified_time" content="2023-08-07T04:30:16.050Z">
 <meta property="article:author" content="Tuntun">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png">
@@ -177,7 +179,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-08-06 18:07:54 / Modified: 21:23:45" itemprop="dateCreated datePublished" datetime="2023-08-06T18:07:54-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 18:07:54 / Modified: 21:30:16" itemprop="dateCreated datePublished" datetime="2023-08-06T18:07:54-07:00">2023-08-06</time>
             </span>
 
           
@@ -265,7 +267,7 @@ the need of system.</p>
 names into Internet Protocol (IP) addresses. DNS maps the name that
 people use to locate a website to the IP address that a computer uses to
 locate that website.</p>
-<p><img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns"></p>
+<p><img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns" width="500"></p>
 <h3 id="web-tier">Web Tier</h3>
 <p>Web Tier mainly refers to Web Service. Web service mainly contains
 business logic. Like fetching the data from database and return to user
@@ -295,6 +297,7 @@ Cache works as a middle-ware inside the system and it can be scaled
 idenpendently. It also brings a series of challenges like cache
 overheat, cache missing and data synchronization. Like data tier, we
 will use a single post to discuss it in detail.</p>
+<p><img src="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png" alt="cache" height="270"></p>
 <h3 id="message-queue">Message Queue</h3>
 <p>Sometimes we may think if there's chain of service calling. How could
 these subsystem to scale independently. i.e If service A is trying to
@@ -307,6 +310,7 @@ into play.</p>
 publish messages to a MQ regardless of whether consumers are working or
 not. At the same time, consumers can consume messages from a MQ
 regardless of whether producers are working or not.</p>
+<p><img src="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png" alt="mq"></p>
 
     </div>
 
