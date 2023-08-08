@@ -355,6 +355,22 @@
 
               <time title="Created: 2023-08-06 21:44:20" itemprop="dateCreated datePublished" datetime="2023-08-06T21:44:20-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-07 22:11:31" itemprop="dateModified" datetime="2023-08-07T22:11:31-07:00">2023-08-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+                </span>
+            </span>
 
           
 
@@ -367,7 +383,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>Fenwick Tree is an advanced data structure.</p>
 
       
     </div>
@@ -471,6 +487,22 @@
 
               <time title="Created: 2023-08-06 18:20:51" itemprop="dateCreated datePublished" datetime="2023-08-06T18:20:51-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-07 22:09:25" itemprop="dateModified" datetime="2023-08-07T22:09:25-07:00">2023-08-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/System-Design/" itemprop="url" rel="index"><span itemprop="name">System Design</span></a>
+                </span>
+            </span>
 
           
 
@@ -483,7 +515,48 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>Consistent Hashing is a technique that commonly used in distributed
+system to <strong><em>distribute data into different servers / services
+/data centers</em></strong>. It can make sure:</p>
+<ol type="1">
+<li>data -&gt; node mapping is calcluated using hash function, data
+<span class="math inline">\(d_i\)</span> will be sent to the first node
+<span class="math inline">\(n_j\)</span> that has hash value <span
+class="math inline">\(f(n_j) \ge f(d_i)\)</span></li>
+<li>When adding/removing nodes, only partial data need to do remapping,
+most data won't be affected.</li>
+<li>Compared to traditional hash mapping, consistent hashing can make a
+more balanced data distributing</li>
+</ol>
+<h2 id="methodology">Methodology</h2>
+<p>Here is a brief digram of how consistent hashing works.
+<img src="https://www.kuniga.me/resources/blog/2019-04-12-consistent-hashing/2019_04_consistent_hash.png" alt="ch"></p>
+<p>Consistent hashing is trying do the following:</p>
+<ol type="1">
+<li>Create a hashing ring <span class="math inline">\([0,
+2^{32}-1]\)</span> and evenly distribute existing node on the ring.</li>
+<li>Calculate the hashing value of the data and send it to the first
+node which has greater hashing value.</li>
+<li>When S3 node get removed, only the scope from <span
+class="math inline">\([f(S3), f(S4)]\)</span> be remaaped to S2.</li>
+</ol>
+<p>The above consistent hashing seems look good, however, some servers
+may be overloaded where as some servers are idel all the time. In this
+case, we may observe that, a large percentage of hash values of datas
+fall into a range i.e <span class="math inline">\([a, b]\)</span> which
+is a subdomain of whole hash ring.</p>
+<p><img src="https://ivoroshilin.files.wordpress.com/2013/07/ring_mapping1.png" alt="ihs"></p>
+<p>In the above diagram, most ids fall into the scope of IP2, which
+represents as an imbalanced distribution. To resolve such issue, we
+introduced virual node to more evenly distribute the workload.</p>
+<p><img src="https://ihong5.files.wordpress.com/2014/08/object-mapping-modified-consistent-hashing.png" alt="vhs"></p>
+<p>Instread of having one node to represent the physical server on the
+hash ring, we actually create multiple virtual node and distribute them
+across the hash ring domain. In this case, if the data fall into a
+subdomain, we can still map them into different physical servers. At the
+same time, if we add or remove node, affected scope will be much smaller
+than naive consistent hashing since each segment will be much
+smaller.</p>
 
       
     </div>
@@ -1079,7 +1152,7 @@ piles is equal to the length of longest increasing sequence.</p>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
