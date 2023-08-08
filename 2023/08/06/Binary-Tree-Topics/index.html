@@ -27,11 +27,13 @@
 <meta property="og:site_name" content="Tuntun&#39;s Blog">
 <meta property="og:description" content="Traverse There&#39;re a lot intereting topics about the traverse of binary tree like the in-order traverse of BST is a sorted sequence. And we may also want to know how to conduct a level tarverse(using q">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.ytimg.com/vi/WLvU5EQVZqY/maxresdefault.jpg">
 <meta property="article:published_time" content="2023-08-07T00:42:02.000Z">
-<meta property="article:modified_time" content="2023-08-08T03:53:37.490Z">
+<meta property="article:modified_time" content="2023-08-08T04:11:46.040Z">
 <meta property="article:author" content="Tuntun">
 <meta property="article:tag" content="Binary Tree">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.ytimg.com/vi/WLvU5EQVZqY/maxresdefault.jpg">
 
 <link rel="canonical" href="https://dreamyang-liu.github.io/2023/08/06/Binary-Tree-Topics/">
 
@@ -191,7 +193,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-07 20:53:37" itemprop="dateModified" datetime="2023-08-07T20:53:37-07:00">2023-08-07</time>
+                <time title="Modified: 2023-08-07 21:11:46" itemprop="dateModified" datetime="2023-08-07T21:11:46-07:00">2023-08-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -219,7 +221,8 @@
 like the in-order traverse of BST is a sorted sequence. And we may also
 want to know how to conduct a level tarverse(using queue) and it's the
 fundamental of doing Breathe First Search(BFS). We will discuss these
-topics as well when we go through each section below.</p>
+topics as well when we go through each section below.
+<img src="https://i.ytimg.com/vi/WLvU5EQVZqY/maxresdefault.jpg" alt="traverse"></p>
 <h3 id="pre-order-traverse">Pre-order Traverse</h3>
 <p>Pre-order traverse will visit root node -&gt; left child -&gt; right
 child.</p>
@@ -280,7 +283,15 @@ array</h3>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TreeNode <span class="title function_">buildBST</span><span class="params">(<span class="type">int</span>[] array, <span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(left == right) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(array[left]);</span><br><span class="line">    <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left + right) / <span class="number">2</span>;</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">left</span> <span class="operator">=</span> buildBST(array, left, mid - <span class="number">1</span>);</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">right</span> <span class="operator">=</span> buildBST(array, mid + <span class="number">1</span>, right);</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(arr[mid]);</span><br><span class="line">    root.left = left;</span><br><span class="line">    root.right = right;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="possible-bsts">Possible BSTs</h3>
 <h3 id="bfs-level-order-traverse">BFS / Level Order Traverse</h3>
+<p>Breadth First Search / Level order traverse tries to scan each level
+and print the value.</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(root == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line">    Queue&lt;TreeNode&gt; q = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">    q.offer(root);</span><br><span class="line">    <span class="keyword">while</span>(!q.isEmpty()) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> q.size();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++) &#123;</span><br><span class="line">            <span class="type">TreeNode</span> <span class="variable">current</span> <span class="operator">=</span> q.poll();</span><br><span class="line">            System.out.print(current.val);</span><br><span class="line">            <span class="keyword">if</span>(current.left != <span class="literal">null</span>) q.offer(current.left);</span><br><span class="line">            <span class="keyword">if</span>(current.right != <span class="literal">null</span>) q.offer(current.right);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(current.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Level order traverse can be treated as an extended variant of
+Pre-order traverse. As for per-order traverse, we do operation on the
+single root node and then move to its left child and right child. But
+for level traverse, we can treat the nodes at the same level as a node
+and after we finish doing operations on this "Big Node", we move to its
+child.</p>
 
     </div>
 
