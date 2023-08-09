@@ -28,7 +28,7 @@
 <meta property="og:description" content="Shuffle Algorithm Fisher–Yates shuffle Algorithm can be used to generate randomized permutation of array. The principal behind the algorithm is that we need to make sure each pair of index i.e \((i, j">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-08-09T05:57:16.000Z">
-<meta property="article:modified_time" content="2023-08-09T06:25:51.488Z">
+<meta property="article:modified_time" content="2023-08-09T06:33:03.938Z">
 <meta property="article:author" content="Tuntun">
 <meta property="article:tag" content="Randomize">
 <meta name="twitter:card" content="summary">
@@ -185,7 +185,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-08-08 22:57:16 / Modified: 23:25:51" itemprop="dateCreated datePublished" datetime="2023-08-08T22:57:16-07:00">2023-08-08</time>
+              <time title="Created: 2023-08-08 22:57:16 / Modified: 23:33:03" itemprop="dateCreated datePublished" datetime="2023-08-08T22:57:16-07:00">2023-08-08</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -216,12 +216,13 @@ j)\)</span> need to have the same probablity of exchange.</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>[] shuffle(<span class="type">int</span>[] arr) &#123;</span><br><span class="line">    <span class="type">Random</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=n-<span class="number">1</span>;i&gt;<span class="number">0</span>;i--) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> random.nextInt() % (i + <span class="number">1</span>);</span><br><span class="line">        <span class="type">int</span> <span class="variable">tmp</span> <span class="operator">=</span> arr[i];</span><br><span class="line">        arr[i] = arr[j];</span><br><span class="line">        arr[j] = tmp;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>In the above implementation, for each <span
 class="math inline">\(i\)</span>, we randomly choose a <span
-class="math inline">\(j \in [0, i]\)</span> that to conduct exchange.
-<em>Note here we also include <span class="math inline">\(i\)</span>
+class="math inline">\(j \in [0, i]\)</span> that to conduct
+exchange.</p>
+<p><em>Note that we also include <span class="math inline">\(i\)</span>
 since it's possible we don't change it at all.</em></p>
-<p>It means that we cover all pairs <span class="math inline">\((i, j) \
-\ j \in [0, i]\)</span>, and as we iterate i from <span
-class="math inline">\(n-1\)</span> to <span
+<p>In this way, we are able to cover all pairs <span
+class="math inline">\((i, j) \ \ j \in [0, i]\)</span>, and as we
+iterate i from <span class="math inline">\(n-1\)</span> to <span
 class="math inline">\(1\)</span>, we will be able to cover all
 pairs.</p>
 
