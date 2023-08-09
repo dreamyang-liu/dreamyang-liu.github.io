@@ -181,6 +181,13 @@
 
               <time title="Created: 2023-08-06 21:45:50" itemprop="dateCreated datePublished" datetime="2023-08-06T21:45:50-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:19:19" itemprop="dateModified" datetime="2023-08-08T22:19:19-07:00">2023-08-08</time>
+              </span>
 
           
 
@@ -239,6 +246,13 @@
 
               <time title="Created: 2023-08-06 21:45:14" itemprop="dateCreated datePublished" datetime="2023-08-06T21:45:14-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:18:59" itemprop="dateModified" datetime="2023-08-08T22:18:59-07:00">2023-08-08</time>
+              </span>
 
           
 
@@ -297,6 +311,13 @@
 
               <time title="Created: 2023-08-06 21:44:40" itemprop="dateCreated datePublished" datetime="2023-08-06T21:44:40-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:18:55" itemprop="dateModified" datetime="2023-08-08T22:18:55-07:00">2023-08-08</time>
+              </span>
 
           
 
@@ -360,7 +381,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-08 22:10:15" itemprop="dateModified" datetime="2023-08-08T22:10:15-07:00">2023-08-08</time>
+                <time title="Modified: 2023-08-08 22:26:30" itemprop="dateModified" datetime="2023-08-08T22:26:30-07:00">2023-08-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -384,10 +405,19 @@
 
       
           <p>Fenwick Tree, also known as binary indexed tree, is a data structure
-that supports point updates and range queries. It is based on the
-assumption that any prefix <span class="math inline">\([1,n]\)</span>
-can be decomposed into at most logn ranges, such that the information of
-these logn ranges is known.</p>
+that supports <code>single point updates</code> and
+<code>range queries</code>. In most case, we can use it to query range
+sum, range product or other operation that satisify:</p>
+<ol type="1">
+<li>Associative Law: <span class="math inline">\((x * y) * z = x * (y *
+z)\)</span></li>
+<li>Having inverse operation, we can infer y given <span
+class="math inline">\(x * y\)</span> and <span
+class="math inline">\(x\)</span></li>
+</ol>
+<p>It is based on the assumption that any prefix <span
+class="math inline">\([1,n]\)</span> can be decomposed into at most logn
+ranges, such that the information of these logn ranges is known.</p>
 <p><img src="https://oi-wiki.org/ds/images/fenwick.svg" alt="ft"></p>
 <p>As we can see from the above figure, the right boundary of the range
 controlled by each position <span class="math inline">\(c_i\)</span> is
@@ -402,7 +432,7 @@ controlled by <span class="math inline">\(c_{12}\)</span> is <span
 class="math inline">\([12 - 4 + 1, 12]\)</span>. <span
 class="math inline">\(2^k\)</span> can be obtained using the lowbit,
 which is <span class="math inline">\(x\  \&amp; \ (-x)\)</span> .</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">lowbit</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> x &amp; (-x);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">updateFT</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> index, <span class="type">int</span> val)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">diff</span> <span class="operator">=</span> val - ft[index];</span><br><span class="line">    <span class="keyword">while</span>(index &lt;= ft.length - <span class="number">1</span>) &#123;</span><br><span class="line">        ft[index] += diff;</span><br><span class="line">        index += lowbit(index);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">createFT</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">    <span class="type">int</span>[] ft = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">        updateFT(ft, i, arr[i-<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">getSum</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> end)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(end &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ret += ft[end];</span><br><span class="line">        end -= lowbit(end);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">lowbit</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> x &amp; (-x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Single Point update</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">updateFT</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> index, <span class="type">int</span> val)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">diff</span> <span class="operator">=</span> val - ft[index];</span><br><span class="line">    <span class="keyword">while</span>(index &lt;= ft.length - <span class="number">1</span>) &#123;</span><br><span class="line">        ft[index] += diff;</span><br><span class="line">        index += lowbit(index);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">createFT</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">    <span class="type">int</span>[] ft = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">        updateFT(ft, i, arr[i-<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">getSum</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> end)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(end &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ret += ft[end];</span><br><span class="line">        end -= lowbit(end);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -448,6 +478,22 @@ which is <span class="math inline">\(x\  \&amp; \ (-x)\)</span> .</p>
 
               <time title="Created: 2023-08-06 21:43:42" itemprop="dateCreated datePublished" datetime="2023-08-06T21:43:42-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:26:00" itemprop="dateModified" datetime="2023-08-08T22:26:00-07:00">2023-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+                </span>
+            </span>
 
           
 
@@ -460,7 +506,13 @@ which is <span class="math inline">\(x\  \&amp; \ (-x)\)</span> .</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>Segment trees are a data structure commonly used to maintain interval
+information.</p>
+<p>Segment trees can be implemented in <span class="math inline">\(O(log
+N)\)</span> time complexity to perform operations such as
+<code>single point update</code>, <code>range update</code>, and
+<code>range query</code> (sum of range, maximum of range, minimum of
+range).</p>
 
       
     </div>
@@ -618,10 +670,16 @@ smaller.</p>
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-08-06 18:07:54 / Modified: 22:16:28" itemprop="dateCreated datePublished" datetime="2023-08-06T18:07:54-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 18:07:54" itemprop="dateCreated datePublished" datetime="2023-08-06T18:07:54-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:19:42" itemprop="dateModified" datetime="2023-08-08T22:19:42-07:00">2023-08-08</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -1046,10 +1104,16 @@ f(n) = 3f(n-1) + 6f(n-2) -7f(n-3)
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-08-06 17:39:49 / Modified: 18:06:13" itemprop="dateCreated datePublished" datetime="2023-08-06T17:39:49-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 17:39:49" itemprop="dateCreated datePublished" datetime="2023-08-06T17:39:49-07:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-08 22:19:31" itemprop="dateModified" datetime="2023-08-08T22:19:31-07:00">2023-08-08</time>
+              </span>
 
           
 
@@ -1171,7 +1235,7 @@ piles is equal to the length of longest increasing sequence.</p>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
