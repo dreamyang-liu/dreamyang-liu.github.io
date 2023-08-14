@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"dreamyang-liu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Shuffle Algorithm Fisher–Yates shuffle Algorithm can be used to generate randomized permutation of array. The principal behind the algorithm is that we need to make sure each pair of index i.e \((i, j">
+  <meta name="description" content="Weighed random() random() is an important function that will return a random number with same probability. Weighed random() requires us to generate random number with different weights. 12345Example:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Random Algorithm">
 <meta property="og:url" content="https://dreamyang-liu.github.io/2023/08/08/Random-Algorithm/index.html">
 <meta property="og:site_name" content="Tuntun&#39;s Blog">
-<meta property="og:description" content="Shuffle Algorithm Fisher–Yates shuffle Algorithm can be used to generate randomized permutation of array. The principal behind the algorithm is that we need to make sure each pair of index i.e \((i, j">
+<meta property="og:description" content="Weighed random() random() is an important function that will return a random number with same probability. Weighed random() requires us to generate random number with different weights. 12345Example:">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-08-09T05:57:16.000Z">
-<meta property="article:modified_time" content="2023-08-09T06:33:03.938Z">
+<meta property="article:published_time" content="2023-08-09T02:57:16.000Z">
+<meta property="article:modified_time" content="2023-08-10T06:08:11.988Z">
 <meta property="article:author" content="Tuntun">
 <meta property="article:tag" content="Randomize">
 <meta name="twitter:card" content="summary">
@@ -118,6 +118,11 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
         <li class="menu-item menu-item-tags">
 
     <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
@@ -126,11 +131,6 @@
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
   </li>
   </ul>
@@ -183,10 +183,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-08-08 22:57:16 / Modified: 23:33:03" itemprop="dateCreated datePublished" datetime="2023-08-08T22:57:16-07:00">2023-08-08</time>
+              <time title="Created: 2023-08-08 22:57:16" itemprop="dateCreated datePublished" datetime="2023-08-08T22:57:16-04:00">2023-08-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-10 02:08:11" itemprop="dateModified" datetime="2023-08-10T02:08:11-04:00">2023-08-10</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -208,7 +214,46 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="shuffle-algorithm">Shuffle Algorithm</h2>
+        <h2 id="weighed-random">Weighed <code>random()</code></h2>
+<p><code>random()</code> is an important function that will return a
+random number with same probability. <em>Weighed random()</em> requires
+us to generate random number with different weights.</p>
+<figure class="highlight latex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Example: A = [10, 50, 20, 20], then if we note P(x) as the probability of return x, we have:</span><br><span class="line">P(0) = 10 / 100 = 0.1</span><br><span class="line">P(1) = 50 / 100 = 0.5</span><br><span class="line">P(2) = 20 / 100 = 0.2</span><br><span class="line">P(3) = 20 / 100 = 0.2</span><br></pre></td></tr></table></figure>
+<p>A naive approach could be we can create an array of <span
+class="math inline">\(100\)</span> elements. And we randomly set <span
+class="math inline">\(10\)</span> elements to <span
+class="math inline">\(0\)</span>, <span
+class="math inline">\(50\)</span> elements to <span
+class="math inline">\(1\)</span>, <span
+class="math inline">\(20\)</span> elements to <span
+class="math inline">\(2\)</span> and <span
+class="math inline">\(20\)</span> elements to <span
+class="math inline">\(3\)</span>. Then we can randomly pick an index
+from <span class="math inline">\(0\)</span> to <span
+class="math inline">\(99\)</span>, and reutrn the value on the picked
+index. However, the above method has a really obvious drawback. It will
+consume a lot memory and setting value will take a lot time as well.</p>
+<p>Instead of creating an array, can we compress the info there ? Ther
+answer is <strong>yes</strong>, let's think about the prefix sum array
+<span class="math inline">\(W&#39;\)</span>of the weights array <span
+class="math inline">\(W\)</span> of size <span
+class="math inline">\(n\)</span> (0-indexed).</p>
+<p><span class="math display">\[
+w&#39;_k = \sum_0^{k-1} w_i
+\]</span> Then given an array, we have <span
+class="math inline">\(|W&#39;| = |W| + 1\)</span> and <span
+class="math inline">\(w&#39;_{n+1} = \sum_0^{n} w_i\)</span>. And we can
+extract <span class="math inline">\(n\)</span> intervals <span
+class="math inline">\(D_i:[w&#39;_i, w&#39;_{i+1}],\ i \in \{0,1 \dots
+n\}\)</span> from <span class="math inline">\(W&#39;\)</span>. And each
+interval correspond to the weight length. Which means, if we randomly
+pick an index <span class="math inline">\(k\)</span>, the probability of
+<span class="math inline">\(k\)</span> fall in to <span
+class="math inline">\(D_i\)</span> is <span
+class="math inline">\(\frac{w_i}{\sum_0^{n-1} w_j}\)</span>.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    TreeMap&lt;Integer, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;();</span><br><span class="line">    <span class="type">int</span> <span class="variable">sw</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">Random</span> <span class="variable">rng</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Solution</span><span class="params">(<span class="type">int</span>[] w)</span> &#123;</span><br><span class="line">        map.put(sw, <span class="number">0</span>);</span><br><span class="line">        sw += w[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;w.length;i++) &#123;</span><br><span class="line">            map.put(sw, i);</span><br><span class="line">            sw += w[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">pickIndex</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">number</span> <span class="operator">=</span> Math.abs(rng.nextInt()) % sw;</span><br><span class="line">        <span class="keyword">return</span> map.get(map.floorKey(number));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="shuffle-algorithm">Shuffle Algorithm</h2>
 <p>Fisher–Yates shuffle Algorithm can be used to generate randomized
 permutation of array. The principal behind the algorithm is that we need
 to make sure each pair of index i.e <span class="math inline">\((i,
@@ -243,7 +288,7 @@ pairs.</p>
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/08/06/Monotonic-Stack-Queue/" rel="prev" title="Monotonic Stack/Queue">
+    <a href="/2023/08/07/Monotonic-Stack-Queue/" rel="prev" title="Monotonic Stack/Queue">
       <i class="fa fa-chevron-left"></i> Monotonic Stack/Queue
     </a></div>
       <div class="post-nav-item">
@@ -308,7 +353,7 @@ pairs.</p>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-algorithm"><span class="nav-number">1.</span> <span class="nav-text">Shuffle Algorithm</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#weighed-random"><span class="nav-number">1.</span> <span class="nav-text">Weighed random()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-algorithm"><span class="nav-number">2.</span> <span class="nav-text">Shuffle Algorithm</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -322,7 +367,7 @@ pairs.</p>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -335,7 +380,7 @@ pairs.</p>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

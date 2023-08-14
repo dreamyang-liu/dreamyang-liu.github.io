@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dreamyang-liu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Chapter 2 各种JOINS Inner join 1234567891011121314SELECT o.order_id, o.customer_id, c.first_name, c.last_nameFROM orders as oINNER JOIN customers as cON o.customer_id &#x3D; c.customer_id-- the word inner is">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL Chapter 2 各种JOINS">
+<meta property="og:url" content="https://dreamyang-liu.github.io/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/index.html">
+<meta property="og:site_name" content="Tuntun&#39;s Blog">
+<meta property="og:description" content="Chapter 2 各种JOINS Inner join 1234567891011121314SELECT o.order_id, o.customer_id, c.first_name, c.last_nameFROM orders as oINNER JOIN customers as cON o.customer_id &#x3D; c.customer_id-- the word inner is">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-14T02:41:07.000Z">
+<meta property="article:modified_time" content="2023-08-14T02:42:15.060Z">
+<meta property="article:author" content="Tuntun">
+<meta property="article:tag" content="MYSQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://dreamyang-liu.github.io/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>SQL Chapter 2 各种JOINS | Tuntun's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tuntun's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SQL Chapter 2 各种JOINS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-08-13 22:41:07 / Modified: 22:42:15" itemprop="dateCreated datePublished" datetime="2023-08-13T22:41:07-04:00">2023-08-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="chapter-2-各种joins">Chapter 2 各种JOINS</h1>
+<p>Inner join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> o.order_id, o.customer_id, c.first_name, c.last_name</span><br><span class="line"><span class="keyword">FROM</span> orders <span class="keyword">as</span> o</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> customers <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">ON</span> o.customer_id <span class="operator">=</span> c.customer_id</span><br><span class="line"><span class="comment">-- the word inner is optional</span></span><br><span class="line"><span class="comment">-- this join customers table and orders table together side by side</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice:</span></span><br><span class="line"><span class="keyword">SELECT</span> o.order_id, o.product_id, o.quantity, o.unit_price</span><br><span class="line"><span class="keyword">FROM</span> order_items <span class="keyword">AS</span> o</span><br><span class="line"><span class="keyword">JOIN</span> products <span class="keyword">AS</span> p</span><br><span class="line"><span class="keyword">ON</span> o.product_id <span class="operator">=</span> p.product_id</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">by</span> o.order_id</span><br></pre></td></tr></table></figure>
+<p>join with different database</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> order_items oi</span><br><span class="line"><span class="keyword">join</span> sql_inventory.products p</span><br><span class="line"><span class="keyword">on</span> oi.product_id <span class="operator">=</span> p.product_id</span><br><span class="line"><span class="comment">-- only need to prefix the table is not currently in the databse</span></span><br></pre></td></tr></table></figure>
+<p>Self Join:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">USE sql_hr;</span><br><span class="line"><span class="keyword">SELECT</span> e.employee_id, e.first_name, m.first_name <span class="keyword">as</span> manager</span><br><span class="line"><span class="keyword">FROM</span> employees e</span><br><span class="line">	<span class="keyword">join</span> employees m</span><br><span class="line">	<span class="keyword">on</span> e.reports_to <span class="operator">=</span> m.employee_id;</span><br><span class="line"><span class="comment">-- same as joining with other table, only difference is need different name</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- Join mutiple table</span></span><br><span class="line">USE sql_store;</span><br><span class="line"><span class="keyword">SELECT</span> o.order_id, o.order_date, c.first_name, c.last_name, [os.name](http:<span class="operator">/</span><span class="operator">/</span>os.name<span class="operator">/</span>) <span class="keyword">AS</span> status</span><br><span class="line"><span class="keyword">From</span> orders o</span><br><span class="line">	<span class="keyword">Join</span> customers c</span><br><span class="line">	<span class="keyword">on</span> o.customer_id <span class="operator">=</span> c.customer_id</span><br><span class="line">	<span class="keyword">Join</span> order_statuses os</span><br><span class="line">	<span class="keyword">on</span> o.status <span class="operator">=</span> os. order_status_id</span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line">USE sql_invoicing;</span><br><span class="line"><span class="keyword">SELECT</span> [c.name](http:<span class="operator">/</span><span class="operator">/</span>c.name<span class="operator">/</span>) <span class="keyword">as</span> client, [pm.name](http:<span class="operator">/</span><span class="operator">/</span>pm.name<span class="operator">/</span>), p.date, p.invoice_id, p.amount</span><br><span class="line"><span class="keyword">FROM</span> payments <span class="keyword">as</span> p</span><br><span class="line"><span class="keyword">Join</span> payment_methods <span class="keyword">as</span> pm</span><br><span class="line"><span class="keyword">On</span> p.payment_method <span class="operator">=</span> pm.payment_method_id</span><br><span class="line"><span class="keyword">Join</span> clients <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">ON</span> p.client_id <span class="operator">=</span> c.client_id</span><br></pre></td></tr></table></figure>
+<p>compound join condition</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">From</span> order_items <span class="keyword">as</span> oi</span><br><span class="line"><span class="keyword">Join</span> order_item_notes <span class="keyword">as</span> oin</span><br><span class="line"><span class="keyword">on</span> oi.product_id <span class="operator">=</span> oin.product_id <span class="keyword">AND</span> oi.order_id <span class="operator">=</span> oin.order_Id</span><br><span class="line"><span class="comment">-- 有两个primary key的要弄两次</span></span><br></pre></td></tr></table></figure>
+<p>implicit join syntax</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">From</span> orders o</span><br><span class="line"><span class="keyword">join</span> customers <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">on</span> o.customer_id <span class="operator">=</span> c.customer_id;</span><br><span class="line"><span class="comment">-- they are the same, but not recommend the following method</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">From</span> orders <span class="keyword">as</span> o, customers <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">WHERE</span> o.customer_id <span class="operator">=</span> c.customer_id</span><br><span class="line">if forget <span class="keyword">to</span> put <span class="keyword">where</span>, <span class="keyword">then</span> <span class="keyword">every</span> record <span class="keyword">from</span> orders will <span class="keyword">join</span> <span class="keyword">with</span> <span class="keyword">every</span> customer <span class="keyword">table</span></span><br></pre></td></tr></table></figure>
+<p>Outer joins</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- two types: left join and right join</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">c.customer_id,</span><br><span class="line">c.first_name,</span><br><span class="line">o.order_id</span><br><span class="line"><span class="keyword">FROM</span> customers c</span><br><span class="line"><span class="keyword">right</span> <span class="keyword">JOIN</span> orders o</span><br><span class="line">	<span class="keyword">ON</span> c.customer_id <span class="operator">=</span> o.customer_id</span><br><span class="line"><span class="comment">-- left join return all record from left table (in this case customers)</span></span><br><span class="line"><span class="comment">-- right join return all record from right table (orders table) </span></span><br><span class="line">		<span class="comment">-- regardless ON whatwhatwhat</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line"><span class="keyword">SELECT</span> p.product_id, [p.name](http:<span class="operator">/</span><span class="operator">/</span>p.name<span class="operator">/</span>), oi.quantity</span><br><span class="line"><span class="keyword">FROM</span> products <span class="keyword">as</span> p</span><br><span class="line">	<span class="keyword">left</span> <span class="keyword">join</span> order_items <span class="keyword">as</span> oi</span><br><span class="line">	<span class="keyword">on</span> p.product_id <span class="operator">=</span> oi.product_id</span><br></pre></td></tr></table></figure>
+<p>outer join with mutiple tables</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> c.customer_id, c.first_name, o.order_id, [sh.name](http:<span class="operator">/</span><span class="operator">/</span>sh.name<span class="operator">/</span>) shipper</span><br><span class="line"><span class="keyword">FROM</span> customers c</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> orders o</span><br><span class="line"><span class="keyword">ON</span> c.customer_id <span class="operator">=</span> o.customer_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> shippers sh</span><br><span class="line"><span class="keyword">ON</span> o.shipper_id <span class="operator">=</span> sh.shipper_id</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> c.customer_id</span><br><span class="line"><span class="comment">-- avoid right join, use left join as comprehensive purpose</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line"><span class="keyword">SELECT</span> o.order_date, o.order_id, c.first_name, [s.name](http:<span class="operator">/</span><span class="operator">/</span>s.name<span class="operator">/</span>) <span class="keyword">as</span> shipper, [os.name](http:<span class="operator">/</span><span class="operator">/</span>os.name<span class="operator">/</span>) <span class="keyword">as</span> status</span><br><span class="line"><span class="keyword">FROM</span> orders <span class="keyword">as</span> o</span><br><span class="line"><span class="keyword">JOIN</span> order_statuses <span class="keyword">as</span> os</span><br><span class="line"><span class="keyword">ON</span> o.status <span class="operator">=</span> os.order_status_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> shippers <span class="keyword">as</span> s</span><br><span class="line"><span class="keyword">ON</span> o.shipper_id <span class="operator">=</span> s.shipper_id</span><br><span class="line"><span class="keyword">JOIN</span> customers <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">ON</span> o.customer_id <span class="operator">=</span> c.customer_id</span><br><span class="line"></span><br><span class="line">USE sql_hr;</span><br><span class="line"><span class="keyword">SELECT</span> e.employee_id, e.first_name, m.first_name <span class="keyword">AS</span> manager</span><br><span class="line"><span class="keyword">FROM</span> employees e</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> employees m</span><br><span class="line"><span class="keyword">ON</span> e.reports_to <span class="operator">=</span> m.employee_id</span><br></pre></td></tr></table></figure>
+<p>USING</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> o.order_id, c.first_name</span><br><span class="line"><span class="keyword">FROM</span> orders o</span><br><span class="line"><span class="keyword">JOIN</span> customers c</span><br><span class="line"><span class="comment">-- ON o.customer_id = c.customer_id</span></span><br><span class="line"><span class="keyword">USING</span> (customer_id)</span><br><span class="line"><span class="comment">-- using can shorter 但必须两个表里都有相同名字的列</span></span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> shippers s</span><br><span class="line"><span class="keyword">USING</span> (shipper_id);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> order_items oi</span><br><span class="line"><span class="keyword">JOIN</span> order_item_nots oin</span><br><span class="line"><span class="comment">-- on oi-order_if = poin.order_id AND oi.product_id = oin.product_id</span></span><br><span class="line"><span class="keyword">USING</span> (order_id, product_id)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line">USE sql_invoicing;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> p.date, [c.name](http:<span class="operator">/</span><span class="operator">/</span>c.name<span class="operator">/</span>) <span class="keyword">as</span> client, p.amount, [pm.name](http:<span class="operator">/</span><span class="operator">/</span>pm.name<span class="operator">/</span>)</span><br><span class="line"><span class="keyword">FROM</span> payments <span class="keyword">AS</span> p</span><br><span class="line"><span class="keyword">JOIN</span> payment_methods <span class="keyword">as</span> pm</span><br><span class="line"><span class="keyword">ON</span> p.payment_method <span class="operator">=</span> pm.payment_method_id</span><br><span class="line"><span class="keyword">JOIN</span> clients <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">USING</span> (client_id);</span><br></pre></td></tr></table></figure>
+<p>natural join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- let the engine to join together </span></span><br><span class="line"><span class="comment">-- (you don&#x27;t know how it will join, no control) discourage to use</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> orders <span class="keyword">as</span> o</span><br><span class="line"><span class="keyword">NATURAL</span> <span class="keyword">JOIN</span> customers <span class="keyword">as</span> c</span><br></pre></td></tr></table></figure>
+<p>— cross join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 链接第一个表的每条记录和第二个表的每条记录</span></span><br><span class="line"><span class="keyword">SELECT</span> c.first_name <span class="keyword">as</span> customer, [p.name](http:<span class="operator">/</span><span class="operator">/</span>p.name<span class="operator">/</span>) <span class="keyword">AS</span> product</span><br><span class="line"><span class="keyword">FROM</span> customers c</span><br><span class="line"><span class="comment">-- implicit one</span></span><br><span class="line"><span class="keyword">FROM</span> customers c, orders o</span><br><span class="line"><span class="comment">-- explicit one</span></span><br><span class="line"><span class="keyword">CROSS</span> <span class="keyword">JOIN</span> products p</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> c.first_name</span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> shippers, products</span><br><span class="line"><span class="keyword">FROM</span> shippers <span class="keyword">as</span> s</span><br><span class="line"><span class="keyword">CROSS</span> <span class="keyword">JOIN</span> products <span class="keyword">as</span> p</span><br></pre></td></tr></table></figure>
+<p>Unions:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- can from same table or different table</span></span><br><span class="line"><span class="keyword">SELECT</span> order_id, order_date, <span class="string">&#x27;Active&#x27;</span> <span class="keyword">AS</span> status</span><br><span class="line"><span class="keyword">FROM</span> orders</span><br><span class="line"><span class="keyword">WHERE</span> order_date <span class="operator">&gt;=</span> <span class="string">&#x27;2019-01-01&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> order_id, order_date, <span class="string">&#x27;Archived&#x27;</span> <span class="keyword">AS</span> status</span><br><span class="line"><span class="keyword">FROM</span> orders</span><br><span class="line"><span class="keyword">WHERE</span> order_date <span class="operator">&lt;=</span> <span class="string">&#x27;2019-01-01&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- number of columns you want to return must be equal</span></span><br><span class="line"><span class="keyword">SELECT</span> first_name <span class="keyword">FROM</span> customers <span class="comment">-- 第一段查询写了啥都会被用来决定列名</span></span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> name <span class="keyword">FROM</span> shippers</span><br><span class="line"></span><br><span class="line"><span class="comment">-- practice</span></span><br><span class="line"><span class="keyword">SELECT</span> customer_id, first_name, points, <span class="string">&#x27;Bronze&#x27;</span> <span class="keyword">as</span> type</span><br><span class="line"><span class="keyword">FROM</span> customers</span><br><span class="line"><span class="keyword">WHERE</span> points <span class="operator">&lt;</span> <span class="number">2000</span></span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> customer_id, first_name, points, <span class="string">&#x27;Sliver&#x27;</span> <span class="keyword">as</span> type</span><br><span class="line"><span class="keyword">FROM</span> customers</span><br><span class="line"><span class="keyword">WHERE</span> points <span class="keyword">BETWEEN</span> <span class="number">2000</span> <span class="keyword">AND</span> <span class="number">3000</span></span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> customer_id, first_name, points, <span class="string">&#x27;Gold&#x27;</span> <span class="keyword">as</span> type</span><br><span class="line"><span class="keyword">FROM</span> customers</span><br><span class="line"><span class="keyword">WHERE</span> points <span class="operator">&gt;</span> <span class="number">3000</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> first_name</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MYSQL/" rel="tag"># MYSQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/" rel="prev" title="SQL Chapter 1 intro/LIKE/LIMIT/REGEXP/IS NULL">
+      <i class="fa fa-chevron-left"></i> SQL Chapter 1 intro/LIKE/LIMIT/REGEXP/IS NULL
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#chapter-2-%E5%90%84%E7%A7%8Djoins"><span class="nav-number">1.</span> <span class="nav-text">Chapter 2 各种JOINS</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tuntun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tuntun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

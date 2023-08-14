@@ -113,6 +113,11 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
         <li class="menu-item menu-item-tags">
 
     <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
@@ -121,11 +126,6 @@
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
   </li>
   </ul>
@@ -155,6 +155,197 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/06/System-Design-Fundamentals/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/06/System-Design-Fundamentals/" class="post-title-link" itemprop="url">System Design Fundamentals</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-06 21:07:54" itemprop="dateCreated datePublished" datetime="2023-08-06T21:07:54-04:00">2023-08-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-09 01:28:10" itemprop="dateModified" datetime="2023-08-09T01:28:10-04:00">2023-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/System-Design/" itemprop="url" rel="index"><span itemprop="name">System Design</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="cap-theorem">CAP Theorem</h2>
+<p>The CAP theorem, or Brewer's theorem, states that a distributed
+database system can only guarantee two out of three characteristics:
+consistency, availability, and partition tolerance. The system
+prioritizes availability over consistency and can respond with possibly
+stale data.</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png" alt="cap" width="300"></p>
+<h3 id="partition-tolerance">Partition Tolerance</h3>
+<p>在CAP理论中,Partition
+Tolerance(分区容忍性)是指系统在发生网络分区故障的时候,仍然能够对外提供服务的能力。</p>
+<p>所谓网络分区故障,是指系统中的节点被分成两部分,节点间的网络通信被阻断。在这种情况下,一个分布式系统可能会表现出下面两种行为:</p>
+<ol type="1">
+<li><p>无法对外提供服务 整个系统不可用,对用户不可见。</p></li>
+<li><p>以牺牲一致性为代价继续服务
+系统继续对用户可见,但返回的数据可能不一致。</p></li>
+</ol>
+<p>Partition
+Tolerance表示系统能够承受网络分区的发生,继续对外服务而不会完全崩溃。根据CAP理论,一个系统不可能同时满足一致性(Consistency)、可用性(Availability)和分区容忍性,最多只能同时满足两个。</p>
+<p>所以一个Partition
+Tolerance系统通常会牺牲数据一致性来保证服务可用性。比如允许读取到过期数据,或两个分区的数据产生冲突。这在许多大规模分布式系统中都是可接受的权衡。</p>
+<p>一个典型的Partition Tolerance(分区容忍性)的例子是DNS系统。</p>
+<p>DNS采用了分布式的树形结构,一个域名由多个DNS服务器共同提供解析服务。当网络发生分区时,可能出现如下情况:</p>
+<ol type="1">
+<li><p>某区域用户无法访问部分DNS服务器,但可以访问到另一部分服务器,仍能得到域名解析结果。</p></li>
+<li><p>不同的DNS服务器返回了不同的解析结果(IP地址不一致),但用户还是能得到响应。</p></li>
+</ol>
+<p>这就是DNS系统表现出来的Partition
+Tolerance性质。当网络分区发生时,DNS系统为了继续服务,承受返回不一致数据的结果,而没有选择完全停止响应。</p>
+<p>Partition
+Tolerance的另一个例子是一些分布式缓存系统,如Memcached。当节点间失去联系时,不同分区的数据可能不一致,但每个分区内部仍能继续使用本地缓存,整个系统不会完全停止服务。</p>
+<p>这些系统都采用了设计理念:“允许读取脏数据”或者“允许短暂不一致”来实现Partition
+Tolerance。因为对大多数应用来说,与整个系统完全不可用相比,读取到陈旧或不一致的数据仍是可以接受的。</p>
+<h2 id="modern-distrbuted-system-components">Modern Distrbuted System
+Components</h2>
+<h3 id="load-balancer">Load Balancer</h3>
+<p>Load Balancer is the entry point of an web application. It will
+distribute incoming customer traffic to difference worker/servers. It
+can help</p>
+<ol type="1">
+<li>Avoid a single server to be overloaded</li>
+<li>Redirect request to healthy server when one server become
+unavailable.</li>
+</ol>
+<p>Load Balancer plays an important role in enabling system to scale
+horizontally. AWS provides the following load balancer services:</p>
+<ol type="1">
+<li>Classic Load Balancer: mainly used to distribute traffic to EC2
+instances</li>
+<li>Application Load Balancer: more flexible, choose this one by
+default.</li>
+<li><em>Network Load Balancer</em></li>
+<li><em>Gateway Load Balancer</em></li>
+</ol>
+<h3 id="cdn">CDN</h3>
+<p>Content Delivery Network(CDN) is a service provided by third-party
+for fast file delivery. By providing a single endpoint, CDN servie will
+automatically route to the closet server to fetch the static files. It
+is mainly used to serve static files like HTML, javascript file and
+images. It can also host some files like video, tarball etc. It can:</p>
+<ol type="1">
+<li>Reduce the load of web server</li>
+<li>Accelerate the file retrievel by fetching file from closest
+server.</li>
+</ol>
+<p>There is a TTL(Time to live) need to set for CDN. If TTL is set to be
+a small value, it will need to update the cache from source very often,
+the charge of data transfer will increase. If TTL is set to be a large
+value, customer may get stale file. The TTL should be set according to
+the need of system.</p>
+<h3 id="dns">DNS</h3>
+<p>The Domain Name System (DNS) is a database that translates domain
+names into Internet Protocol (IP) addresses. DNS maps the name that
+people use to locate a website to the IP address that a computer uses to
+locate that website.</p>
+<p><img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns" width="500"></p>
+<h3 id="web-tier">Web Tier</h3>
+<p>Web Tier mainly refers to Web Service. Web service mainly contains
+business logic. Like fetching the data from database and return to user
+or submit an order on behalf of user etc. Ideally, web tier should be
+stateless since it can make web tier eailer to scale horizontally.</p>
+<h3 id="data-tier">Data Tier</h3>
+<p>Data Tier mainly refers to database or persistent storage. The
+"persistent" means even if the server shut down, the data will not be
+lost. On the contaray, some in-memory cache system will lose all data if
+server get shut down. As data becomes more and more complex, people
+developed various data base system to accomodate different use case.</p>
+<ol type="1">
+<li>Relational Database</li>
+<li>NoSQL (Not only SQL)</li>
+</ol>
+<p>Giving an expressive decription of database here would be too
+ambitious, we will use a single post to discuss it in detail.</p>
+<h3 id="cache-tier">Cache Tier</h3>
+<p>Cacher Tier emerges as querying database is such an expensive
+operation. In the mean while, some request can also be expensive like
+running a model to give calculation. Thanks to the <strong>Principle of
+Locality</strong>, we know the tendency of a processor to access the
+same set of memory locations repetitively over a short period of time.
+It means that the same data could be used multiple times over a short
+period of time. And that makes cache tier useful in real production.
+Cache works as a middle-ware inside the system and it can be scaled
+idenpendently. It also brings a series of challenges like cache
+overheat, cache missing and data synchronization. Like data tier, we
+will use a single post to discuss it in detail.</p>
+<p><img src="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png" alt="cache" height="270"></p>
+<h3 id="message-queue">Message Queue</h3>
+<p>Sometimes we may think if there's chain of service calling. How could
+these subsystem to scale independently. i.e If service A is trying to
+call service B, if service B is not available at the time when service A
+made the call, then service A must wait, otherwise we will lose the
+request from customer. We may want something that can abstract service's
+input producer and outcome consumer. Here is what message queue come
+into play.</p>
+<p>Message queues serve as temporary storage services. Producers can
+publish messages to a MQ regardless of whether consumers are working or
+not. At the same time, consumers can consume messages from a MQ
+regardless of whether producers are working or not.</p>
+<p><img src="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png" alt="mq"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/06/Binary-Exponentiation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -178,10 +369,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-08-06 17:41:25 / Modified: 22:26:20" itemprop="dateCreated datePublished" datetime="2023-08-06T17:41:25-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 20:41:25" itemprop="dateCreated datePublished" datetime="2023-08-06T20:41:25-04:00">2023-08-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-07 01:26:20" itemprop="dateModified" datetime="2023-08-07T01:26:20-04:00">2023-08-07</time>
+              </span>
 
           
 
@@ -273,14 +470,14 @@ f(n) = 3f(n-1) + 6f(n-2) -7f(n-3)
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2023-08-06 17:39:49" itemprop="dateCreated datePublished" datetime="2023-08-06T17:39:49-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 20:39:49" itemprop="dateCreated datePublished" datetime="2023-08-06T20:39:49-04:00">2023-08-06</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-08 22:19:31" itemprop="dateModified" datetime="2023-08-08T22:19:31-07:00">2023-08-08</time>
+                <time title="Modified: 2023-08-09 01:19:31" itemprop="dateModified" datetime="2023-08-09T01:19:31-04:00">2023-08-09</time>
               </span>
 
           
@@ -350,7 +547,7 @@ piles is equal to the length of longest increasing sequence.</p>
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-08-06 16:40:51 / Modified: 17:39:26" itemprop="dateCreated datePublished" datetime="2023-08-06T16:40:51-07:00">2023-08-06</time>
+              <time title="Created: 2023-08-06 19:40:51 / Modified: 20:39:26" itemprop="dateCreated datePublished" datetime="2023-08-06T19:40:51-04:00">2023-08-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -415,6 +612,156 @@ situations:</p>
 <h2
 id="i-hope-you-can-find-the-post-useful-and-thanks-for-reading-it"><span class="emoji" alias="tada" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f389.png?v8">&#x1f389;</span>
 I hope you can find the post useful and thanks for reading it!</h2>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/06/Binary-Tree-Topics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/06/Binary-Tree-Topics/" class="post-title-link" itemprop="url">Binary Tree Topics</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-06 17:42:02" itemprop="dateCreated datePublished" datetime="2023-08-06T17:42:02-04:00">2023-08-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-13 22:22:59" itemprop="dateModified" datetime="2023-08-13T22:22:59-04:00">2023-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="traverse">Traverse</h2>
+<p>There're a lot intereting topics about the traverse of binary tree
+like the in-order traverse of BST is a sorted sequence. And we may also
+want to know how to conduct a level tarverse(using queue) and it's the
+fundamental of doing Breadth First Search(BFS). We will discuss these
+topics as well when we go through each section below.
+<img src="https://i.ytimg.com/vi/WLvU5EQVZqY/maxresdefault.jpg" alt="traverse"></p>
+<h3 id="pre-order-traverse">Pre-order Traverse</h3>
+<p>Pre-order traverse will visit root node -&gt; left child -&gt; right
+child.</p>
+<h3 id="in-order-traverse">In-Order Traverse</h3>
+<p>In-order traverse will visit left child -&gt; root node -&gt; right
+child. The in-order traverse of BST will return a sorted array.</p>
+<h3 id="post-order-traverse">Post-Order Traverse</h3>
+<p>In-order traverse will visit left child -&gt; right node -&gt; root
+child.</p>
+<blockquote>
+<p>To determine a binary tree, we need in-order sequence + pre-order /
+post-order sequence.</p>
+</blockquote>
+<h3 id="methodology-of-solving-binary-tree-problems">Methodology of
+solving Binary Tree Problems</h3>
+<p>One important observation is that when we take a look at the position
+of root node, from pre-order to post-order, it goes from the first to
+the last. Since we always visit left child before visiting right child.
+We can treat the difference among different traverses is only
+<strong><em>when to do operation on root node</em></strong>.</p>
+<p>Then we can formulate questions into several scenarios:</p>
+<ol type="1">
+<li>To do the operation on root node, you need to do the operation on
+left subtree and right subtree first. (Merge Sort)</li>
+<li>To do the operation on root node, you need to do operation on its
+parent node first. (Get the depth of Binary Tree)</li>
+<li>To do the operation on root node, you need to do the operation on
+left/right subtree first. (Check BST)</li>
+</ol>
+<p>The above three scenarios roughly covered all three traverse methods.
+Given a problem, we need to pay attention that <strong>what is the
+operation for a given node</strong>, and <strong><em>when to do it.
+Pre-order, In-order or Post-order</em></strong> ?</p>
+<blockquote>
+<p>Binary Search Tree(BST) is a kind of special Binary Tree that for a
+given root node the left subtree only contains nodes with value less
+than root node, and right subtree only contains nodes with value greater
+than root node.</p>
+</blockquote>
+<h2 id="classic-topics-problems">Classic Topics / Problems</h2>
+<p>Here are some famous topics and problems that you may want to know.
+### Lowest Common Ancestor Lowest Common Ancestor problem is trying to
+get the lowest common ancestor node of two given nodes.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">TreeNode <span class="title function_">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNoe t1, TreeNode t2)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(root == <span class="literal">null</span> || root == t1 || root == t2) <span class="keyword">return</span> root;</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">l</span> <span class="operator">=</span> lowestCommonAncestor(root.left, t1, t2);</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">r</span> <span class="operator">=</span> lowestCommonAncestor(root.right, t1, t2);</span><br><span class="line">    <span class="keyword">if</span>(l != <span class="literal">null</span> &amp;&amp; r != <span class="literal">null</span>) <span class="keyword">return</span> root;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(l != <span class="literal">null</span>) <span class="keyword">return</span> l;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(r != <span class="literal">null</span>) <span class="keyword">return</span> r;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>To analysis the solution in a way that fit into the 3 scenarios
+mentioned above. Let's think about what operation do we need to do for a
+single node. Basically, we need to traverse every node in the binary
+tree to determine whether the node is the LCA that we want. For a given
+node, LCA could be this node, but to confirm this, we need to make sure
+that both target nodes are within it's subtree. Which means we can only
+confirm this unless we finish checking it's left subtree and right
+subtree. Which means it's actually a post-order traverse.</p>
+<h3 id="serialized-and-deseriazlied-binary-tree">Serialized and
+Deseriazlied Binary Tree</h3>
+<h3 id="create-an-bst-from-sorted-array">Create an BST from sorted
+array</h3>
+<p>Creating an BST from sorte array is another interesting topic.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TreeNode <span class="title function_">buildBST</span><span class="params">(<span class="type">int</span>[] array, <span class="type">int</span> left, <span class="type">int</span> right)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(left == right) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(array[left]);</span><br><span class="line">    <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left + right) / <span class="number">2</span>;</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">left</span> <span class="operator">=</span> buildBST(array, left, mid - <span class="number">1</span>);</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">right</span> <span class="operator">=</span> buildBST(array, mid + <span class="number">1</span>, right);</span><br><span class="line">    <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(arr[mid]);</span><br><span class="line">    root.left = left;</span><br><span class="line">    root.right = right;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="possible-bsts">Possible BSTs</h3>
+<p>Given an sorted array, return all possible BSTs.</p>
+<h3 id="bfs-level-order-traverse">BFS / Level Order Traverse</h3>
+<p>Breadth First Search / Level order traverse tries to scan each level
+and print the value.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(root == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line">    Queue&lt;TreeNode&gt; q = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">    q.offer(root);</span><br><span class="line">    <span class="keyword">while</span>(!q.isEmpty()) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> q.size();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++) &#123;</span><br><span class="line">            <span class="type">TreeNode</span> <span class="variable">current</span> <span class="operator">=</span> q.poll();</span><br><span class="line">            System.out.print(current.val);</span><br><span class="line">            <span class="keyword">if</span>(current.left != <span class="literal">null</span>) q.offer(current.left);</span><br><span class="line">            <span class="keyword">if</span>(current.right != <span class="literal">null</span>) q.offer(current.right);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(current.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Level order traverse can be treated as an extended variant of
+Pre-order traverse. As for per-order traverse, we do operation on the
+single root node and then move to its left child and right child. But
+for level traverse, we can treat the nodes at the same level as a node
+and after we finish doing operations on this "Big Node", we move to its
+child.</p>
 
       
     </div>
@@ -499,7 +846,7 @@ I hope you can find the post useful and thanks for reading it!</h2>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -512,7 +859,7 @@ I hope you can find the post useful and thanks for reading it!</h2>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
