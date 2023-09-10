@@ -155,6 +155,569 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/09/09/RateLimiter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/09/RateLimiter/" class="post-title-link" itemprop="url">RateLimiter Algorithm</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-09-09 18:04:07 / Modified: 18:51:57" itemprop="dateCreated datePublished" datetime="2023-09-09T18:04:07-07:00">2023-09-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>RateLimiter is a curcial component in a distributed system. Normally
+we can used it to avoid DDoS or malicious request. In this post, we are
+going the introduce several algorithm that can be used to do Rate
+Limiting.</p>
+<h3 id="token-bucket">Token Bucket</h3>
+<p>A token bucket is a container that has pre-defined capacity. Tokens
+are put in the bucket at preset rates periodically. Once the bucket is
+full, no more tokens are added. As shown in Figure, the token bucket
+capacity is 4. The refiller puts 2 tokens into the bucket every second.
+Once the bucket is full, extra tokens will overflow.</p>
+<p><img src="/images/Token-Bucket.png" width="350"></p>
+<p>Token Bucket can handle burst request and can make sure the limit
+won't exceed the preset capacity.</p>
+<h3 id="leaking-bucket">Leaking Bucket</h3>
+<p>Leaking Bucket is like Token Bucket but it acts like a FIFO queue.
+The leaking bucket has a process rate which indicate how many requests
+it can processs per seconds. And when a request come, it will first
+check whether the queue is full or not, if not, add the request to the
+queue, otherwise drop the request. Request in the queue are pulled from
+the queue and processed at regulard intervals.</p>
+<p><img src="/images/Leaking-Bucket.png" width="800"></p>
+<p>One concern with Leaking Bucket is that it was processed in an FIFO
+way, if the queue was filled with old request, new request will be
+rate-limited.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/09/08/Golang-Tutorial-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/08/Golang-Tutorial-1/" class="post-title-link" itemprop="url">Golang Tutorial 1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-08 23:54:54" itemprop="dateCreated datePublished" datetime="2023-09-08T23:54:54-07:00">2023-09-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-09 18:12:49" itemprop="dateModified" datetime="2023-09-09T18:12:49-07:00">2023-09-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/09/08/Rust-Tutorial-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/08/Rust-Tutorial-1/" class="post-title-link" itemprop="url">Rust Tutorial 1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-09-08 23:54:25 / Modified: 23:54:57" itemprop="dateCreated datePublished" datetime="2023-09-08T23:54:25-07:00">2023-09-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/09/02/Backtracking-Template/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/02/Backtracking-Template/" class="post-title-link" itemprop="url">Backtracking Template</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-02 20:31:31" itemprop="dateCreated datePublished" datetime="2023-09-02T20:31:31-07:00">2023-09-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-08 21:20:39" itemprop="dateModified" datetime="2023-09-08T21:20:39-07:00">2023-09-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="backtracking">Backtracking</h2>
+<p>Backtracking is normally used to search the solution space. Such
+solution space normally is combinatorial solution space which increase
+exponentially. A good example is the permutation problem.</p>
+<p>Given a number <span class="math inline">\(n\)</span>, print out all
+the permutations of numbers of <span class="math inline">\([1,\dots,
+n]\)</span>.</p>
+<p>For this problem, <span class="math inline">\(n = 3\)</span>, the
+expected output should be</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1,2,3</span><br><span class="line">1,3,2</span><br><span class="line">2,1,3</span><br><span class="line">2,3,1</span><br><span class="line">3,2,1</span><br><span class="line">3,1,2</span><br></pre></td></tr></table></figure>
+<p>In this case, we need to use backtrack to help us tackling this
+problem. <strong>Backtrack can save the checkpoint every time when we
+need to make a decision on which candidate to expand. </strong></p>
+<p>Here is a template for Backtracking.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">backtracking</span><span class="params">(List&lt;Candidate&gt; candidates, List&lt;Candidate&gt; partial_solution)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(candidates.isEmpty()) &#123;</span><br><span class="line">        <span class="comment">// save / check / validate partial solution</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span>(each candidate in candidates) &#123;</span><br><span class="line">            <span class="comment">// remove candidate from candidates</span></span><br><span class="line">            <span class="comment">// add candidate to partial solution</span></span><br><span class="line">            backtracking(candidates, partial_solution);</span><br><span class="line">            <span class="comment">// remove candidate from partial solution</span></span><br><span class="line">            <span class="comment">// add candidate back to candidates</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Let's do a partial dry run for the permutation problem.</p>
+<ol type="1">
+<li>We pick <span class="math inline">\(1\)</span> from
+<code>candidates</code> and remove <span
+class="math inline">\(1\)</span> from it</li>
+<li>We pick <span class="math inline">\(2\)</span> from
+<code>candidates</code> and remove <span
+class="math inline">\(2\)</span> from it</li>
+<li>We pick <span class="math inline">\(3\)</span> from
+<code>candidates</code> and remove <span
+class="math inline">\(3\)</span> from it</li>
+<li><code>candidates</code> is empty and we jump out from backtrack #
+<code>[1,2,3]</code></li>
+<li>We add <span class="math inline">\(3\)</span> back to
+<code>candidates</code> and find there's no other candidate.</li>
+<li>We add <span class="math inline">\(2\)</span> back to
+<code>candidates</code> and move to the next candidate
+<code>3</code></li>
+<li>We pick <span class="math inline">\(3\)</span> from
+<code>candidates</code> and remove <span
+class="math inline">\(3\)</span> from it</li>
+<li>We pick <span class="math inline">\(2\)</span> from
+<code>candidates</code> and remove <span
+class="math inline">\(2\)</span> from it</li>
+<li><code>candidates</code> is empty and we jump out from backtrack #
+<code>[1,3,2]</code></li>
+<li><span class="math inline">\(\dots\)</span></li>
+</ol>
+<figure>
+<img
+src="https://ibpublicimages.s3-us-west-2.amazonaws.com/tutorial/backtracking1.png"
+alt="Backtracking" />
+<figcaption aria-hidden="true">Backtracking</figcaption>
+</figure>
+<p>Now let's give an example of permutation problem.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">List&lt;List&lt;Integer&gt;&gt; permutations = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">backtrack</span><span class="params">(<span class="type">int</span> n, <span class="type">boolean</span>[] visited, List&lt;Integer&gt; solution)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(solution.size() == n) &#123;</span><br><span class="line">        permutations.add(<span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;(solution));</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;=n; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span>(!visited[i]) &#123;</span><br><span class="line">            solution.add(i);</span><br><span class="line">            visited[i] = <span class="literal">true</span>;</span><br><span class="line">            backtrack(n, visited, solution);</span><br><span class="line">            visited[i] = <span class="literal">false</span>;</span><br><span class="line">            solution.remove(solutions.size()-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Obviously, the time complexity is not linear, actually, it should be
+the same of the number of leaf node which is <span
+class="math inline">\(O(N!)\)</span>.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/20/LangChain/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/20/LangChain/" class="post-title-link" itemprop="url">LangChain</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-20 21:08:14" itemprop="dateCreated datePublished" datetime="2023-08-20T21:08:14-07:00">2023-08-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-22 20:37:53" itemprop="dateModified" datetime="2023-08-22T20:37:53-07:00">2023-08-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/15/Docker-Memo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/15/Docker-Memo/" class="post-title-link" itemprop="url">Docker Memo</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-15 13:59:12" itemprop="dateCreated datePublished" datetime="2023-08-15T13:59:12-07:00">2023-08-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 22:25:02" itemprop="dateModified" datetime="2023-09-02T22:25:02-07:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cloud-Computing/" itemprop="url" rel="index"><span itemprop="name">Cloud Computing</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="dockerfile">Dockerfile</h2>
+<p>Dockerfile is a text file that contains the <code>definition</code>
+of a container image, which can be used to launch a container. The
+<code>defintion</code> contains the command, base image, configurations
+etc. In this post, we will go through each component and discuss in what
+scenario we will use them. Let's get started.</p>
+<h2 id="docker-image">Docker image</h2>
+<p>Before we dive into each components, we may want to know what exactly
+a docker image is. Reference: <a
+target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/concepts/about-container-images#structure_of_an_image">structure_of_an_image</a></p>
+<blockquote>
+<p><em>An image is a read-only template with instructions for creating a
+Docker container. Often, an image is_based on another image, with some
+additional customization. --FROM Docker Official</em></p>
+</blockquote>
+<p>Docker image can contains a lot files, to dive deep into detail,
+let's pull an image first.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">alpine3.18: Pulling from library/python</span><br><span class="line">9fda8d8052c6: Pull complete </span><br><span class="line">e7ae3e644d56: Pull complete </span><br><span class="line">4da8ee49dcce: Pull complete </span><br><span class="line">7c6a85daf644: Pull complete </span><br><span class="line">35f63c7ece91: Pull complete </span><br><span class="line">Digest: sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c</span><br><span class="line">Status: Downloaded newer image for python:alpine3.18</span><br><span class="line">docker.io/library/python:alpine3.18</span><br></pre></td></tr></table></figure>
+<p>From the above output, we know that we pull
+<code>python:alpine3.18</code> image from dockerhub and this image has 5
+layers.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sha256:0e3cec02f9651c77b976ef920ee7414ed059a7be05fb9b0c1e091afbfccd6f32&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RepoTags&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;python:alpine3.18&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RepoDigests&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;python@sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Parent&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Comment&quot;</span><span class="punctuation">:</span> <span class="string">&quot;buildkit.dockerfile.v0&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Created&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2023-07-22T09:54:20Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Container&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ContainerConfig&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Domainname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;User&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdout&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStderr&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Tty&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OpenStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;StdinOnce&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Env&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Cmd&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Volumes&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;WorkingDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Entrypoint&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OnBuild&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;DockerVersion&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Config&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Domainname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;User&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdout&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStderr&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Tty&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OpenStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;StdinOnce&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Env&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;LANG=C.UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_VERSION=3.11.4&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_PIP_VERSION=23.1.2&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_SETUPTOOLS_VERSION=65.5.1&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_GET_PIP_SHA256=45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Cmd&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;python3&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;ArgsEscaped&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Volumes&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;WorkingDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Entrypoint&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OnBuild&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Architecture&quot;</span><span class="punctuation">:</span> <span class="string">&quot;arm64&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Variant&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v8&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Os&quot;</span><span class="punctuation">:</span> <span class="string">&quot;linux&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Size&quot;</span><span class="punctuation">:</span> <span class="number">57440899</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;VirtualSize&quot;</span><span class="punctuation">:</span> <span class="number">57440899</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;GraphDriver&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Data&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;LowerDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/bc0dd55b4f4eca654fb57ec3ab9997d5511bb31e1fbaa1e37e55d2d0c953ae78/diff:/var/lib/docker/overlay2/667b39e359e38324b6665b23a88143302006a058bccf71cc4465b5abc8f1394c/diff:/var/lib/docker/overlay2/d46312d087510c9820f8a8bf37bf437eda7f8f11a36bfc1497a2ce2a7d9d87de/diff:/var/lib/docker/overlay2/8a1a8952108eed0ca2e6b9b225204b1869cd946e345c7df86434ed56ce1a8a2b/diff&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;MergedDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/merged&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;UpperDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/diff&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;WorkDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/work&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;overlay2&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RootFS&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;layers&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Layers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;sha256:b2191e2be29d816fa6fbde954316d54e10df9a882c7ca38e3e087d9cbca49fe6&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:07c9596e31dd51b9652cd1ca250dbb2632b60b9930a41f8b35f723ad64f7759d&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:91225753119dc0605d12eeb9754f640054c6c8d936db3c0d7b9a382ddddcf1ec&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:cc409c6a686ee7a64acc8c0569f57e1a3c93cd53c82e782d8f2a623daa9cda64&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:edd41b2a090ce8eef948b7d3979bda4726c46c3a5cee13fbe1b87acdbf6315b6&quot;</span></span><br><span class="line">            <span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Metadata&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;LastTagTime&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0001-01-01T00:00:00Z&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+<h2 id="base-image-parent-image">Base Image / Parent Image</h2>
+<p>In most Dockerfiles, the first line you will see is
+<code>FROM &#123;base image&#125;</code> like <code>FROM python:3.8</code>.</p>
+<p>This line defines the base image of the image we are going to build.
+The base image may contains one or more layers.</p>
+<h2 id="run">RUN</h2>
+<p><code>RUN</code> command can be use to execute some command like
+installing packages, downloading files etc. One thing need to mention is
+that each command will add a new layer to existing image. Combining
+multiple command into a single <code>RUN</code> command is a common
+trick to make image smaller and with fewer layers.</p>
+<h2 id="cmd">CMD</h2>
+<p>The CMD describes the default container parameters or commands. The
+user can easily override the default command when you use this. ##
+ENTRYPOINT ENTRYPOINT is also used to define the commands that will
+<strong><em>ALWAYS</em></strong> run, which means it cannot be override.
+ENTRYPOINT can be used to ensure that a specific command is always run
+when a container starts, even if the user tries to override it.</p>
+<h2 id="copy">COPY</h2>
+<p><code>COPY</code> can be used to copy local files into container
+image, and that's all.</p>
+<h2 id="add">ADD</h2>
+<p><code>ADD</code> command also allows copying files/folders from host
+to image. It supports tarball extraction and remote URL support.
+Generally, <code>ADD</code> is more preferrable than <code>COPY</code>.
+Now let's take an example of using <code>ADD</code> in Dockerfile.</p>
+<p>Assuming we are in a folder <code>/tmp/app</code> and it has the
+following files,</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">server.js node_modules package.json</span><br></pre></td></tr></table></figure>
+<p>At the same time we write the following command to our Dockerfile.
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ADD</span><span class="language-bash"> server.js /tmp</span></span><br><span class="line"><span class="comment"># ADD &lt;host path&gt; &lt;image path&gt;</span></span><br></pre></td></tr></table></figure> The above commmand will copy the file
+<code>/tmp/app/server.js</code>(host path) to
+<code>/tmp/server.js</code>(container image path). <strong><em>One thing
+we notice that the first argument should be within the
+context</em></strong>, the context can be interpreted as the path where
+we execute the <code>docker build</code> command.</p>
+<h2 id="volume">VOLUME</h2>
+<p>Volume can be treated as a persistent data storage for docker
+container. The following command means any container launched from this
+image, the <code>/var/www/html</code> directory on the host machine will
+be mounted to the <code>/var/www/html directory</code> inside the
+container. This means that any changes made to the
+<code>/var/www/html</code> directory inside the container will be
+reflected on the host machine, and vice versa.</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">VOLUME</span><span class="language-bash"> /var/www/html</span></span><br></pre></td></tr></table></figure>
+<h2 id="dive"><em>Dive</em></h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/wagoodman/dive">Dive</a> is a very useful
+tool to analyze the container image. It enable you to see each layers'
+command and change that reflected on the file system.</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/wagoodman/dive/main/.data/demo.gif"
+alt="Dive" />
+<figcaption aria-hidden="true">Dive</figcaption>
+</figure>
+<h2 id="reference">Reference</h2>
+<ol type="1">
+<li><a
+target="_blank" rel="noopener" href="https://github.com/opencontainers/image-spec/blob/main/manifest.md#oci-image-manifest-specification">OCI
+Image Manifest Specification</a></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -180,7 +743,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-08-13 22:41:07 / Modified: 22:42:15" itemprop="dateCreated datePublished" datetime="2023-08-13T22:41:07-04:00">2023-08-13</time>
+              <time title="Created: 2023-08-13 19:41:07 / Modified: 19:42:15" itemprop="dateCreated datePublished" datetime="2023-08-13T19:41:07-07:00">2023-08-13</time>
             </span>
 
           
@@ -261,7 +824,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-08-13 22:39:45 / Modified: 22:42:28" itemprop="dateCreated datePublished" datetime="2023-08-13T22:39:45-04:00">2023-08-13</time>
+              <time title="Created: 2023-08-13 19:39:45 / Modified: 19:42:28" itemprop="dateCreated datePublished" datetime="2023-08-13T19:39:45-07:00">2023-08-13</time>
             </span>
 
           
@@ -340,15 +903,24 @@ intro/LIKE/LIMIT/REGEXP/IS NULL</h1>
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2023-08-08 22:58:04" itemprop="dateCreated datePublished" datetime="2023-08-08T22:58:04-04:00">2023-08-08</time>
+              <time title="Created: 2023-08-08 22:58:04" itemprop="dateCreated datePublished" datetime="2023-08-08T22:58:04-07:00">2023-08-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-10 02:11:35" itemprop="dateModified" datetime="2023-08-10T02:11:35-04:00">2023-08-10</time>
+                <time title="Modified: 2023-09-02 20:28:34" itemprop="dateModified" datetime="2023-09-02T20:28:34-07:00">2023-09-02</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Overview/" itemprop="url" rel="index"><span itemprop="name">Overview</span></a>
+                </span>
+            </span>
 
           
 
@@ -366,8 +938,19 @@ world. Knowing the fundamental of Linux System could benfit developer in
 a lot of aspects. In this blog, we will explore some fundamental
 topics.</p>
 <h2 id="file-system">File System</h2>
+<p>You can find a more detailed <a
+target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">File
+system Hierarchy</a> here.</p>
 <h2 id="kernel">Kernel</h2>
 <h2 id="environment-variable">Environment Variable</h2>
+<h3 id="path">PATH</h3>
+<p><code>PATH</code> is one of the most important environment variable.
+By default, it will have the value of</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:</span><br></pre></td></tr></table></figure>
+<p>When you type a command, it will search all the above folders and
+find whether there's a file with same name can be found. The user need
+to have the permission to execute the file other wise it will raise a
+permission error <code>zsh: permission denied: db.json</code>.</p>
 <h2 id="external-devices">External Devices</h2>
 
       
@@ -412,14 +995,14 @@ topics.</p>
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2023-08-08 22:57:16" itemprop="dateCreated datePublished" datetime="2023-08-08T22:57:16-04:00">2023-08-08</time>
+              <time title="Created: 2023-08-08 19:57:16" itemprop="dateCreated datePublished" datetime="2023-08-08T19:57:16-07:00">2023-08-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-10 02:08:11" itemprop="dateModified" datetime="2023-08-10T02:08:11-04:00">2023-08-10</time>
+                <time title="Modified: 2023-08-09 23:08:11" itemprop="dateModified" datetime="2023-08-09T23:08:11-07:00">2023-08-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -513,503 +1096,10 @@ pairs.</p>
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/07/Monotonic-Stack-Queue/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/07/Monotonic-Stack-Queue/" class="post-title-link" itemprop="url">Monotonic Stack/Queue</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-07 00:45:50" itemprop="dateCreated datePublished" datetime="2023-08-07T00:45:50-04:00">2023-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-09 01:19:19" itemprop="dateModified" datetime="2023-08-09T01:19:19-04:00">2023-08-09</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/07/Union-Find/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/07/Union-Find/" class="post-title-link" itemprop="url">Union Find</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-07 00:45:14" itemprop="dateCreated datePublished" datetime="2023-08-07T00:45:14-04:00">2023-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-09 01:18:59" itemprop="dateModified" datetime="2023-08-09T01:18:59-04:00">2023-08-09</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/07/Trie-Tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/07/Trie-Tree/" class="post-title-link" itemprop="url">Trie Tree</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-07 00:44:40" itemprop="dateCreated datePublished" datetime="2023-08-07T00:44:40-04:00">2023-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-09 01:18:55" itemprop="dateModified" datetime="2023-08-09T01:18:55-04:00">2023-08-09</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/07/Fenwick-Tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/07/Fenwick-Tree/" class="post-title-link" itemprop="url">Fenwick Tree</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-07 00:44:20" itemprop="dateCreated datePublished" datetime="2023-08-07T00:44:20-04:00">2023-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-09 01:27:05" itemprop="dateModified" datetime="2023-08-09T01:27:05-04:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Fenwick Tree, also known as binary indexed tree, is a data structure
-that supports <code>single point updates</code> and
-<code>range queries</code>. In most case, we can use it to query range
-sum, range product or other operation that satisify:</p>
-<ol type="1">
-<li>Associative Law: <span class="math inline">\((x * y) * z = x * (y *
-z)\)</span></li>
-<li>Having inverse operation, we can infer y given <span
-class="math inline">\(x * y\)</span> and <span
-class="math inline">\(x\)</span></li>
-</ol>
-<p>It is based on the assumption that any prefix <span
-class="math inline">\([1,n]\)</span> can be decomposed into at most
-<span class="math inline">\(\log n\)</span> ranges, such that the
-information of these logn ranges is known.</p>
-<p><img src="https://oi-wiki.org/ds/images/fenwick.svg" alt="ft"></p>
-<p>As we can see from the above figure, the right boundary of the range
-controlled by each position <span class="math inline">\(c_i\)</span> is
-<span class="math inline">\(i\)</span>. In Fenwick, <span
-class="math inline">\(c_i\)</span> is assigned to control a range of
-length <span class="math inline">\(2^k\)</span>. Here, <span
-class="math inline">\(k\)</span> is the number of the first 1 bit from
-the right, minus 1. For example, <span class="math inline">\(12 =
-(1100)_2\)</span>, then <span class="math inline">\(k = 2\)</span>, and
-<span class="math inline">\(2^k = 4\)</span>. So in this case, the range
-controlled by <span class="math inline">\(c_{12}\)</span> is <span
-class="math inline">\([12 - 4 + 1, 12]\)</span>. <span
-class="math inline">\(2^k\)</span> can be obtained using the lowbit,
-which is <span class="math inline">\(x\  \&amp; \ (-x)\)</span> .</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">lowbit</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> x &amp; (-x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Single Point update</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">updateFT</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> index, <span class="type">int</span> val)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">diff</span> <span class="operator">=</span> val - ft[index];</span><br><span class="line">    <span class="keyword">while</span>(index &lt;= ft.length - <span class="number">1</span>) &#123;</span><br><span class="line">        ft[index] += diff;</span><br><span class="line">        index += lowbit(index);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">createFT</span><span class="params">(<span class="type">int</span>[] arr)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> arr.length;</span><br><span class="line">    <span class="type">int</span>[] ft = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">        updateFT(ft, i, arr[i-<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">getSum</span><span class="params">(<span class="type">int</span>[] ft, <span class="type">int</span> end)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(end &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ret += ft[end];</span><br><span class="line">        end -= lowbit(end);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/07/Segment-Tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/07/Segment-Tree/" class="post-title-link" itemprop="url">Segment Tree</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-07 00:43:42" itemprop="dateCreated datePublished" datetime="2023-08-07T00:43:42-04:00">2023-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-09 01:28:00" itemprop="dateModified" datetime="2023-08-09T01:28:00-04:00">2023-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Segment trees are a data structure commonly used to maintain interval
-information.</p>
-<p>Segment trees can be implemented in <span
-class="math inline">\(O(\log N)\)</span> time complexity to perform
-operations such as <code>single point update</code>,
-<code>range update</code>, and <code>range query</code> (sum of range,
-maximum of range, minimum of range).</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/06/Consistent-Hashing/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tuntun">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tuntun's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/06/Consistent-Hashing/" class="post-title-link" itemprop="url">Consistent Hashing</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-06 21:20:51" itemprop="dateCreated datePublished" datetime="2023-08-06T21:20:51-04:00">2023-08-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-08 01:09:25" itemprop="dateModified" datetime="2023-08-08T01:09:25-04:00">2023-08-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/System-Design/" itemprop="url" rel="index"><span itemprop="name">System Design</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Consistent Hashing is a technique that commonly used in distributed
-system to <strong><em>distribute data into different servers / services
-/data centers</em></strong>. It can make sure:</p>
-<ol type="1">
-<li>data -&gt; node mapping is calcluated using hash function, data
-<span class="math inline">\(d_i\)</span> will be sent to the first node
-<span class="math inline">\(n_j\)</span> that has hash value <span
-class="math inline">\(f(n_j) \ge f(d_i)\)</span></li>
-<li>When adding/removing nodes, only partial data need to do remapping,
-most data won't be affected.</li>
-<li>Compared to traditional hash mapping, consistent hashing can make a
-more balanced data distributing</li>
-</ol>
-<h2 id="methodology">Methodology</h2>
-<p>Here is a brief digram of how consistent hashing works.
-<img src="https://www.kuniga.me/resources/blog/2019-04-12-consistent-hashing/2019_04_consistent_hash.png" alt="ch"></p>
-<p>Consistent hashing is trying do the following:</p>
-<ol type="1">
-<li>Create a hashing ring <span class="math inline">\([0,
-2^{32}-1]\)</span> and evenly distribute existing node on the ring.</li>
-<li>Calculate the hashing value of the data and send it to the first
-node which has greater hashing value.</li>
-<li>When S3 node get removed, only the scope from <span
-class="math inline">\([f(S3), f(S4)]\)</span> be remaaped to S2.</li>
-</ol>
-<p>The above consistent hashing seems look good, however, some servers
-may be overloaded where as some servers are idel all the time. In this
-case, we may observe that, a large percentage of hash values of datas
-fall into a range i.e <span class="math inline">\([a, b]\)</span> which
-is a subdomain of whole hash ring.</p>
-<p><img src="https://ivoroshilin.files.wordpress.com/2013/07/ring_mapping1.png" alt="ihs"></p>
-<p>In the above diagram, most ids fall into the scope of IP2, which
-represents as an imbalanced distribution. To resolve such issue, we
-introduced virual node to more evenly distribute the workload.</p>
-<p><img src="https://ihong5.files.wordpress.com/2014/08/object-mapping-modified-consistent-hashing.png" alt="vhs"></p>
-<p>Instread of having one node to represent the physical server on the
-hash ring, we actually create multiple virtual node and distribute them
-across the hash ring domain. In this case, if the data fall into a
-subdomain, we can still map them into different physical servers. At the
-same time, if we add or remove node, affected scope will be much smaller
-than naive consistent hashing since each segment will be much
-smaller.</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1075,20 +1165,20 @@ smaller.</p>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

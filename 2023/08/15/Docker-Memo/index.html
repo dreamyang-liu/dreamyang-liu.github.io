@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dreamyang-liu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Dockerfile Dockerfile is a text file that contains the definition of a container image, which can be used to launch a container. The defintion contains the command, base image, configurations etc. In">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker Memo">
+<meta property="og:url" content="https://dreamyang-liu.github.io/2023/08/15/Docker-Memo/index.html">
+<meta property="og:site_name" content="Tuntun&#39;s Blog">
+<meta property="og:description" content="Dockerfile Dockerfile is a text file that contains the definition of a container image, which can be used to launch a container. The defintion contains the command, base image, configurations etc. In">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-15T20:59:12.000Z">
+<meta property="article:modified_time" content="2023-09-03T05:25:02.831Z">
+<meta property="article:author" content="Tuntun">
+<meta property="article:tag" content="Container">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://dreamyang-liu.github.io/2023/08/15/Docker-Memo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Docker Memo | Tuntun's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tuntun's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://dreamyang-liu.github.io/2023/08/15/Docker-Memo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tuntun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tuntun's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker Memo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-15 13:59:12" itemprop="dateCreated datePublished" datetime="2023-08-15T13:59:12-07:00">2023-08-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-02 22:25:02" itemprop="dateModified" datetime="2023-09-02T22:25:02-07:00">2023-09-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cloud-Computing/" itemprop="url" rel="index"><span itemprop="name">Cloud Computing</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="dockerfile">Dockerfile</h2>
+<p>Dockerfile is a text file that contains the <code>definition</code>
+of a container image, which can be used to launch a container. The
+<code>defintion</code> contains the command, base image, configurations
+etc. In this post, we will go through each component and discuss in what
+scenario we will use them. Let's get started.</p>
+<h2 id="docker-image">Docker image</h2>
+<p>Before we dive into each components, we may want to know what exactly
+a docker image is. Reference: <a
+target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/concepts/about-container-images#structure_of_an_image">structure_of_an_image</a></p>
+<blockquote>
+<p><em>An image is a read-only template with instructions for creating a
+Docker container. Often, an image is_based on another image, with some
+additional customization. --FROM Docker Official</em></p>
+</blockquote>
+<p>Docker image can contains a lot files, to dive deep into detail,
+let's pull an image first.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">alpine3.18: Pulling from library/python</span><br><span class="line">9fda8d8052c6: Pull complete </span><br><span class="line">e7ae3e644d56: Pull complete </span><br><span class="line">4da8ee49dcce: Pull complete </span><br><span class="line">7c6a85daf644: Pull complete </span><br><span class="line">35f63c7ece91: Pull complete </span><br><span class="line">Digest: sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c</span><br><span class="line">Status: Downloaded newer image for python:alpine3.18</span><br><span class="line">docker.io/library/python:alpine3.18</span><br></pre></td></tr></table></figure>
+<p>From the above output, we know that we pull
+<code>python:alpine3.18</code> image from dockerhub and this image has 5
+layers.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sha256:0e3cec02f9651c77b976ef920ee7414ed059a7be05fb9b0c1e091afbfccd6f32&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RepoTags&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;python:alpine3.18&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RepoDigests&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;python@sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Parent&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Comment&quot;</span><span class="punctuation">:</span> <span class="string">&quot;buildkit.dockerfile.v0&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Created&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2023-07-22T09:54:20Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Container&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ContainerConfig&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Domainname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;User&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdout&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStderr&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Tty&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OpenStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;StdinOnce&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Env&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Cmd&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Volumes&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;WorkingDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Entrypoint&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OnBuild&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;DockerVersion&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Config&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Domainname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;User&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStdout&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;AttachStderr&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Tty&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OpenStdin&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;StdinOnce&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Env&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;LANG=C.UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_VERSION=3.11.4&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_PIP_VERSION=23.1.2&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_SETUPTOOLS_VERSION=65.5.1&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;PYTHON_GET_PIP_SHA256=45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Cmd&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;python3&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;ArgsEscaped&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Volumes&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;WorkingDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Entrypoint&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;OnBuild&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Architecture&quot;</span><span class="punctuation">:</span> <span class="string">&quot;arm64&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Variant&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v8&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Os&quot;</span><span class="punctuation">:</span> <span class="string">&quot;linux&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Size&quot;</span><span class="punctuation">:</span> <span class="number">57440899</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;VirtualSize&quot;</span><span class="punctuation">:</span> <span class="number">57440899</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;GraphDriver&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Data&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;LowerDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/bc0dd55b4f4eca654fb57ec3ab9997d5511bb31e1fbaa1e37e55d2d0c953ae78/diff:/var/lib/docker/overlay2/667b39e359e38324b6665b23a88143302006a058bccf71cc4465b5abc8f1394c/diff:/var/lib/docker/overlay2/d46312d087510c9820f8a8bf37bf437eda7f8f11a36bfc1497a2ce2a7d9d87de/diff:/var/lib/docker/overlay2/8a1a8952108eed0ca2e6b9b225204b1869cd946e345c7df86434ed56ce1a8a2b/diff&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;MergedDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/merged&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;UpperDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/diff&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;WorkDir&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/work&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;overlay2&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;RootFS&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;layers&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Layers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;sha256:b2191e2be29d816fa6fbde954316d54e10df9a882c7ca38e3e087d9cbca49fe6&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:07c9596e31dd51b9652cd1ca250dbb2632b60b9930a41f8b35f723ad64f7759d&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:91225753119dc0605d12eeb9754f640054c6c8d936db3c0d7b9a382ddddcf1ec&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:cc409c6a686ee7a64acc8c0569f57e1a3c93cd53c82e782d8f2a623daa9cda64&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;sha256:edd41b2a090ce8eef948b7d3979bda4726c46c3a5cee13fbe1b87acdbf6315b6&quot;</span></span><br><span class="line">            <span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Metadata&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;LastTagTime&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0001-01-01T00:00:00Z&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+<h2 id="base-image-parent-image">Base Image / Parent Image</h2>
+<p>In most Dockerfiles, the first line you will see is
+<code>FROM &#123;base image&#125;</code> like <code>FROM python:3.8</code>.</p>
+<p>This line defines the base image of the image we are going to build.
+The base image may contains one or more layers.</p>
+<h2 id="run">RUN</h2>
+<p><code>RUN</code> command can be use to execute some command like
+installing packages, downloading files etc. One thing need to mention is
+that each command will add a new layer to existing image. Combining
+multiple command into a single <code>RUN</code> command is a common
+trick to make image smaller and with fewer layers.</p>
+<h2 id="cmd">CMD</h2>
+<p>The CMD describes the default container parameters or commands. The
+user can easily override the default command when you use this. ##
+ENTRYPOINT ENTRYPOINT is also used to define the commands that will
+<strong><em>ALWAYS</em></strong> run, which means it cannot be override.
+ENTRYPOINT can be used to ensure that a specific command is always run
+when a container starts, even if the user tries to override it.</p>
+<h2 id="copy">COPY</h2>
+<p><code>COPY</code> can be used to copy local files into container
+image, and that's all.</p>
+<h2 id="add">ADD</h2>
+<p><code>ADD</code> command also allows copying files/folders from host
+to image. It supports tarball extraction and remote URL support.
+Generally, <code>ADD</code> is more preferrable than <code>COPY</code>.
+Now let's take an example of using <code>ADD</code> in Dockerfile.</p>
+<p>Assuming we are in a folder <code>/tmp/app</code> and it has the
+following files,</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">server.js node_modules package.json</span><br></pre></td></tr></table></figure>
+<p>At the same time we write the following command to our Dockerfile.
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ADD</span><span class="language-bash"> server.js /tmp</span></span><br><span class="line"><span class="comment"># ADD &lt;host path&gt; &lt;image path&gt;</span></span><br></pre></td></tr></table></figure> The above commmand will copy the file
+<code>/tmp/app/server.js</code>(host path) to
+<code>/tmp/server.js</code>(container image path). <strong><em>One thing
+we notice that the first argument should be within the
+context</em></strong>, the context can be interpreted as the path where
+we execute the <code>docker build</code> command.</p>
+<h2 id="volume">VOLUME</h2>
+<p>Volume can be treated as a persistent data storage for docker
+container. The following command means any container launched from this
+image, the <code>/var/www/html</code> directory on the host machine will
+be mounted to the <code>/var/www/html directory</code> inside the
+container. This means that any changes made to the
+<code>/var/www/html</code> directory inside the container will be
+reflected on the host machine, and vice versa.</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">VOLUME</span><span class="language-bash"> /var/www/html</span></span><br></pre></td></tr></table></figure>
+<h2 id="dive"><em>Dive</em></h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/wagoodman/dive">Dive</a> is a very useful
+tool to analyze the container image. It enable you to see each layers'
+command and change that reflected on the file system.</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/wagoodman/dive/main/.data/demo.gif"
+alt="Dive" />
+<figcaption aria-hidden="true">Dive</figcaption>
+</figure>
+<h2 id="reference">Reference</h2>
+<ol type="1">
+<li><a
+target="_blank" rel="noopener" href="https://github.com/opencontainers/image-spec/blob/main/manifest.md#oci-image-manifest-specification">OCI
+Image Manifest Specification</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Container/" rel="tag"># Container</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/" rel="prev" title="SQL Chapter 2 各种JOINS">
+      <i class="fa fa-chevron-left"></i> SQL Chapter 2 各种JOINS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/20/LangChain/" rel="next" title="LangChain">
+      LangChain <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dockerfile"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-image"><span class="nav-number">2.</span> <span class="nav-text">Docker image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#base-image-parent-image"><span class="nav-number">3.</span> <span class="nav-text">Base Image &#x2F; Parent Image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#run"><span class="nav-number">4.</span> <span class="nav-text">RUN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cmd"><span class="nav-number">5.</span> <span class="nav-text">CMD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#copy"><span class="nav-number">6.</span> <span class="nav-text">COPY</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#add"><span class="nav-number">7.</span> <span class="nav-text">ADD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volume"><span class="nav-number">8.</span> <span class="nav-text">VOLUME</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dive"><span class="nav-number">9.</span> <span class="nav-text">Dive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">10.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tuntun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tuntun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
