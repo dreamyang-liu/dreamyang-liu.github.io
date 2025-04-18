@@ -168,22 +168,7 @@
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Fenwick-Tree/">Fenwick Tree</a>
-          </div>
-        
-          <div class="file">
-            <i class="fas fa-file-code"></i>
             <a href="/2023/08/06/Segment-Tree/">Segment Tree</a>
-          </div>
-        
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Binary-Tree-Topics/">Binary Tree Topics</a>
-          </div>
-        
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Binary-Search-Templates/">Binary Search Templates</a>
           </div>
         
       </div>
@@ -256,7 +241,7 @@
 <li>…</li>
 </ol>
 <p>Before dive into each topic, let’s define what is a valid parentheses. <code>()</code>, <code>()()()()</code> and <code>((((((()))))))(())()</code>.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">isValidParentheses</span>(<span class="params">s: <span class="built_in">str</span></span>):</span><br><span class="line">    need = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> ch <span class="keyword">in</span> s:</span><br><span class="line">        <span class="keyword">if</span> ch == <span class="string">&#x27;(&#x27;</span>:</span><br><span class="line">            need += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            need -= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> need &lt; <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">isValidParentheses</span>(<span class="params">s: <span class="built_in">str</span></span>):</span><br><span class="line">    stack = []</span><br><span class="line">    <span class="keyword">for</span> ch <span class="keyword">in</span> s:</span><br><span class="line">        <span class="keyword">if</span> ch == <span class="string">&#x27;)&#x27;</span>:</span><br><span class="line">            <span class="keyword">if</span> stack[-<span class="number">1</span>] == <span class="string">&#x27;(&#x27;</span>:</span><br><span class="line">                stack.pop()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                stack.append(ch)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            stack.append(ch)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">isValidParentheses</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>):<br>    need = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> s:<br>        <span class="hljs-keyword">if</span> ch == <span class="hljs-string">&#x27;(&#x27;</span>:<br>            need += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>:<br>            need -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> need &lt; <span class="hljs-number">0</span>:<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">isValidParentheses</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>):<br>    stack = []<br>    <span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> s:<br>        <span class="hljs-keyword">if</span> ch == <span class="hljs-string">&#x27;)&#x27;</span>:<br>            <span class="hljs-keyword">if</span> stack[-<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;(&#x27;</span>:<br>                stack.pop()<br>            <span class="hljs-keyword">else</span>:<br>                stack.append(ch)<br>        <span class="hljs-keyword">else</span>:<br>            stack.append(ch)<br></code></pre></td></tr></table></figure>
 
         </div>
         
@@ -365,7 +350,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 </script>
-<script src="https://raw.githubusercontent.com/jgallen23/toc/greenkeeper/update-all/dist/toc.min.js"></script>
+<script src="/js/toc.js"></script>
 
 <!-- Scripts -->
 <script>

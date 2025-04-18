@@ -162,7 +162,7 @@
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Divide-and-Conquer/">Divide and Conquer</a>
-            <span class="count">(2)</span>
+            <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
@@ -210,7 +210,7 @@
 <img src="https://i.stack.imgur.com/bz2VO.png" alt="patience-sorting" width="600"/>
 
 <p>We can just skip the proof, feel free to refer <a target="_blank" rel="noopener" href="https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf">document</a> for detailed proof. The only thing we nned to know is that the number of piles is equal to the length of longest increasing sequence.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">    <span class="type">int</span>[] top = <span class="keyword">new</span> <span class="title class_">int</span>[nums.length];</span><br><span class="line">    <span class="comment">// 牌堆数初始化为 0</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">piles</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">    <span class="comment">// 要处理的扑克牌int poker = nums[i];</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/***** 搜索左侧边界的二分查找 *****/</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">0</span>, right = piles;</span><br><span class="line">    <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left + right) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (top[mid] &gt; poker) &#123;</span><br><span class="line">            right = mid;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (top[mid] &lt; poker) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            right = mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 没找到合适的牌堆，新建一堆</span></span><br><span class="line">    <span class="keyword">if</span> (left == piles) piles++;</span><br><span class="line">    <span class="comment">// 把这张牌放到牌堆顶</span></span><br><span class="line">            top[left] = poker;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 牌堆数就是 LIS 长度</span></span><br><span class="line">    <span class="keyword">return</span> piles;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">int</span> <span class="hljs-title function_">lengthOfLIS</span><span class="hljs-params">(<span class="hljs-type">int</span>[] nums)</span> &#123;<br>    <span class="hljs-type">int</span>[] top = <span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[nums.length];<br>    <span class="hljs-comment">// 牌堆数初始化为 0</span><br>    <span class="hljs-type">int</span> <span class="hljs-variable">piles</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; nums.length; i++) &#123;<br>    <span class="hljs-comment">// 要处理的扑克牌int poker = nums[i];</span><br><br>    <span class="hljs-comment">/***** 搜索左侧边界的二分查找 *****/</span><br>    <span class="hljs-type">int</span> <span class="hljs-variable">left</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>, right = piles;<br>    <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">mid</span> <span class="hljs-operator">=</span> (left + right) / <span class="hljs-number">2</span>;<br>        <span class="hljs-keyword">if</span> (top[mid] &gt; poker) &#123;<br>            right = mid;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (top[mid] &lt; poker) &#123;<br>            left = mid + <span class="hljs-number">1</span>;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            right = mid;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 没找到合适的牌堆，新建一堆</span><br>    <span class="hljs-keyword">if</span> (left == piles) piles++;<br>    <span class="hljs-comment">// 把这张牌放到牌堆顶</span><br>            top[left] = poker;<br>        &#125;<br>    <span class="hljs-comment">// 牌堆数就是 LIS 长度</span><br>    <span class="hljs-keyword">return</span> piles;<br>&#125;<br></code></pre></td></tr></table></figure>
         </div>
         
         <!-- 文章导航 -->
@@ -218,12 +218,12 @@
           
             <a class="prev" href="/2023/08/06/Binary-Exponentiation/">
               <i class="fas fa-chevron-left"></i>
-              Binary Exponentiation
+              二进制快速幂
             </a>
           
           
             <a class="next" href="/2023/08/06/Binary-Search-Templates/">
-              Binary Search Templates
+              二分查找模板
               <i class="fas fa-chevron-right"></i>
             </a>
           
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 </script>
-<script src="https://raw.githubusercontent.com/jgallen23/toc/greenkeeper/update-all/dist/toc.min.js"></script>
+<script src="/js/toc.js"></script>
 
 <!-- Scripts -->
 <script>
