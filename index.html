@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Blog & Website</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- MathJax for LaTeX support -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <a href="index.html" id="site-name">Personal Blog</a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="active" id="home-link">Home</a></li>
+                    <li><a href="#" id="blog-link">Blog</a></li>
+                    <li><a href="#" id="about-link">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Home Section -->
+            <section id="home-section" class="section active">
+                <div class="hero">
+                    <h1>Welcome to My Personal Website</h1>
+                    <p class="subtitle">A place for my thoughts, projects, and ideas</p>
+                </div>
+                <div class="recent-posts">
+                    <h2>Recent Posts</h2>
+                    <div id="recent-posts-list" class="posts-grid">
+                        <!-- Posts will be loaded here dynamically -->
+                        <div class="loading">Loading recent posts...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blog Section -->
+            <section id="blog-section" class="section">
+                <h1>Blog</h1>
+                <div class="blog-container">
+                    <div class="posts-list">
+                        <div id="posts-list" class="posts-grid">
+                            <!-- Posts will be loaded here dynamically -->
+                            <div class="loading">Loading posts...</div>
+                        </div>
+                    </div>
+                    <aside class="sidebar">
+                        <div class="widget">
+                            <h3>Tags</h3>
+                            <div id="tags-list">
+                                <!-- Tags will be loaded here dynamically -->
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- Post Section (for individual posts) -->
+            <section id="post-section" class="section">
+                <div class="post-container">
+                    <div class="post-header">
+                        <h1 id="post-title"></h1>
+                        <div class="post-meta">
+                            <span id="post-date"></span>
+                            <span id="post-tags"></span>
+                        </div>
+                    </div>
+                    <div id="post-content" class="post-content">
+                        <!-- Post content will be loaded here dynamically -->
+                    </div>
+                    <div class="post-navigation">
+                        <a href="#" id="back-to-blog">← Back to Blog</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about-section" class="section">
+                <h1>About Me</h1>
+                <div class="about-container">
+                    <div class="bio">
+                        <p id="author-bio">Loading bio...</p>
+                    </div>
+                    <div class="social-links">
+                        <h3>Connect with me</h3>
+                        <ul id="social-links-list">
+                            <!-- Social links will be loaded here dynamically -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year"></span> <span id="footer-name"></span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/markdown.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
