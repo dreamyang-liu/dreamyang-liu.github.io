@@ -4,14 +4,15 @@ This blog template is designed to work both online and offline. However, when us
 
 ## Common Network-Related Issues
 
-When running the blog locally without internet access, you might see errors like:
+When running the blog locally without internet access, you might see errors or warnings like:
 
 ```
 GET https://polyfill.io/v3/polyfill.min.js?features=es6 net::ERR_NAME_NOT_RESOLVED
+Could not load polyfill from CDN. LaTeX rendering may be limited.
 GET https://via.placeholder.com/800x400 net::ERR_NAME_NOT_RESOLVED
 ```
 
-These errors occur because the blog is trying to load resources from external CDNs or websites.
+These messages occur because the blog is trying to load resources from external CDNs or websites. **These warnings are expected when running offline** and don't indicate a problem with the blog itself. The fallback mechanisms will ensure the blog still functions properly, though some features like LaTeX rendering might have limited functionality.
 
 ## Built-in Fallbacks
 
