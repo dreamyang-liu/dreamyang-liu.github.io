@@ -17,6 +17,8 @@ A simple, elegant blog and personal website with Markdown and LaTeX support.
 3. Customize the site settings in `config.js`
 4. Deploy to GitHub Pages or your preferred hosting service
 
+> **Note:** For information about using this blog offline or with limited network connectivity, please see the [Offline Usage Guide](OFFLINE_USAGE.md).
+
 ## Directory Structure
 
 ```

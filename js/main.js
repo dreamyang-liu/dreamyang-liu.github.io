@@ -110,12 +110,12 @@ function showSection(sectionId) {
 async function loadPosts() {
   try {
     // In a real application, this would fetch posts from a server
-    // For this demo, we'll simulate loading posts
+    // For this demo, we'll use a hardcoded post to avoid CORS issues when running locally
     
     // Simulate loading delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Create a sample post
+    // Create a sample post with pre-rendered HTML to avoid Markdown parsing issues
     const samplePost = {
       filename: 'example.md',
       frontmatter: {
@@ -123,78 +123,63 @@ async function loadPosts() {
         date: '2025-04-17',
         tags: ['markdown', 'latex', 'tutorial']
       },
-      content: `
-# Getting Started with Markdown and LaTeX
+      content: `# Getting Started with Markdown and LaTeX
 
-This is an example blog post that demonstrates the Markdown and LaTeX support in this blog.
-
-## Markdown Features
-
-You can use all standard Markdown features:
-
-- **Bold text** and *italic text*
-- [Links](https://example.com)
-- Lists (like this one)
-- Code blocks:
-
-\`\`\`javascript
-function hello() {
+This is an example blog post that demonstrates the Markdown and LaTeX support in this blog.`,
+      html: `<h1>Getting Started with Markdown and LaTeX</h1>
+<p>This is an example blog post that demonstrates the Markdown and LaTeX support in this blog.</p>
+<h2>Markdown Features</h2>
+<p>You can use all standard Markdown features:</p>
+<ul>
+<li><strong>Bold text</strong> and <em>italic text</em></li>
+<li><a href="https://example.com">Links</a></li>
+<li>Lists (like this one)</li>
+<li>Code blocks:</li>
+</ul>
+<pre><code class="language-javascript">function hello() {
   console.log("Hello, world!");
 }
-\`\`\`
-
-## LaTeX Support
-
-You can include mathematical equations using LaTeX syntax:
-
-Inline equations like $E = mc^2$ are supported.
-
-You can also include display equations:
-
-$$
-\\frac{d}{dx}\\left( \\int_{a}^{x} f(u)\\,du\\right)=f(x)
-$$
-
-## Conclusion
-
-This blog template makes it easy to write content with both Markdown and LaTeX support!
-      `,
-      html: marked.parse(`
-# Getting Started with Markdown and LaTeX
-
-This is an example blog post that demonstrates the Markdown and LaTeX support in this blog.
-
-## Markdown Features
-
-You can use all standard Markdown features:
-
-- **Bold text** and *italic text*
-- [Links](https://example.com)
-- Lists (like this one)
-- Code blocks:
-
-\`\`\`javascript
-function hello() {
-  console.log("Hello, world!");
-}
-\`\`\`
-
-## LaTeX Support
-
-You can include mathematical equations using LaTeX syntax:
-
-Inline equations like $E = mc^2$ are supported.
-
-You can also include display equations:
-
-$$
-\\frac{d}{dx}\\left( \\int_{a}^{x} f(u)\\,du\\right)=f(x)
-$$
-
-## Conclusion
-
-This blog template makes it easy to write content with both Markdown and LaTeX support!
-      `),
+</code></pre>
+<h2>LaTeX Support</h2>
+<p>You can include mathematical equations using LaTeX syntax:</p>
+<p>Inline equations like \\(E = mc^2\\) are supported.</p>
+<p>You can also include display equations:</p>
+<p>\\[\\frac{d}{dx}\\left( \\int_{a}^{x} f(u)\\,du\\right)=f(x)\\]</p>
+<h2>Images</h2>
+<p>You can include images in your posts:</p>
+<div style="width: 100%; height: 400px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; margin: 20px 0; border-radius: 8px;">
+  <span style="color: #666; font-style: italic;">Example Image Placeholder</span>
+</div>
+<h2>Blockquotes</h2>
+<blockquote>
+<p>This is a blockquote.</p>
+<p>It can span multiple lines.</p>
+</blockquote>
+<h2>Tables</h2>
+<table>
+<thead>
+<tr>
+<th>Header 1</th>
+<th>Header 2</th>
+<th>Header 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cell 1</td>
+<td>Cell 2</td>
+<td>Cell 3</td>
+</tr>
+<tr>
+<td>Cell 4</td>
+<td>Cell 5</td>
+<td>Cell 6</td>
+</tr>
+</tbody>
+</table>
+<h2>Conclusion</h2>
+<p>This blog template makes it easy to write content with both Markdown and LaTeX support!</p>
+<p>You can customize this template to fit your needs and add more features as required.</p>`,
       excerpt: 'This is an example blog post that demonstrates the Markdown and LaTeX support in this blog.'
     };
     

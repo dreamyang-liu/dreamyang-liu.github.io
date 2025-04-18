@@ -5,14 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Blog & Website</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- MathJax for LaTeX support -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- Marked.js for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Highlight.js for code syntax highlighting -->
+    <!-- MathJax for LaTeX support with offline fallback -->
+    <script>
+        // Check if we can load from CDN, otherwise use a message
+        window.addEventListener('error', function(e) {
+            if (e.target.src && e.target.src.includes('polyfill.io')) {
+                console.warn('Could not load polyfill from CDN. LaTeX rendering may be limited.');
+            }
+            if (e.target.src && e.target.src.includes('mathjax')) {
+                console.warn('Could not load MathJax from CDN. LaTeX rendering may be limited.');
+            }
+        }, true);
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" onerror="console.warn('Failed to load polyfill')"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" onerror="console.warn('Failed to load MathJax')"></script>
+    
+    <!-- Marked.js for Markdown parsing with offline fallback -->
+    <script>
+        // Simple Markdown parser fallback if CDN fails
+        window.addEventListener('error', function(e) {
+            if (e.target.src && e.target.src.includes('marked')) {
+                console.warn('Could not load Marked.js from CDN. Using simple fallback.');
+                window.marked = {
+                    parse: function(text) {
+                        return '<p>' + text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+                    }
+                };
+            }
+        }, true);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" onerror="console.warn('Failed to load Marked')"></script>
+    
+    <!-- Highlight.js for code syntax highlighting with offline fallback -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.target.src && e.target.src.includes('highlight.js')) {
+                console.warn('Could not load Highlight.js from CDN. Code highlighting will be limited.');
+                window.hljs = {
+                    highlightElement: function() {},
+                    highlightAuto: function() { return { value: '' }; },
+                    getLanguage: function() { return null; }
+                };
+            }
+        }, true);
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" onerror="console.warn('Failed to load Highlight.js')"></script>
 </head>
 <body>
     <header>

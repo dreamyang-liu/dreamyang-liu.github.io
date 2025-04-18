@@ -50,7 +50,8 @@ $$
 
 You can include images in your posts:
 
-![Example Image](https://via.placeholder.com/800x400)
+<!-- Use a description instead of an external image URL -->
+![Example Image - A placeholder for demonstration purposes]()
 
 ## Blockquotes
 
