@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>System Design Fundamentals | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CAP-Theorem"><span class="toc-text">CAP Theorem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Tolerance"><span class="toc-text">Partition Tolerance</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modern-Distrbuted-System-Components"><span class="toc-text">Modern Distrbuted System Components</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Load-Balancer"><span class="toc-text">Load Balancer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDN"><span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DNS"><span class="toc-text">DNS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Web-Tier"><span class="toc-text">Web Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-Tier"><span class="toc-text">Data Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Tier"><span class="toc-text">Cache Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Message-Queue"><span class="toc-text">Message Queue</span></a></li></ol></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Consistent-Hashing/">Consistent Hashing</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Overview/">Overview</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>System Design Fundamentals.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>System Design Fundamentals</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2023-08-06
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/System-Design/">System Design</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Overview/" rel="tag">Overview</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <h2 id="CAP-Theorem"><a href="#CAP-Theorem" class="headerlink" title="CAP Theorem"></a>CAP Theorem</h2><p>The CAP theorem, or Brewer’s theorem, states that a distributed database system can only guarantee two out of three characteristics: consistency, availability, and partition tolerance. The system prioritizes availability over consistency and can respond with possibly stale data.</p>
+<img src="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png" alt="cap" width="300">
+
+<h3 id="Partition-Tolerance"><a href="#Partition-Tolerance" class="headerlink" title="Partition Tolerance"></a>Partition Tolerance</h3><p>在CAP理论中,Partition Tolerance(分区容忍性)是指系统在发生网络分区故障的时候,仍然能够对外提供服务的能力。</p>
+<p>所谓网络分区故障,是指系统中的节点被分成两部分,节点间的网络通信被阻断。在这种情况下,一个分布式系统可能会表现出下面两种行为:</p>
+<ol>
+<li><p>无法对外提供服务 整个系统不可用,对用户不可见。</p>
+</li>
+<li><p>以牺牲一致性为代价继续服务 系统继续对用户可见,但返回的数据可能不一致。</p>
+</li>
+</ol>
+<p>Partition Tolerance表示系统能够承受网络分区的发生,继续对外服务而不会完全崩溃。根据CAP理论,一个系统不可能同时满足一致性(Consistency)、可用性(Availability)和分区容忍性,最多只能同时满足两个。</p>
+<p>所以一个Partition Tolerance系统通常会牺牲数据一致性来保证服务可用性。比如允许读取到过期数据,或两个分区的数据产生冲突。这在许多大规模分布式系统中都是可接受的权衡。</p>
+<p>一个典型的Partition Tolerance(分区容忍性)的例子是DNS系统。</p>
+<p>DNS采用了分布式的树形结构,一个域名由多个DNS服务器共同提供解析服务。当网络发生分区时,可能出现如下情况:</p>
+<ol>
+<li><p>某区域用户无法访问部分DNS服务器,但可以访问到另一部分服务器,仍能得到域名解析结果。</p>
+</li>
+<li><p>不同的DNS服务器返回了不同的解析结果(IP地址不一致),但用户还是能得到响应。</p>
+</li>
+</ol>
+<p>这就是DNS系统表现出来的Partition Tolerance性质。当网络分区发生时,DNS系统为了继续服务,承受返回不一致数据的结果,而没有选择完全停止响应。</p>
+<p>Partition Tolerance的另一个例子是一些分布式缓存系统,如Memcached。当节点间失去联系时,不同分区的数据可能不一致,但每个分区内部仍能继续使用本地缓存,整个系统不会完全停止服务。</p>
+<p>这些系统都采用了设计理念:“允许读取脏数据”或者“允许短暂不一致”来实现Partition Tolerance。因为对大多数应用来说,与整个系统完全不可用相比,读取到陈旧或不一致的数据仍是可以接受的。</p>
+<h2 id="Modern-Distrbuted-System-Components"><a href="#Modern-Distrbuted-System-Components" class="headerlink" title="Modern Distrbuted System Components"></a>Modern Distrbuted System Components</h2><h3 id="Load-Balancer"><a href="#Load-Balancer" class="headerlink" title="Load Balancer"></a>Load Balancer</h3><p>Load Balancer is the entry point of an web application. It will distribute incoming customer traffic to difference worker&#x2F;servers. It can help</p>
+<ol>
+<li>Avoid a single server to be overloaded</li>
+<li>Redirect request to healthy server when one server become unavailable.</li>
+</ol>
+<p>Load Balancer plays an important role in enabling system to scale horizontally. AWS provides the following load balancer services:</p>
+<ol>
+<li>Classic Load Balancer: mainly used to distribute traffic to EC2 instances</li>
+<li>Application Load Balancer: more flexible, choose this one by default.</li>
+<li><em>Network Load Balancer</em> </li>
+<li><em>Gateway Load Balancer</em></li>
+</ol>
+<h3 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h3><p>Content Delivery Network(CDN) is a service provided by third-party for fast file delivery. By providing a single endpoint, CDN servie will automatically route to the closet server to fetch the static files. It is mainly used to serve static files like HTML, javascript file and images. It can also host some files like video, tarball etc. It can:</p>
+<ol>
+<li>Reduce the load of web server</li>
+<li>Accelerate the file retrievel by fetching file from closest server.</li>
+</ol>
+<p>There is a TTL(Time to live) need to set for CDN. If TTL is set to be a small value, it will need to update the cache from source very often, the charge of data transfer will increase. If TTL is set to be a large value, customer may get stale file. The TTL should be set according to the need of system.</p>
+<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>The Domain Name System (DNS) is a database that translates domain names into Internet Protocol (IP) addresses. DNS maps the name that people use to locate a website to the IP address that a computer uses to locate that website.</p>
+<img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns" width="500">
+
+<h3 id="Web-Tier"><a href="#Web-Tier" class="headerlink" title="Web Tier"></a>Web Tier</h3><p>Web Tier mainly refers to Web Service. Web service mainly contains business logic. Like fetching the data from database and return to user or submit an order on behalf of user etc. Ideally, web tier should be stateless since it can make web tier eailer to scale horizontally.</p>
+<h3 id="Data-Tier"><a href="#Data-Tier" class="headerlink" title="Data Tier"></a>Data Tier</h3><p>Data Tier mainly refers to database or persistent storage. The “persistent” means even if the server shut down, the data will not be lost. On the contaray, some in-memory cache system will lose all data if server get shut down. As data becomes more and more complex, people developed various data base system to accomodate different use case.</p>
+<ol>
+<li>Relational Database</li>
+<li>NoSQL (Not only SQL)</li>
+</ol>
+<p>Giving an expressive decription of database here would be too ambitious, we will use a single post to discuss it in detail.</p>
+<h3 id="Cache-Tier"><a href="#Cache-Tier" class="headerlink" title="Cache Tier"></a>Cache Tier</h3><p>Cacher Tier emerges as querying database is such an expensive operation. In the mean while, some request can also be expensive like running a model to give calculation. Thanks to the <strong>Principle of Locality</strong>, we know the tendency of a processor to access the same set of memory locations repetitively over a short period of time. It means that the same data could be used multiple times over a short period of time. And that makes cache tier useful in real production. Cache works as a middle-ware inside the system and it can be scaled idenpendently. It also brings a series of challenges like cache overheat, cache missing and data synchronization. Like data tier, we will use a single post to discuss it in detail.</p>
+<img src="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png" alt="cache" height="270">
+
+<h3 id="Message-Queue"><a href="#Message-Queue" class="headerlink" title="Message Queue"></a>Message Queue</h3><p>Sometimes we may think if there’s chain of service calling. How could these subsystem to scale independently. i.e If service A is trying to call service B, if service B is not available at the time when service A made the call, then service A must wait, otherwise we will lose the request from customer. We may want something that can abstract service’s input producer and outcome consumer. Here is what message queue come into play.</p>
+<p>Message queues serve as temporary storage services. Producers can publish messages to a MQ regardless of whether consumers are working or not. At the same time, consumers can consume messages from a MQ regardless of whether producers are working or not.</p>
+<img src="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png" alt="mq">
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2023/08/06/Consistent-Hashing/">
+              <i class="fas fa-chevron-left"></i>
+              Consistent Hashing
+            </a>
+          
+          
+            <a class="next" href="/2023/08/06/Binary-Tree-Topics/">
+              Binary Tree Topics
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2025-04-18
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+<script src="https://raw.githubusercontent.com/jgallen23/toc/greenkeeper/update-all/dist/toc.min.js"></script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>
