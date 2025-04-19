@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 增强代码块功能（已包含添加复制按钮）
-    // enhanceCodeBlocks();
+    enhanceCodeBlocks();
     
-    // // 注释掉重复的复制按钮添加功能，避免功能重叠
-    // // addCopyButtons();
+    // 注释掉重复的复制按钮添加功能，避免功能重叠
+    // addCopyButtons();
     
-    // // 处理Python代码的特殊缩进
-    // fixPythonIndentation();
+    // 处理Python代码的特殊缩进
+    fixPythonIndentation();
     
-    // // 添加代码块横向滚动指示
-    // addScrollIndicators();
+    // 添加代码块横向滚动指示
+    addScrollIndicators();
     
-    // // 美化普通代码块
-    // enhancePlainCodeBlocks();
+    // 美化普通代码块
+    enhancePlainCodeBlocks();
 });
 
 // 美化普通代码块
@@ -88,8 +88,6 @@ function enhanceCodeBlocks() {
         // 获取行号内容
         const gutter = table.querySelector('.gutter pre');
         const gutterLines = gutter ? Array.from(gutter.querySelectorAll('.line')).map(line => line.textContent) : [];
-
-        console.log(table.innerHTML);
         
         // 获取代码内容
         const code = table.querySelector('.code pre code');
