@@ -197,7 +197,7 @@
             <span class="count">(1)</span>
           </div>
         
-          <div class="tag-item ">
+          <div class="tag-item active">
             <i class="fas fa-tag"></i>
             <a href="/tags/ML-System/">ML System</a>
             <span class="count">(1)</span>
@@ -257,7 +257,7 @@
             <span class="count">(1)</span>
           </div>
         
-          <div class="tag-item active">
+          <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
             <span class="count">(1)</span>
@@ -308,7 +308,7 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-tag"></i>
-        <span>tag: %u6301%u4E45%u5316%u6A21%u5F0F.md</span>
+        <span>tag: ML%20System.md</span>
       </div>
     </div>
     
@@ -316,7 +316,7 @@
       <div class="tag-header">
         <h1>
           <i class="fas fa-tag"></i>
-          Tag: 持久化模式
+          Tag: ML System
         </h1>
         <span class="tag-count">1 posts</span>
       </div>
@@ -327,32 +327,26 @@
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+                <a href="/2023/08/06/KV-Cache/">KV Cache</a>
               </span>
             </div>
             
             <div class="post-meta">
               <span class="date">
                 <i class="fas fa-calendar-alt"></i>
-                2025-04-17
+                2023-08-06
               </span>
               
             </div>
             
             <div class="post-excerpt">
-              1. GPU ECC（Error‑Correcting Code）
-原理：在显存（VRAM）中为每 N 位数据生成冗余校验位，常见为 SECDED（单错纠正、双错检测）。  
-实现：  
-专业级卡（Tesla/Quadro/A100、AMD Instinct）默认支持 ECC，消费级卡多关闭或不支持。  
-ECC 逻辑集成在内存控制器，对程序透明。
+              KV Cache在LLM推理时，在attention层中计算attention score时，需要计算query和key的点积，然后进行softmax归一化，最后与value进行加权求和。由于自回归的特性，每次生成一个token都需要和之前的所有token进行attention计算，这个时候就需要将之前的key和value进行缓存，以便下一次计算时直接使用。是一种用来加速推理的技术。
 
-
-优缺点：  
-优点：避免显存位翻转导致的 S...
+但是KV ...
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/" class="read-more">
+              <a href="/2023/08/06/KV-Cache/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>

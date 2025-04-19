@@ -179,15 +179,27 @@
             <span class="count">(1)</span>
           </div>
         
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/KV-Cache/">KV Cache</a>
+            <span class="count">(1)</span>
+          </div>
+        
           <div class="tag-item active">
             <i class="fas fa-tag"></i>
             <a href="/tags/LLM/">LLM</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/Linux/">Linux</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/ML-System/">ML System</a>
             <span class="count">(1)</span>
           </div>
         
@@ -306,7 +318,7 @@
           <i class="fas fa-tag"></i>
           Tag: LLM
         </h1>
-        <span class="tag-count">1 posts</span>
+        <span class="tag-count">2 posts</span>
       </div>
 
       <div class="posts-container">
@@ -345,6 +357,36 @@
             </div>
           </div>
         
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/06/KV-Cache/">KV Cache</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-06
+              </span>
+              
+            </div>
+            
+            <div class="post-excerpt">
+              KV Cache在LLM推理时，在attention层中计算attention score时，需要计算query和key的点积，然后进行softmax归一化，最后与value进行加权求和。由于自回归的特性，每次生成一个token都需要和之前的所有token进行attention计算，这个时候就需要将之前的key和value进行缓存，以便下一次计算时直接使用。是一种用来加速推理的技术。
+
+但是KV ...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/06/KV-Cache/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+        
       </div>
 
       
@@ -365,7 +407,7 @@
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2025-04-18
+      2025-04-19
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
