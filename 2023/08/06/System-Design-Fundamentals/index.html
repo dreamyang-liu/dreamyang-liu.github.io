@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>System Design Fundamentals | Tuntun&#39;s Blog</title>
+  <title>系统设计基础 | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -143,7 +143,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CAP-Theorem"><span class="toc-text">CAP Theorem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Tolerance"><span class="toc-text">Partition Tolerance</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modern-Distrbuted-System-Components"><span class="toc-text">Modern Distrbuted System Components</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Load-Balancer"><span class="toc-text">Load Balancer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDN"><span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DNS"><span class="toc-text">DNS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Web-Tier"><span class="toc-text">Web Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-Tier"><span class="toc-text">Data Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Tier"><span class="toc-text">Cache Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Message-Queue"><span class="toc-text">Message Queue</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CAP%E5%AE%9A%E7%90%86"><span class="toc-text">CAP定理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Tolerance"><span class="toc-text">Partition Tolerance</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%B0%E4%BB%A3%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E7%BB%84%E4%BB%B6"><span class="toc-text">现代分布式系统组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%99%A8"><span class="toc-text">负载均衡器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDN"><span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DNS"><span class="toc-text">DNS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Web%E5%B1%82"><span class="toc-text">Web层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%B1%82"><span class="toc-text">数据层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E5%B1%82"><span class="toc-text">缓存层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="toc-text">消息队列</span></a></li></ol></li></ol>
       </div>
     </div>
     
@@ -155,6 +155,11 @@
         <span>CATEGORY POSTS</span>
       </div>
       <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Consistent-Hashing/">一致性哈希</a>
+          </div>
         
       </div>
     </div>
@@ -171,7 +176,7 @@
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Overview/">Overview</a>
+            <a href="/tags/%E6%A6%82%E8%BF%B0/">概述</a>
             <span class="count">(1)</span>
           </div>
         
@@ -185,14 +190,14 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-file-alt"></i>
-        <span>System Design Fundamentals.md</span>
+        <span>系统设计基础.md</span>
       </div>
     </div>
     
     <div class="content-area">
       <article class="post-content">
         <div class="post-header">
-          <h1>System Design Fundamentals</h1>
+          <h1>系统设计基础</h1>
           <div class="post-meta">
             <span class="date">
               <i class="fas fa-calendar-alt"></i>
@@ -201,7 +206,7 @@
               <span class="categories">
                 <i class="fas fa-folder"></i>
                 <div class="categories-list">
-                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/System-Design/">System Design</a></li></ul>
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">系统设计</a></li></ul>
                 </div>
               </span>
             
@@ -209,7 +214,7 @@
               <span class="tags">
                 <i class="fas fa-tags"></i>
                 <div class="tags-list">
-                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Overview/" rel="tag">Overview</a></li></ul>
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%A6%82%E8%BF%B0/" rel="tag">概述</a></li></ul>
                 </div>
               </span>
             
@@ -217,7 +222,7 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <h2 id="CAP-Theorem"><a href="#CAP-Theorem" class="headerlink" title="CAP Theorem"></a>CAP Theorem</h2><p>The CAP theorem, or Brewer’s theorem, states that a distributed database system can only guarantee two out of three characteristics: consistency, availability, and partition tolerance. The system prioritizes availability over consistency and can respond with possibly stale data.</p>
+          <h2 id="CAP定理"><a href="#CAP定理" class="headerlink" title="CAP定理"></a>CAP定理</h2><p>CAP定理，或称为Brewer定理，指出分布式数据库系统只能保证三个特性中的两个：一致性、可用性和分区容忍性。系统优先考虑可用性而非一致性，可能会响应可能过时的数据。</p>
 <img src="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png" alt="cap" width="300">
 
 <h3 id="Partition-Tolerance"><a href="#Partition-Tolerance" class="headerlink" title="Partition Tolerance"></a>Partition Tolerance</h3><p>在CAP理论中,Partition Tolerance(分区容忍性)是指系统在发生网络分区故障的时候,仍然能够对外提供服务的能力。</p>
@@ -240,41 +245,42 @@
 </ol>
 <p>这就是DNS系统表现出来的Partition Tolerance性质。当网络分区发生时,DNS系统为了继续服务,承受返回不一致数据的结果,而没有选择完全停止响应。</p>
 <p>Partition Tolerance的另一个例子是一些分布式缓存系统,如Memcached。当节点间失去联系时,不同分区的数据可能不一致,但每个分区内部仍能继续使用本地缓存,整个系统不会完全停止服务。</p>
-<p>这些系统都采用了设计理念:“允许读取脏数据”或者“允许短暂不一致”来实现Partition Tolerance。因为对大多数应用来说,与整个系统完全不可用相比,读取到陈旧或不一致的数据仍是可以接受的。</p>
-<h2 id="Modern-Distrbuted-System-Components"><a href="#Modern-Distrbuted-System-Components" class="headerlink" title="Modern Distrbuted System Components"></a>Modern Distrbuted System Components</h2><h3 id="Load-Balancer"><a href="#Load-Balancer" class="headerlink" title="Load Balancer"></a>Load Balancer</h3><p>Load Balancer is the entry point of an web application. It will distribute incoming customer traffic to difference worker&#x2F;servers. It can help</p>
+<p>这些系统都采用了设计理念:”允许读取脏数据”或者”允许短暂不一致”来实现Partition Tolerance。因为对大多数应用来说,与整个系统完全不可用相比,读取到陈旧或不一致的数据仍是可以接受的。</p>
+<h2 id="现代分布式系统组件"><a href="#现代分布式系统组件" class="headerlink" title="现代分布式系统组件"></a>现代分布式系统组件</h2><h3 id="负载均衡器"><a href="#负载均衡器" class="headerlink" title="负载均衡器"></a>负载均衡器</h3><p>负载均衡器是Web应用程序的入口点。它将传入的客户流量分配到不同的工作节点&#x2F;服务器。它可以帮助：</p>
 <ol>
-<li>Avoid a single server to be overloaded</li>
-<li>Redirect request to healthy server when one server become unavailable.</li>
+<li>避免单个服务器过载</li>
+<li>当一个服务器不可用时，将请求重定向到健康的服务器。</li>
 </ol>
-<p>Load Balancer plays an important role in enabling system to scale horizontally. AWS provides the following load balancer services:</p>
+<p>负载均衡器在使系统能够水平扩展方面发挥着重要作用。AWS提供以下负载均衡器服务：</p>
 <ol>
-<li>Classic Load Balancer: mainly used to distribute traffic to EC2 instances</li>
-<li>Application Load Balancer: more flexible, choose this one by default.</li>
-<li><em>Network Load Balancer</em> </li>
-<li><em>Gateway Load Balancer</em></li>
+<li>经典负载均衡器：主要用于将流量分配到EC2实例</li>
+<li>应用负载均衡器：更灵活，默认选择这个。</li>
+<li><em>网络负载均衡器</em></li>
+<li><em>网关负载均衡器</em></li>
 </ol>
-<h3 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h3><p>Content Delivery Network(CDN) is a service provided by third-party for fast file delivery. By providing a single endpoint, CDN servie will automatically route to the closet server to fetch the static files. It is mainly used to serve static files like HTML, javascript file and images. It can also host some files like video, tarball etc. It can:</p>
+<h3 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h3><p>内容分发网络（CDN）是第三方提供的快速文件交付服务。通过提供单一端点，CDN服务将自动路由到最近的服务器获取静态文件。它主要用于提供静态文件，如HTML、JavaScript文件和图像。它还可以托管一些文件，如视频、压缩包等。它可以：</p>
 <ol>
-<li>Reduce the load of web server</li>
-<li>Accelerate the file retrievel by fetching file from closest server.</li>
+<li>减轻Web服务器的负载</li>
+<li>通过从最近的服务器获取文件来加速文件检索。</li>
 </ol>
-<p>There is a TTL(Time to live) need to set for CDN. If TTL is set to be a small value, it will need to update the cache from source very often, the charge of data transfer will increase. If TTL is set to be a large value, customer may get stale file. The TTL should be set according to the need of system.</p>
-<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>The Domain Name System (DNS) is a database that translates domain names into Internet Protocol (IP) addresses. DNS maps the name that people use to locate a website to the IP address that a computer uses to locate that website.</p>
+<p>CDN需要设置TTL（生存时间）。如果TTL设置为较小的值，它将需要经常从源更新缓存，数据传输的费用将增加。如果TTL设置为较大的值，客户可能会获取过时的文件。TTL应根据系统需求设置。</p>
+<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>域名系统（DNS）是一个将域名转换为互联网协议（IP）地址的数据库。DNS将人们用来定位网站的名称映射到计算机用来定位该网站的IP地址。</p>
 <img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns" width="500">
 
-<h3 id="Web-Tier"><a href="#Web-Tier" class="headerlink" title="Web Tier"></a>Web Tier</h3><p>Web Tier mainly refers to Web Service. Web service mainly contains business logic. Like fetching the data from database and return to user or submit an order on behalf of user etc. Ideally, web tier should be stateless since it can make web tier eailer to scale horizontally.</p>
-<h3 id="Data-Tier"><a href="#Data-Tier" class="headerlink" title="Data Tier"></a>Data Tier</h3><p>Data Tier mainly refers to database or persistent storage. The “persistent” means even if the server shut down, the data will not be lost. On the contaray, some in-memory cache system will lose all data if server get shut down. As data becomes more and more complex, people developed various data base system to accomodate different use case.</p>
+<h3 id="Web层"><a href="#Web层" class="headerlink" title="Web层"></a>Web层</h3><p>Web层主要指Web服务。Web服务主要包含业务逻辑。如从数据库获取数据并返回给用户，或代表用户提交订单等。理想情况下，Web层应该是无状态的，因为这可以使Web层更容易水平扩展。</p>
+<h3 id="数据层"><a href="#数据层" class="headerlink" title="数据层"></a>数据层</h3><p>数据层主要指数据库或持久存储。”持久”意味着即使服务器关闭，数据也不会丢失。相反，一些内存缓存系统如果服务器关闭，将丢失所有数据。随着数据变得越来越复杂，人们开发了各种数据库系统来适应不同的用例。</p>
 <ol>
-<li>Relational Database</li>
-<li>NoSQL (Not only SQL)</li>
+<li>关系型数据库</li>
+<li>NoSQL（不仅仅是SQL）</li>
 </ol>
-<p>Giving an expressive decription of database here would be too ambitious, we will use a single post to discuss it in detail.</p>
-<h3 id="Cache-Tier"><a href="#Cache-Tier" class="headerlink" title="Cache Tier"></a>Cache Tier</h3><p>Cacher Tier emerges as querying database is such an expensive operation. In the mean while, some request can also be expensive like running a model to give calculation. Thanks to the <strong>Principle of Locality</strong>, we know the tendency of a processor to access the same set of memory locations repetitively over a short period of time. It means that the same data could be used multiple times over a short period of time. And that makes cache tier useful in real production. Cache works as a middle-ware inside the system and it can be scaled idenpendently. It also brings a series of challenges like cache overheat, cache missing and data synchronization. Like data tier, we will use a single post to discuss it in detail.</p>
+<p>在这里详细描述数据库太过雄心勃勃，我们将用单独的文章详细讨论它。</p>
+<h3 id="缓存层"><a href="#缓存层" class="headerlink" title="缓存层"></a>缓存层</h3><p>缓存层的出现是因为查询数据库是一个昂贵的操作。同时，一些请求也可能很昂贵，比如运行模型进行计算。多亏了<strong>局部性原理</strong>，我们知道处理器在短时间内重复访问同一组内存位置的趋势。这意味着同一数据可能在短时间内被多次使用。这使得缓存层在实际生产中很有用。缓存作为系统内的中间件工作，可以独立扩展。它也带来了一系列挑战，如缓存过热、缓存未命中和数据同步。与数据层一样，我们将用单独的文章详细讨论它。</p>
 <img src="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png" alt="cache" height="270">
 
-<h3 id="Message-Queue"><a href="#Message-Queue" class="headerlink" title="Message Queue"></a>Message Queue</h3><p>Sometimes we may think if there’s chain of service calling. How could these subsystem to scale independently. i.e If service A is trying to call service B, if service B is not available at the time when service A made the call, then service A must wait, otherwise we will lose the request from customer. We may want something that can abstract service’s input producer and outcome consumer. Here is what message queue come into play.</p>
-<p>Message queues serve as temporary storage services. Producers can publish messages to a MQ regardless of whether consumers are working or not. At the same time, consumers can consume messages from a MQ regardless of whether producers are working or not.</p>
+<h3 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h3><p>有时我们可能会考虑是否存在服务调用链。这些子系统如何独立扩展。例如，如果服务A试图调用服务B，如果服务B在服务A发出调用时不可用，那么服务A必须等待，否则我们将丢失来自客户的请求。我们可能希望有一些东西可以抽象服务的输入生产者和结果消费者。这就是消息队列发挥作用的地方。</p>
+<p>消息队列作为临时存储服务。生产者可以向MQ发布消息，无论消费者是否工作。同时，消费者可以从MQ消费消息，无论生产者是否工作。</p>
 <img src="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png" alt="mq">
+
         </div>
         
         <!-- 文章导航 -->

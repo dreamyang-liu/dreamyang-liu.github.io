@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Parentheses Problems | Tuntun&#39;s Blog</title>
+  <title>括号问题 | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -158,17 +158,27 @@
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
+            <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/08/Random-Algorithm/">Random Algorithm</a>
+            <a href="/2023/08/06/Fenwick-Tree/">树状数组</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Segment-Tree/">Segment Tree</a>
+            <a href="/2023/08/06/Segment-Tree/">线段树</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Binary-Tree-Topics/">二叉树主题</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Binary-Search-Templates/">二分查找模板</a>
           </div>
         
       </div>
@@ -186,7 +196,7 @@
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/String/">String</a>
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/">字符串</a>
             <span class="count">(1)</span>
           </div>
         
@@ -200,14 +210,14 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-file-alt"></i>
-        <span>Parentheses Problems.md</span>
+        <span>括号问题.md</span>
       </div>
     </div>
     
     <div class="content-area">
       <article class="post-content">
         <div class="post-header">
-          <h1>Parentheses Problems</h1>
+          <h1>括号问题</h1>
           <div class="post-meta">
             <span class="date">
               <i class="fas fa-calendar-alt"></i>
@@ -216,7 +226,7 @@
               <span class="categories">
                 <i class="fas fa-folder"></i>
                 <div class="categories-list">
-                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a></li></ul>
                 </div>
               </span>
             
@@ -224,7 +234,7 @@
               <span class="tags">
                 <i class="fas fa-tags"></i>
                 <div class="tags-list">
-                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/String/" rel="tag">String</a></li></ul>
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a></li></ul>
                 </div>
               </span>
             
@@ -232,16 +242,37 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>Parentheses is a kind of interesting problem, it is mainly related to valid parentheses like:</p>
+          <p>括号是一类有趣的问题，主要与有效括号相关，例如：</p>
 <ol>
-<li>Check whether the string is a valid parentheses</li>
-<li>Find the longest valid parentheses (substring) in a substring</li>
-<li>Find the longest valid parentheses (subsequence) in a substring</li>
-<li>Generate all valid parentheses for given length</li>
+<li>检查字符串是否是有效括号</li>
+<li>在子串中找到最长的有效括号（子串）</li>
+<li>在子串中找到最长的有效括号（子序列）</li>
+<li>为给定长度生成所有有效括号</li>
 <li>…</li>
 </ol>
-<p>Before dive into each topic, let’s define what is a valid parentheses. <code>()</code>, <code>()()()()</code> and <code>((((((()))))))(())()</code>.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">isValidParentheses</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>):<br>    need = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> s:<br>        <span class="hljs-keyword">if</span> ch == <span class="hljs-string">&#x27;(&#x27;</span>:<br>            need += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>:<br>            need -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> need &lt; <span class="hljs-number">0</span>:<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">isValidParentheses</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>):<br>    stack = []<br>    <span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> s:<br>        <span class="hljs-keyword">if</span> ch == <span class="hljs-string">&#x27;)&#x27;</span>:<br>            <span class="hljs-keyword">if</span> stack[-<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;(&#x27;</span>:<br>                stack.pop()<br>            <span class="hljs-keyword">else</span>:<br>                stack.append(ch)<br>        <span class="hljs-keyword">else</span>:<br>            stack.append(ch)<br></code></pre></td></tr></table></figure>
+<p>在深入探讨每个主题之前，让我们定义什么是有效括号。<code>()</code>、<code>()()()()</code>和<code>((((((()))))))(())()</code>。</p>
+<pre><code class="language-python">def isValidParentheses(s: str):
+    need = 0
+    for ch in s:
+        if ch == &#39;(&#39;:
+            need += 1
+        else:
+            need -= 1
+            if need &lt; 0:
+                return False
+    return True
+
+def isValidParentheses(s: str):
+    stack = []
+    for ch in s:
+        if ch == &#39;)&#39;:
+            if stack[-1] == &#39;(&#39;:
+                stack.pop()
+            else:
+                stack.append(ch)
+        else:
+            stack.append(ch)
+</code></pre>
 
         </div>
         
@@ -255,7 +286,7 @@
           
           
             <a class="next" href="/2023/09/09/RateLimiter/">
-              RateLimiter Algorithm
+              限流算法
               <i class="fas fa-chevron-right"></i>
             </a>
           

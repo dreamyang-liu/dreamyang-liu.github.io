@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Linux System Overview | Tuntun&#39;s Blog</title>
+  <title>Linux系统概述 | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -143,7 +143,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#File-System"><span class="toc-text">File System</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kernel"><span class="toc-text">Kernel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Environment-Variable"><span class="toc-text">Environment Variable</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PATH"><span class="toc-text">PATH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#External-Devices"><span class="toc-text">External Devices</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-text">文件系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E6%A0%B8"><span class="toc-text">内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">环境变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PATH"><span class="toc-text">PATH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E8%AE%BE%E5%A4%87"><span class="toc-text">外部设备</span></a></li></ol>
       </div>
     </div>
     
@@ -185,14 +185,14 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-file-alt"></i>
-        <span>Linux System Overview.md</span>
+        <span>Linux系统概述.md</span>
       </div>
     </div>
     
     <div class="content-area">
       <article class="post-content">
         <div class="post-header">
-          <h1>Linux System Overview</h1>
+          <h1>Linux系统概述</h1>
           <div class="post-meta">
             <span class="date">
               <i class="fas fa-calendar-alt"></i>
@@ -201,7 +201,7 @@
               <span class="categories">
                 <i class="fas fa-folder"></i>
                 <div class="categories-list">
-                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Overview/">Overview</a></li></ul>
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/%E6%A6%82%E8%BF%B0/">概述</a></li></ul>
                 </div>
               </span>
             
@@ -217,12 +217,12 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>Linux is probably the most widely used operation system in this world. Knowing the fundamental of Linux System could benfit developer in a lot of aspects. In this blog, we will explore some fundamental topics.</p>
-<h2 id="File-System"><a href="#File-System" class="headerlink" title="File System"></a>File System</h2><p>You can find a more detailed <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">File system Hierarchy</a> here.  </p>
-<h2 id="Kernel"><a href="#Kernel" class="headerlink" title="Kernel"></a>Kernel</h2><h2 id="Environment-Variable"><a href="#Environment-Variable" class="headerlink" title="Environment Variable"></a>Environment Variable</h2><h3 id="PATH"><a href="#PATH" class="headerlink" title="PATH"></a>PATH</h3><p><code>PATH</code> is one of the most important environment variable. By default, it will have the value of </p>
+          <p>Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。在这篇博客中，我们将探讨一些基础主题。</p>
+<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>你可以在这里找到更详细的<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">文件系统层次结构</a>。</p>
+<h2 id="内核"><a href="#内核" class="headerlink" title="内核"></a>内核</h2><h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><h3 id="PATH"><a href="#PATH" class="headerlink" title="PATH"></a>PATH</h3><p><code>PATH</code>是最重要的环境变量之一。默认情况下，它的值为</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:<br></code></pre></td></tr></table></figure>
-<p>When you type a command, it will search all the above folders and find whether there’s a file with same name can be found. The user need to have the permission to execute the file other wise it will raise a permission error <code>zsh: permission denied: db.json</code>.</p>
-<h2 id="External-Devices"><a href="#External-Devices" class="headerlink" title="External Devices"></a>External Devices</h2>
+<p>当你输入一个命令时，它会搜索上述所有文件夹，并查找是否存在同名的可执行文件。用户需要有执行该文件的权限，否则会出现权限错误<code>zsh: permission denied: db.json</code>。</p>
+<h2 id="外部设备"><a href="#外部设备" class="headerlink" title="外部设备"></a>外部设备</h2>
         </div>
         
         <!-- 文章导航 -->
@@ -230,12 +230,12 @@
           
             <a class="prev" href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">
               <i class="fas fa-chevron-left"></i>
-              SQL Chapter 1 intro/LIKE/LIMIT/REGEXP/IS NULL
+              SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL
             </a>
           
           
             <a class="next" href="/2023/08/08/Random-Algorithm/">
-              Random Algorithm
+              随机算法
               <i class="fas fa-chevron-right"></i>
             </a>
           

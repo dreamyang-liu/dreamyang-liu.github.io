@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Patience Sorting | Tuntun&#39;s Blog</title>
+  <title>耐心排序 | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -143,7 +143,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Patience-Sorting"><span class="toc-text">Patience Sorting</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%80%90%E5%BF%83%E6%8E%92%E5%BA%8F"><span class="toc-text">耐心排序</span></a></li></ol>
       </div>
     </div>
     
@@ -161,13 +161,13 @@
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Divide-and-Conquer/">Divide and Conquer</a>
-            <span class="count">(1)</span>
+            <a href="/tags/%E5%88%86%E6%B2%BB%E6%B3%95/">分治法</a>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/LIS/">LIS</a>
+            <a href="/tags/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/">最长递增子序列</a>
             <span class="count">(1)</span>
           </div>
         
@@ -181,14 +181,14 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-file-alt"></i>
-        <span>Patience Sorting.md</span>
+        <span>耐心排序.md</span>
       </div>
     </div>
     
     <div class="content-area">
       <article class="post-content">
         <div class="post-header">
-          <h1>Patience Sorting</h1>
+          <h1>耐心排序</h1>
           <div class="post-meta">
             <span class="date">
               <i class="fas fa-calendar-alt"></i>
@@ -198,7 +198,7 @@
               <span class="tags">
                 <i class="fas fa-tags"></i>
                 <div class="tags-list">
-                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Divide-and-Conquer/" rel="tag">Divide and Conquer</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/LIS/" rel="tag">LIS</a></li></ul>
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%88%86%E6%B2%BB%E6%B3%95/" rel="tag">分治法</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/" rel="tag">最长递增子序列</a></li></ul>
                 </div>
               </span>
             
@@ -206,11 +206,41 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <h2 id="Patience-Sorting"><a href="#Patience-Sorting" class="headerlink" title="Patience Sorting"></a>Patience Sorting</h2><p>From wikipedia: <em>Patience sorting is a sorting algorithm in computer science that uses the rules of the card game Patience to sort a list of elements by their values. The goal of the game is to form as few piles as possible</em>. Pateince sorting can be used to solve Longest Increasing Sequence(LIS) problem. </p>
+          <h2 id="耐心排序"><a href="#耐心排序" class="headerlink" title="耐心排序"></a>耐心排序</h2><p>来自维基百科：<em>耐心排序是计算机科学中的一种排序算法，它使用纸牌游戏”耐心”的规则按值对元素列表进行排序。游戏的目标是形成尽可能少的牌堆</em>。耐心排序可用于解决最长递增序列（LIS）问题。</p>
 <img src="https://i.stack.imgur.com/bz2VO.png" alt="patience-sorting" width="600"/>
 
-<p>We can just skip the proof, feel free to refer <a target="_blank" rel="noopener" href="https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf">document</a> for detailed proof. The only thing we nned to know is that the number of piles is equal to the length of longest increasing sequence.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">int</span> <span class="hljs-title function_">lengthOfLIS</span><span class="hljs-params">(<span class="hljs-type">int</span>[] nums)</span> &#123;<br>    <span class="hljs-type">int</span>[] top = <span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[nums.length];<br>    <span class="hljs-comment">// 牌堆数初始化为 0</span><br>    <span class="hljs-type">int</span> <span class="hljs-variable">piles</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; nums.length; i++) &#123;<br>    <span class="hljs-comment">// 要处理的扑克牌int poker = nums[i];</span><br><br>    <span class="hljs-comment">/***** 搜索左侧边界的二分查找 *****/</span><br>    <span class="hljs-type">int</span> <span class="hljs-variable">left</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>, right = piles;<br>    <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">mid</span> <span class="hljs-operator">=</span> (left + right) / <span class="hljs-number">2</span>;<br>        <span class="hljs-keyword">if</span> (top[mid] &gt; poker) &#123;<br>            right = mid;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (top[mid] &lt; poker) &#123;<br>            left = mid + <span class="hljs-number">1</span>;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            right = mid;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 没找到合适的牌堆，新建一堆</span><br>    <span class="hljs-keyword">if</span> (left == piles) piles++;<br>    <span class="hljs-comment">// 把这张牌放到牌堆顶</span><br>            top[left] = poker;<br>        &#125;<br>    <span class="hljs-comment">// 牌堆数就是 LIS 长度</span><br>    <span class="hljs-keyword">return</span> piles;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>我们可以跳过证明，详细证明请参考<a target="_blank" rel="noopener" href="https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf">文档</a>。我们只需要知道牌堆数等于最长递增序列的长度。</p>
+<pre><code class="language-java">int lengthOfLIS(int[] nums) &#123;
+    int[] top = new int[nums.length];
+    // 牌堆数初始化为 0
+    int piles = 0;
+    for (int i = 0; i &lt; nums.length; i++) &#123;
+    // 要处理的扑克牌
+    int poker = nums[i];
+
+    /***** 搜索左侧边界的二分查找 *****/
+    int left = 0, right = piles;
+    while (left &lt; right) &#123;
+        int mid = (left + right) / 2;
+        if (top[mid] &gt; poker) &#123;
+            right = mid;
+        &#125; else if (top[mid] &lt; poker) &#123;
+            left = mid + 1;
+        &#125; else &#123;
+            right = mid;
+        &#125;
+    &#125;
+
+    // 没找到合适的牌堆，新建一堆
+    if (left == piles) piles++;
+    // 把这张牌放到牌堆顶
+            top[left] = poker;
+        &#125;
+    // 牌堆数就是 LIS 长度
+    return piles;
+&#125;
+</code></pre>
+
         </div>
         
         <!-- 文章导航 -->
