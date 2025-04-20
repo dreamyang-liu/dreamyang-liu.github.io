@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -143,40 +146,46 @@
       </div>
       <div class="section-content">
         
-          <a class="category-item " href="/categories/AI/">
-            <i class="fas fa-folder"></i>
-            <span>AI</span>
-            <span class="count">(1)</span>
-          </a>
-        
           <a class="category-item " href="/categories/Algorithm/">
             <i class="fas fa-folder"></i>
             <span>Algorithm</span>
+            <span class="count">(12)</span>
+          </a>
+        
+          <a class="category-item " href="/categories/Cloud-Computing/">
+            <i class="fas fa-folder"></i>
+            <span>Cloud Computing</span>
             <span class="count">(1)</span>
           </a>
         
-          <a class="category-item " href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/">
+          <a class="category-item " href="/categories/Documentation/">
             <i class="fas fa-folder"></i>
-            <span>云计算</span>
+            <span>Documentation</span>
             <span class="count">(1)</span>
           </a>
         
-          <a class="category-item " href="/categories/%E6%A6%82%E8%BF%B0/">
+          <a class="category-item " href="/categories/ML-System/">
             <i class="fas fa-folder"></i>
-            <span>概述</span>
+            <span>ML System</span>
+            <span class="count">(3)</span>
+          </a>
+        
+          <a class="category-item " href="/categories/OS/">
+            <i class="fas fa-folder"></i>
+            <span>OS</span>
             <span class="count">(1)</span>
           </a>
         
-          <a class="category-item " href="/categories/%E7%AE%97%E6%B3%95/">
+          <a class="category-item " href="/categories/System-Design/">
             <i class="fas fa-folder"></i>
-            <span>算法</span>
-            <span class="count">(6)</span>
+            <span>System Design</span>
+            <span class="count">(1)</span>
           </a>
         
           <a class="category-item " href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">
             <i class="fas fa-folder"></i>
             <span>系统设计</span>
-            <span class="count">(2)</span>
+            <span class="count">(1)</span>
           </a>
         
       </div>
@@ -197,106 +206,10 @@
                   <div class="category-section">
             <div class="category-header collapsed">
               <i class="fas fa-folder"></i>
-              <a href="/categories/AI/" class="category-link">
-                <h2>AI</h2>
-              </a>
-              <span class="count">1 posts</span>
-              <i class="fas fa-chevron-down toggle-icon"></i>
-            </div>
-            <div class="category-posts collapsed">
-              
-                <div class="post-item">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="post-info">
-                    <a href="/2023/08/20/LangChain/">LangChain</a>
-                    <span class="date">
-                      <i class="fas fa-calendar-alt"></i>
-                      2023-08-20
-                    </span>
-                  </div>
-                </div>
-              
-            </div>
-          </div>
-                  <div class="category-section">
-            <div class="category-header collapsed">
-              <i class="fas fa-folder"></i>
               <a href="/categories/Algorithm/" class="category-link">
                 <h2>Algorithm</h2>
               </a>
-              <span class="count">1 posts</span>
-              <i class="fas fa-chevron-down toggle-icon"></i>
-            </div>
-            <div class="category-posts collapsed">
-              
-                <div class="post-item">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="post-info">
-                    <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
-                    <span class="date">
-                      <i class="fas fa-calendar-alt"></i>
-                      2023-09-02
-                    </span>
-                  </div>
-                </div>
-              
-            </div>
-          </div>
-                  <div class="category-section">
-            <div class="category-header collapsed">
-              <i class="fas fa-folder"></i>
-              <a href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/" class="category-link">
-                <h2>云计算</h2>
-              </a>
-              <span class="count">1 posts</span>
-              <i class="fas fa-chevron-down toggle-icon"></i>
-            </div>
-            <div class="category-posts collapsed">
-              
-                <div class="post-item">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="post-info">
-                    <a href="/2023/08/15/Docker-Memo/">Docker备忘录</a>
-                    <span class="date">
-                      <i class="fas fa-calendar-alt"></i>
-                      2023-08-15
-                    </span>
-                  </div>
-                </div>
-              
-            </div>
-          </div>
-                  <div class="category-section">
-            <div class="category-header collapsed">
-              <i class="fas fa-folder"></i>
-              <a href="/categories/%E6%A6%82%E8%BF%B0/" class="category-link">
-                <h2>概述</h2>
-              </a>
-              <span class="count">1 posts</span>
-              <i class="fas fa-chevron-down toggle-icon"></i>
-            </div>
-            <div class="category-posts collapsed">
-              
-                <div class="post-item">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="post-info">
-                    <a href="/2023/08/08/Linux-System-Overview/">Linux系统概述</a>
-                    <span class="date">
-                      <i class="fas fa-calendar-alt"></i>
-                      2023-08-08
-                    </span>
-                  </div>
-                </div>
-              
-            </div>
-          </div>
-                  <div class="category-section">
-            <div class="category-header collapsed">
-              <i class="fas fa-folder"></i>
-              <a href="/categories/%E7%AE%97%E6%B3%95/" class="category-link">
-                <h2>算法</h2>
-              </a>
-              <span class="count">6 posts</span>
+              <span class="count">12 posts</span>
               <i class="fas fa-chevron-down toggle-icon"></i>
             </div>
             <div class="category-posts collapsed">
@@ -315,10 +228,54 @@
                 <div class="post-item">
                   <i class="fas fa-file-alt"></i>
                   <div class="post-info">
+                    <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-09-02
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
                     <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
                     <span class="date">
                       <i class="fas fa-calendar-alt"></i>
                       2023-08-08
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Monotonic-Stack-Queue/">Monotonic Stack/Queue</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Union-Find/">并查集</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Trie-Tree/">Trie Tree</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
                     </span>
                   </div>
                 </div>
@@ -359,7 +316,171 @@
                 <div class="post-item">
                   <i class="fas fa-file-alt"></i>
                   <div class="post-info">
+                    <a href="/2023/08/06/Binary-Exponentiation/">二进制快速幂</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Patience-Sorting/">耐心排序</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
                     <a href="/2023/08/06/Binary-Search-Templates/">二分查找模板</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+                  <div class="category-section">
+            <div class="category-header collapsed">
+              <i class="fas fa-folder"></i>
+              <a href="/categories/Cloud-Computing/" class="category-link">
+                <h2>Cloud Computing</h2>
+              </a>
+              <span class="count">1 posts</span>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="category-posts collapsed">
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/15/Docker-Memo/">Docker 杂记</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-15
+                    </span>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+                  <div class="category-section">
+            <div class="category-header collapsed">
+              <i class="fas fa-folder"></i>
+              <a href="/categories/Documentation/" class="category-link">
+                <h2>Documentation</h2>
+              </a>
+              <span class="count">1 posts</span>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="category-posts collapsed">
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2025-04-19
+                    </span>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+                  <div class="category-section">
+            <div class="category-header collapsed">
+              <i class="fas fa-folder"></i>
+              <a href="/categories/ML-System/" class="category-link">
+                <h2>ML System</h2>
+              </a>
+              <span class="count">3 posts</span>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="category-posts collapsed">
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2025-04-17
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/KV-Cache/">KV Cache</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Model-Quant/">Model Quantization</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-06
+                    </span>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+                  <div class="category-section">
+            <div class="category-header collapsed">
+              <i class="fas fa-folder"></i>
+              <a href="/categories/OS/" class="category-link">
+                <h2>OS</h2>
+              </a>
+              <span class="count">1 posts</span>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="category-posts collapsed">
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/08/Linux-System-Overview/">Linux系统概述</a>
+                    <span class="date">
+                      <i class="fas fa-calendar-alt"></i>
+                      2023-08-08
+                    </span>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+                  <div class="category-section">
+            <div class="category-header collapsed">
+              <i class="fas fa-folder"></i>
+              <a href="/categories/System-Design/" class="category-link">
+                <h2>System Design</h2>
+              </a>
+              <span class="count">1 posts</span>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="category-posts collapsed">
+              
+                <div class="post-item">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="post-info">
+                    <a href="/2023/08/06/Consistent-Hashing/">一致性哈希</a>
                     <span class="date">
                       <i class="fas fa-calendar-alt"></i>
                       2023-08-06
@@ -375,21 +496,10 @@
               <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" class="category-link">
                 <h2>系统设计</h2>
               </a>
-              <span class="count">2 posts</span>
+              <span class="count">1 posts</span>
               <i class="fas fa-chevron-down toggle-icon"></i>
             </div>
             <div class="category-posts collapsed">
-              
-                <div class="post-item">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="post-info">
-                    <a href="/2023/08/06/Consistent-Hashing/">一致性哈希</a>
-                    <span class="date">
-                      <i class="fas fa-calendar-alt"></i>
-                      2023-08-06
-                    </span>
-                  </div>
-                </div>
               
                 <div class="post-item">
                   <i class="fas fa-file-alt"></i>

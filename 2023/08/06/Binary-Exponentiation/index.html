@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -151,7 +155,6 @@ mjx-container[display="true"] + br {
 }
 </style></head>
 
-
   <body>
     <div class="wrapper">
       <div class="mobile-menu-toggle">
@@ -261,8 +264,74 @@ mjx-container[display="true"] + br {
     
     <!-- 同分类文章 -->
     
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Monotonic-Stack-Queue/">Monotonic Stack/Queue</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Union-Find/">并查集</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Trie-Tree/">Trie Tree</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Fenwick-Tree/">树状数组</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Segment-Tree/">线段树</a>
+          </div>
+        
+      </div>
+    </div>
+    
     
     <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">快速幂</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
     
   </div>
 
@@ -284,6 +353,20 @@ mjx-container[display="true"] + br {
               <i class="fas fa-calendar-alt"></i>
               2023-08-06
             </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/" rel="tag">快速幂</a></li></ul>
+                </div>
+              </span>
             
           </div>
         </div>

@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Docker备忘录 | Tuntun&#39;s Blog</title>
+  <title>Docker 杂记 | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -143,7 +146,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile"><span class="toc-text">Dockerfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker%E9%95%9C%E5%83%8F"><span class="toc-text">Docker镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F-%E7%88%B6%E9%95%9C%E5%83%8F"><span class="toc-text">基础镜像 &#x2F; 父镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RUN"><span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD"><span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COPY"><span class="toc-text">COPY</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VOLUME"><span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dive"><span class="toc-text">Dive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile"><span class="toc-text">Dockerfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker%E9%95%9C%E5%83%8F"><span class="toc-text">Docker镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F-%E7%88%B6%E9%95%9C%E5%83%8F"><span class="toc-text">基础镜像 &#x2F; 父镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RUN"><span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD"><span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COPY"><span class="toc-text">COPY</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VOLUME"><span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dive"><span class="toc-text">Dive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-FileSystem"><span class="toc-text">Docker FileSystem</span></a></li></ol>
       </div>
     </div>
     
@@ -171,12 +174,6 @@
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item">
-            <i class="fas fa-tag"></i>
             <a href="/tags/Docker/">Docker</a>
             <span class="count">(1)</span>
           </div>
@@ -191,14 +188,14 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-file-alt"></i>
-        <span>Docker备忘录.md</span>
+        <span>Docker 杂记.md</span>
       </div>
     </div>
     
     <div class="content-area">
       <article class="post-content">
         <div class="post-header">
-          <h1>Docker备忘录</h1>
+          <h1>Docker 杂记</h1>
           <div class="post-meta">
             <span class="date">
               <i class="fas fa-calendar-alt"></i>
@@ -207,7 +204,7 @@
               <span class="categories">
                 <i class="fas fa-folder"></i>
                 <div class="categories-list">
-                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/">云计算</a></li></ul>
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Cloud-Computing/">Cloud Computing</a></li></ul>
                 </div>
               </span>
             
@@ -215,7 +212,7 @@
               <span class="tags">
                 <i class="fas fa-tags"></i>
                 <div class="tags-list">
-                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag">容器</a></li></ul>
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Docker/" rel="tag">Docker</a></li></ul>
                 </div>
               </span>
             
@@ -256,20 +253,31 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
 <li><a target="_blank" rel="noopener" href="https://github.com/opencontainers/image-spec/blob/main/manifest.md#oci-image-manifest-specification">OCI镜像清单规范</a></li>
 </ol>
+<h2 id="Docker-FileSystem"><a href="#Docker-FileSystem" class="headerlink" title="Docker FileSystem"></a>Docker FileSystem</h2><p>Docker的filesystem有很多,可以配置，最常用且推荐的目前应该是overlay2，它的性能和稳定性都比较好。如果你对Docker DataRoot list一下，你会发现有很多文件夹，其中有一个是overlay2，这个文件夹就是overlay2的存储位置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker<br>buildkit  containers  engine-id  image  network  overlay2  plugins  runtimes  swarm  tmp  volumes<br></code></pre></td></tr></table></figure>
+
+<p>其中有很多各个文件夹，名字都是一串哈希值，这些文件夹就是各个镜像的FileSystem的存储位置，其中是每个都是一个layer，这个layer有可能是一个image 的layer，也可能是正在运行的container的layer，也可能是一个volume的layer。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker/overlay2<br>074c2e151731c12c6ec2fbb44dc248270142ee04c04d6003795e6a1fc57994f0      <br>89335ec1218350aca441be8a571fd7937473be28bb578ec4908b59b91d6eb8b0<br>074c2e151731c12c6ec2fbb44dc248270142ee04c04d6003795e6a1fc57994f0-init<br>205cc1a3d898504822c0a5c74a32a6572af61e2d8219a472f0cba2e0b5612b11       <br>8bb32d29875df42b515543e512571eece693ce9c0b2dc599d5dd9572cd823fe7<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker/overlay2/205cc1a3d898504822c0a5c74a32a6572af61e2d8219a472f0cba2e0b5612b11<br>diff  <span class="hljs-built_in">link</span>  lower  work<br></code></pre></td></tr></table></figure>
+
+
+<p>这里folder name的hash并不是layer的sha256，而是一个短ID，Overlay2 在磁盘上为该层分配的 diff 目录名。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;GraphDriver&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;LowerDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/ead641d5d5794fe289eed7b83bb46408cca181111f434b57a56d44f99504ac78/diff:&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;MergedDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/merged&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;UpperDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/diff&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;WorkDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/work&quot;</span><br>    <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;Name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;overlay2&quot;</span><br><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br><span class="hljs-attr">&quot;RootFS&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;layers&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;Layers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>        <span class="hljs-string">&quot;sha256:f2a05f227c1388a37b341c57f367d4fffda24260eb043c30c884d9287c626106&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-string">&quot;sha256:80ddc4ff0604054169d1e2e2ad074d7ee4af7ba8174f94af6f3daeab6b13cca2&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-string">&quot;sha256:f646b5a3df86583662f76ff3202439763dce7cbff0af66288198e2a736e343a4&quot;</span><br>    <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>Overlay2 存储结构要点<br>1.	镜像元数据 &amp; LayerDB<br>•	&#x2F;var&#x2F;lib&#x2F;docker&#x2F;image&#x2F;overlay2&#x2F;imagedb&#x2F;content&#x2F;sha256&#x2F;<digest><br>这里的<br>	•	&#x2F;var&#x2F;lib&#x2F;docker&#x2F;image&#x2F;overlay2&#x2F;layerdb&#x2F;sha256&#x2F;<digest>&#x2F;cache-id<br>这个文件里的内容（一个短 ID，比如 36849485abab637c0…）才是 Overlay2 在磁盘上为该层分配的 diff 目录名。<br>	2.	Overlay2 工作目录<br>	•	&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;<cache-id>&#x2F;diff<br>存放该层的实际文件内容。<br>	•	&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;<cache-id>&#x2F;merged<br>容器运行时挂载点，读取时会把 LowerDir + UpperDir overlay 在这里。</p>
 
         </div>
         
         <!-- 文章导航 -->
         <nav class="post-nav">
           
-            <a class="prev" href="/2023/08/20/LangChain/">
+            <a class="prev" href="/2023/09/02/Backtracking-Template/">
               <i class="fas fa-chevron-left"></i>
-              LangChain
+              Backtracking Template
             </a>
           
           
-            <a class="next" href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">
-              SQL 第2章 各种JOINS
+            <a class="next" href="/2023/08/08/Linux-System-Overview/">
+              Linux系统概述
               <i class="fas fa-chevron-right"></i>
             </a>
           

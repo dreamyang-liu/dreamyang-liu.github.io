@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -143,7 +146,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-text">文件系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E6%A0%B8"><span class="toc-text">内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">环境变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PATH"><span class="toc-text">PATH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E8%AE%BE%E5%A4%87"><span class="toc-text">外部设备</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-text">文件系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E6%A0%B8"><span class="toc-text">内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">环境变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PATH"><span class="toc-text">PATH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#I-O%E8%AE%BE%E5%A4%87"><span class="toc-text">I&#x2F;O设备</span></a></li></ol>
       </div>
     </div>
     
@@ -201,7 +204,7 @@
               <span class="categories">
                 <i class="fas fa-folder"></i>
                 <div class="categories-list">
-                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/%E6%A6%82%E8%BF%B0/">概述</a></li></ul>
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/OS/">OS</a></li></ul>
                 </div>
               </span>
             
@@ -217,20 +220,20 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。在这篇博客中，我们将探讨一些基础主题。</p>
+          <p>Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。</p>
 <h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>你可以在这里找到更详细的<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">文件系统层次结构</a>。</p>
 <h2 id="内核"><a href="#内核" class="headerlink" title="内核"></a>内核</h2><h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><h3 id="PATH"><a href="#PATH" class="headerlink" title="PATH"></a>PATH</h3><p><code>PATH</code>是最重要的环境变量之一。默认情况下，它的值为</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:<br></code></pre></td></tr></table></figure>
 <p>当你输入一个命令时，它会搜索上述所有文件夹，并查找是否存在同名的可执行文件。用户需要有执行该文件的权限，否则会出现权限错误<code>zsh: permission denied: db.json</code>。</p>
-<h2 id="外部设备"><a href="#外部设备" class="headerlink" title="外部设备"></a>外部设备</h2>
+<h2 id="I-O设备"><a href="#I-O设备" class="headerlink" title="I&#x2F;O设备"></a>I&#x2F;O设备</h2>
         </div>
         
         <!-- 文章导航 -->
         <nav class="post-nav">
           
-            <a class="prev" href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">
+            <a class="prev" href="/2023/08/15/Docker-Memo/">
               <i class="fas fa-chevron-left"></i>
-              SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL
+              Docker 杂记
             </a>
           
           

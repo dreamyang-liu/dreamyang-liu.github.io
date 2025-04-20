@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -151,7 +155,6 @@ mjx-container[display="true"] + br {
 }
 </style></head>
 
-
   <body>
     <div class="wrapper">
       <div class="mobile-menu-toggle">
@@ -264,41 +267,48 @@ mjx-container[display="true"] + br {
             <i class="fas fa-folder"></i>
             <a href="/categories/Algorithm/" class="category-link">
               <span>Algorithm</span>
+              <span class="count">(12)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Cloud-Computing/" class="category-link">
+              <span>Cloud Computing</span>
               <span class="count">(1)</span>
             </a>
           </div>
           <div class="folder">
             <i class="fas fa-folder"></i>
-            <a href="/categories/%E7%AE%97%E6%B3%95/" class="category-link">
-              <span>算法</span>
-              <span class="count">(6)</span>
+            <a href="/categories/System-Design/" class="category-link">
+              <span>System Design</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/ML-System/" class="category-link">
+              <span>ML System</span>
+              <span class="count">(3)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/OS/" class="category-link">
+              <span>OS</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Documentation/" class="category-link">
+              <span>Documentation</span>
+              <span class="count">(1)</span>
             </a>
           </div>
           <div class="folder">
             <i class="fas fa-folder"></i>
             <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" class="category-link">
               <span>系统设计</span>
-              <span class="count">(2)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/" class="category-link">
-              <span>云计算</span>
-              <span class="count">(1)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/AI/" class="category-link">
-              <span>AI</span>
-              <span class="count">(1)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/%E6%A6%82%E8%BF%B0/" class="category-link">
-              <span>概述</span>
               <span class="count">(1)</span>
             </a>
           </div>
@@ -314,7 +324,15 @@ mjx-container[display="true"] + br {
       <div class="section-content">
           <div class="file">
             <i class="fas fa-file-code"></i>
+            <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
             <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/17/MLSys/">MLSys</a>
           </div>
           <div class="file">
             <i class="fas fa-file-code"></i>
@@ -323,14 +341,6 @@ mjx-container[display="true"] + br {
           <div class="file">
             <i class="fas fa-file-code"></i>
             <a href="/2023/09/09/RateLimiter/">限流算法</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/09/08/Golang-Tutorial-1/">Golang Tutorial 1</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/09/08/Rust-Tutorial-1/">Rust Tutorial 1</a>
           </div>
       </div>
     </div>
@@ -345,12 +355,6 @@ mjx-container[display="true"] + br {
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/AI/">AI</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item">
-            <i class="fas fa-tag"></i>
             <a href="/tags/Backtracking/">Backtracking</a>
             <span class="count">(1)</span>
           </div>
@@ -358,7 +362,7 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Data-Structure/">Data Structure</a>
-            <span class="count">(2)</span>
+            <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
@@ -370,13 +374,13 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/ECC/">ECC</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
@@ -400,24 +404,36 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/ML-System/">ML System</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/MYSQL/">MYSQL</a>
             <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <a href="/tags/Quantization/">Quantization</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
             <a href="/tags/Ring-Reduce/">Ring Reduce</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/mermaid/">mermaid</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/test/">test</a>
             <span class="count">(1)</span>
           </div>
         
@@ -453,20 +469,20 @@ mjx-container[display="true"] + br {
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+            <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">快速幂</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
-            <span class="count">(3)</span>
+            <span class="count">(4)</span>
           </div>
         
           <div class="tag-item">
@@ -517,6 +533,40 @@ mjx-container[display="true"] + br {
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
+                <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-19
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Documentation/">Documentation</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              Mermaid Diagram TestThis post demonstrates the mermaid diagram rendering capability in the blog.
+Flowchart Exampleflowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No|...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/19/Mermaid-Test/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
                 <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
               </span>
             </div>
@@ -526,6 +576,10 @@ mjx-container[display="true"] + br {
                 <i class="fas fa-calendar-alt"></i>
                 2025-04-17
               </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
             </div>
             
             <div class="post-excerpt">
@@ -551,6 +605,38 @@ ECC 逻辑集成在内存控制器，对程序透明。
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
+                <a href="/2025/04/17/MLSys/">MLSys</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-17
+              </span>
+            </div>
+            
+            <div class="post-excerpt">
+              Flowchart Examplegraph TD
+  MLSystems["ML Systems"]
+
+  %% Major branches
+  MLSystems --&gt; Training["Training"]
+  MLSystems --&gt; Inference["Inference"]
+  MLSystems --&gt; Cross["Cross‑cutting &amp;...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/17/MLSys/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
                 <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
               </span>
             </div>
@@ -562,7 +648,7 @@ ECC 逻辑集成在内存控制器，对程序透明。
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                 </span>
             </div>
             
@@ -576,9 +662,7 @@ ECC 逻辑集成在内存控制器，对程序透明。
 …
 
 在深入探讨每个主题之前，让我们定义什么是有效括号。()、()()()()和((((((()))))))(())()。
-def isValidParentheses(s: str):
-    need = 0
-   ...
+123456789101112131415161718192021def isValidPare...
             </div>
             
             <div class="post-footer">
@@ -712,38 +796,7 @@ def isValidParentheses(s: str):
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2023/08/20/LangChain/">LangChain</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-20
-              </span>
-                <span class="category">
-                  <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/AI/">AI</a>
-                </span>
-            </div>
-            
-            <div class="post-excerpt">
-              LangChain is a framework that 
-...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/20/LangChain/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/08/15/Docker-Memo/">Docker备忘录</a>
+                <a href="/2023/08/15/Docker-Memo/">Docker 杂记</a>
               </span>
             </div>
             
@@ -754,7 +807,7 @@ def isValidParentheses(s: str):
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/">云计算</a>
+                  <a class="category-link" href="/categories/Cloud-Computing/">Cloud Computing</a>
                 </span>
             </div>
             
@@ -776,51 +829,31 @@ Docker镜像在深入了解各个组件之前，我们可能想知道Docker镜�
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">SQL 第2章 各种JOINS</a>
+                <a href="/2023/08/08/Linux-System-Overview/">Linux系统概述</a>
               </span>
             </div>
             
             <div class="post-meta">
               <span class="date">
                 <i class="fas fa-calendar-alt"></i>
-                2023-08-13
+                2023-08-08
               </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/OS/">OS</a>
+                </span>
             </div>
             
             <div class="post-excerpt">
-              第2章 各种JOINS内连接
-1234567891011121314SELECT o.order_id, o.customer_id, c.first_name, c.last_nameFROM orders as oINNER JOIN customers as cON o.customer_id = c.customer_id-- inner关键字是可选的-- 这将customers表和ord...
+              Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。
+文件系统你可以在这里找到更详细的文件系统层次结构。
+内核环境变量PATHPATH是最重要的环境变量之一。默认情况下，它的值为
+1/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:
+当你输入一个命令时，它会搜索上述所有文件夹，并查找是否存在同名的可执行文件。用...
             </div>
             
             <div class="post-footer">
-              <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-13
-              </span>
-            </div>
-            
-            <div class="post-excerpt">
-              第1章 介绍&#x2F;LIKE&#x2F;LIMIT&#x2F;REGEXP&#x2F;IS NULLUSE sql_store;  – 使用这个数据库
-123456789SELECT	last_name,	first_name,	points,	points * 10 + 100-- 除了select，所有列都是可选的FROM CustomersWHERE customer_id = 1ORD...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/" class="read-more">
+              <a href="/2023/08/08/Linux-System-Overview/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>

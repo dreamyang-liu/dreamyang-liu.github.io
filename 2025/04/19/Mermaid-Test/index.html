@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title> | Tuntun&#39;s Blog</title>
+  <title>Mermaid Diagram Test | Tuntun&#39;s Blog</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -67,7 +70,7 @@
         <i class="fas fa-folder"></i>
         <span>Categories</span>
       </a>
-      <a href="/tags/" class="nav-item active">
+      <a href="/tags/" class="nav-item ">
         <i class="fas fa-tags"></i>
         <span>Tags</span>
       </a>
@@ -136,254 +139,216 @@
 <div class="vscode-container">
   <!-- 左侧资源管理器 -->
   <div class="sidebar-explorer">
+    <!-- TOC导航 -->
     <div class="explorer-section">
       <div class="section-header">
-        <i class="fas fa-tags"></i>
-        <span>ALL TAGS</span>
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Mermaid-Diagram-Test"><span class="toc-text">Mermaid Diagram Test</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Flowchart-Example"><span class="toc-text">Flowchart Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sequence-Diagram-Example"><span class="toc-text">Sequence Diagram Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Class-Diagram-Example"><span class="toc-text">Class Diagram Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State-Diagram-Example"><span class="toc-text">State Diagram Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gantt-Chart-Example"><span class="toc-text">Gantt Chart Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Entity-Relationship-Diagram"><span class="toc-text">Entity Relationship Diagram</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pie-Chart-Example"><span class="toc-text">Pie Chart Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Journey-Diagram-Example"><span class="toc-text">Journey Diagram Example</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Git-Graph-Example"><span class="toc-text">Git Graph Example</span></a></li></ol></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
       </div>
       <div class="section-content">
         
-          <div class="tag-item ">
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/AI/">AI</a>
+            <a href="/tags/test/">test</a>
             <span class="count">(1)</span>
           </div>
         
-          <div class="tag-item ">
+          <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Backtracking/">Backtracking</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/Data-Structure/">Data Structure</a>
-            <span class="count">(2)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/Docker/">Docker</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/ECC/">ECC</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/GPU/">GPU</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/KV-Cache/">KV Cache</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/LLM/">LLM</a>
-            <span class="count">(2)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/Linux/">Linux</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/ML-System/">ML System</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item active">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/MYSQL/">MYSQL</a>
-            <span class="count">(2)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/Ring-Reduce/">Ring Reduce</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">二分查找</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97%E6%8A%80%E5%B7%A7/">位运算技巧</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%88%86%E6%B2%BB%E6%B3%95/">分治法</a>
-            <span class="count">(2)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/">字符串</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
-            <span class="count">(3)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E6%95%B0%E7%BB%84/">数组</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/">最长递增子序列</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E6%A6%82%E8%BF%B0/">概述</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E7%BA%BF%E6%AE%B5%E6%A0%91/">线段树</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/%E9%9A%8F%E6%9C%BA%E5%8C%96/">随机化</a>
+            <a href="/tags/mermaid/">mermaid</a>
             <span class="count">(1)</span>
           </div>
         
       </div>
     </div>
+    
   </div>
 
   <!-- 主要内容区域 -->
   <div class="editor-content">
     <div class="tab-bar">
       <div class="tab active">
-        <i class="fas fa-tag"></i>
-        <span>tag: MYSQL.md</span>
+        <i class="fas fa-file-alt"></i>
+        <span>Mermaid Diagram Test.md</span>
       </div>
     </div>
     
     <div class="content-area">
-      <div class="tag-header">
-        <h1>
-          <i class="fas fa-tag"></i>
-          Tag: MYSQL
-        </h1>
-        <span class="tag-count">2 posts</span>
-      </div>
-
-      <div class="posts-container">
-        
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">SQL 第2章 各种JOINS</a>
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Mermaid Diagram Test</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2025-04-19
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Documentation/">Documentation</a></li></ul>
+                </div>
               </span>
-            </div>
             
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-13
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/mermaid/" rel="tag">mermaid</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/test/" rel="tag">test</a></li></ul>
+                </div>
               </span>
-              
-            </div>
             
-            <div class="post-excerpt">
-              第2章 各种JOINS内连接
-1234567891011121314SELECT o.order_id, o.customer_id, c.first_name, c.last_nameFROM orders as oINNER JOIN customers as cON o.customer_id = c.customer_id-- inner关键字是可选的-- 这将customers表和ord...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
           </div>
+        </div>
         
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-13
-              </span>
-              
-            </div>
-            
-            <div class="post-excerpt">
-              第1章 介绍&#x2F;LIKE&#x2F;LIMIT&#x2F;REGEXP&#x2F;IS NULLUSE sql_store;  – 使用这个数据库
-123456789SELECT	last_name,	first_name,	points,	points * 10 + 100-- 除了select，所有列都是可选的FROM CustomersWHERE customer_id = 1ORD...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-        
-      </div>
+        <div class="post-body vscode-markdown">
+          <h1 id="Mermaid-Diagram-Test"><a href="#Mermaid-Diagram-Test" class="headerlink" title="Mermaid Diagram Test"></a>Mermaid Diagram Test</h1><p>This post demonstrates the mermaid diagram rendering capability in the blog.</p>
+<h2 id="Flowchart-Example"><a href="#Flowchart-Example" class="headerlink" title="Flowchart Example"></a>Flowchart Example</h2><pre class="mermaid">flowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No| D[Debug]
+    D --> B
+    C --> E[End]</pre>
 
-      
+<h2 id="Sequence-Diagram-Example"><a href="#Sequence-Diagram-Example" class="headerlink" title="Sequence Diagram Example"></a>Sequence Diagram Example</h2><pre class="mermaid">sequenceDiagram
+    participant Browser
+    participant Server
+    Browser->>Server: GET /page
+    Server-->>Browser: HTML Content
+    Browser->>Server: GET /api/data
+    Server-->>Browser: JSON Data
+    Note right of Browser: Renders the page</pre>
+
+<h2 id="Class-Diagram-Example"><a href="#Class-Diagram-Example" class="headerlink" title="Class Diagram Example"></a>Class Diagram Example</h2><pre class="mermaid">classDiagram
+    class Animal {
+        +name: string
+        +age: int
+        +makeSound(): void
+    }
+    class Dog {
+        +breed: string
+        +bark(): void
+    }
+    class Cat {
+        +color: string
+        +meow(): void
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat</pre>
+
+<h2 id="State-Diagram-Example"><a href="#State-Diagram-Example" class="headerlink" title="State Diagram Example"></a>State Diagram Example</h2><pre class="mermaid">stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing: Start
+    Processing --> Completed: Success
+    Processing --> Error: Failure
+    Completed --> [*]
+    Error --> Idle: Retry</pre>
+
+<h2 id="Gantt-Chart-Example"><a href="#Gantt-Chart-Example" class="headerlink" title="Gantt Chart Example"></a>Gantt Chart Example</h2><pre class="mermaid">gantt
+    title Project Schedule
+    dateFormat  YYYY-MM-DD
+    section Planning
+    Research           :a1, 2025-01-01, 30d
+    Design             :a2, after a1, 20d
+    section Development
+    Implementation     :a3, after a2, 40d
+    Testing            :a4, after a3, 15d
+    section Deployment
+    Release            :a5, after a4, 5d</pre>
+
+<h2 id="Entity-Relationship-Diagram"><a href="#Entity-Relationship-Diagram" class="headerlink" title="Entity Relationship Diagram"></a>Entity Relationship Diagram</h2><pre class="mermaid">erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE_ITEM : contains
+    CUSTOMER {
+        string name
+        string email
+    }
+    ORDER {
+        int id
+        date created_at
+    }
+    LINE_ITEM {
+        string product
+        int quantity
+        float price
+    }</pre>
+
+<h2 id="Pie-Chart-Example"><a href="#Pie-Chart-Example" class="headerlink" title="Pie Chart Example"></a>Pie Chart Example</h2><pre class="mermaid">pie title Programming Languages
+    "JavaScript" : 40
+    "Python" : 30
+    "Java" : 20
+    "Other" : 10</pre>
+
+<h2 id="Journey-Diagram-Example"><a href="#Journey-Diagram-Example" class="headerlink" title="Journey Diagram Example"></a>Journey Diagram Example</h2><pre class="mermaid">journey
+    title User Journey
+    section Login
+      Enter credentials: 5: User
+      Validate: 3: System
+      Login success: 5: User, System
+    section Use Application
+      Browse content: 5: User
+      Interact with features: 4: User
+      Save progress: 3: System
+    section Logout
+      Click logout: 5: User
+      Clear session: 5: System</pre>
+
+<h2 id="Git-Graph-Example"><a href="#Git-Graph-Example" class="headerlink" title="Git Graph Example"></a>Git Graph Example</h2><pre class="mermaid">gitGraph
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    branch feature
+    checkout feature
+    commit
+    checkout develop
+    merge feature
+    checkout main
+    merge develop</pre>
+
+<p>This post demonstrates how mermaid diagrams can be used to create various types of visualizations in your blog posts.</p>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+          
+            <a class="next" href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">
+              MLSys 学习笔记 1
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
     </div>
   </div>
 </div>

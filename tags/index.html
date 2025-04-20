@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -142,12 +145,6 @@
       </div>
       <div class="section-content">
         
-          <a class="tag-item" href="/tags/AI/">
-            <i class="fas fa-tag"></i>
-            <span>AI</span>
-            <span class="count">1</span>
-          </a>
-        
           <a class="tag-item" href="/tags/Backtracking/">
             <i class="fas fa-tag"></i>
             <span>Backtracking</span>
@@ -157,7 +154,7 @@
           <a class="tag-item" href="/tags/Data-Structure/">
             <i class="fas fa-tag"></i>
             <span>Data Structure</span>
-            <span class="count">2</span>
+            <span class="count">1</span>
           </a>
         
           <a class="tag-item" href="/tags/Docker/">
@@ -169,13 +166,13 @@
           <a class="tag-item" href="/tags/ECC/">
             <i class="fas fa-tag"></i>
             <span>ECC</span>
-            <span class="count">1</span>
+            <span class="count">2</span>
           </a>
         
           <a class="tag-item" href="/tags/GPU/">
             <i class="fas fa-tag"></i>
             <span>GPU</span>
-            <span class="count">1</span>
+            <span class="count">2</span>
           </a>
         
           <a class="tag-item" href="/tags/KV-Cache/">
@@ -199,24 +196,36 @@
           <a class="tag-item" href="/tags/ML-System/">
             <i class="fas fa-tag"></i>
             <span>ML System</span>
-            <span class="count">1</span>
+            <span class="count">2</span>
           </a>
         
-          <a class="tag-item" href="/tags/MYSQL/">
+          <a class="tag-item" href="/tags/Quantization/">
             <i class="fas fa-tag"></i>
-            <span>MYSQL</span>
-            <span class="count">2</span>
+            <span>Quantization</span>
+            <span class="count">1</span>
           </a>
         
           <a class="tag-item" href="/tags/Reduce-Scatter/">
             <i class="fas fa-tag"></i>
             <span>Reduce-Scatter</span>
-            <span class="count">1</span>
+            <span class="count">2</span>
           </a>
         
           <a class="tag-item" href="/tags/Ring-Reduce/">
             <i class="fas fa-tag"></i>
             <span>Ring Reduce</span>
+            <span class="count">2</span>
+          </a>
+        
+          <a class="tag-item" href="/tags/mermaid/">
+            <i class="fas fa-tag"></i>
+            <span>mermaid</span>
+            <span class="count">1</span>
+          </a>
+        
+          <a class="tag-item" href="/tags/test/">
+            <i class="fas fa-tag"></i>
+            <span>test</span>
             <span class="count">1</span>
           </a>
         
@@ -250,22 +259,22 @@
             <span class="count">1</span>
           </a>
         
-          <a class="tag-item" href="/tags/%E5%AE%B9%E5%99%A8/">
+          <a class="tag-item" href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">
             <i class="fas fa-tag"></i>
-            <span>容器</span>
+            <span>快速幂</span>
             <span class="count">1</span>
           </a>
         
           <a class="tag-item" href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">
             <i class="fas fa-tag"></i>
             <span>持久化模式</span>
-            <span class="count">1</span>
+            <span class="count">2</span>
           </a>
         
           <a class="tag-item" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
             <i class="fas fa-tag"></i>
             <span>数据结构</span>
-            <span class="count">3</span>
+            <span class="count">4</span>
           </a>
         
           <a class="tag-item" href="/tags/%E6%95%B0%E7%BB%84/">
@@ -307,7 +316,7 @@
       <div class="tab active">
         <i class="fas fa-tags"></i>
         <span>tags.md</span>
-        <span class="tab-count">26</span>
+        <span class="tab-count">27</span>
       </div>
     </div>
     
@@ -315,12 +324,6 @@
       <div class="tags-overview">
         <h1><i class="fas fa-tags"></i> All Tags</h1>
         <div class="tags-cloud">
-          
-            <a class="tag-link" href="/tags/AI/">
-              <i class="fas fa-tag"></i>
-              AI
-              <span class="count">1</span>
-            </a>
           
             <a class="tag-link" href="/tags/Backtracking/">
               <i class="fas fa-tag"></i>
@@ -331,7 +334,7 @@
             <a class="tag-link" href="/tags/Data-Structure/">
               <i class="fas fa-tag"></i>
               Data Structure
-              <span class="count">2</span>
+              <span class="count">1</span>
             </a>
           
             <a class="tag-link" href="/tags/Docker/">
@@ -343,13 +346,13 @@
             <a class="tag-link" href="/tags/ECC/">
               <i class="fas fa-tag"></i>
               ECC
-              <span class="count">1</span>
+              <span class="count">2</span>
             </a>
           
             <a class="tag-link" href="/tags/GPU/">
               <i class="fas fa-tag"></i>
               GPU
-              <span class="count">1</span>
+              <span class="count">2</span>
             </a>
           
             <a class="tag-link" href="/tags/KV-Cache/">
@@ -373,24 +376,36 @@
             <a class="tag-link" href="/tags/ML-System/">
               <i class="fas fa-tag"></i>
               ML System
-              <span class="count">1</span>
+              <span class="count">2</span>
             </a>
           
-            <a class="tag-link" href="/tags/MYSQL/">
+            <a class="tag-link" href="/tags/Quantization/">
               <i class="fas fa-tag"></i>
-              MYSQL
-              <span class="count">2</span>
+              Quantization
+              <span class="count">1</span>
             </a>
           
             <a class="tag-link" href="/tags/Reduce-Scatter/">
               <i class="fas fa-tag"></i>
               Reduce-Scatter
-              <span class="count">1</span>
+              <span class="count">2</span>
             </a>
           
             <a class="tag-link" href="/tags/Ring-Reduce/">
               <i class="fas fa-tag"></i>
               Ring Reduce
+              <span class="count">2</span>
+            </a>
+          
+            <a class="tag-link" href="/tags/mermaid/">
+              <i class="fas fa-tag"></i>
+              mermaid
+              <span class="count">1</span>
+            </a>
+          
+            <a class="tag-link" href="/tags/test/">
+              <i class="fas fa-tag"></i>
+              test
               <span class="count">1</span>
             </a>
           
@@ -424,22 +439,22 @@
               <span class="count">1</span>
             </a>
           
-            <a class="tag-link" href="/tags/%E5%AE%B9%E5%99%A8/">
+            <a class="tag-link" href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">
               <i class="fas fa-tag"></i>
-              容器
+              快速幂
               <span class="count">1</span>
             </a>
           
             <a class="tag-link" href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">
               <i class="fas fa-tag"></i>
               持久化模式
-              <span class="count">1</span>
+              <span class="count">2</span>
             </a>
           
             <a class="tag-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
               <i class="fas fa-tag"></i>
               数据结构
-              <span class="count">3</span>
+              <span class="count">4</span>
             </a>
           
             <a class="tag-link" href="/tags/%E6%95%B0%E7%BB%84/">

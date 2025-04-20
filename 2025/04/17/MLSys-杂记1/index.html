@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -151,7 +155,6 @@ mjx-container[display="true"] + br {
 }
 </style></head>
 
-
   <body>
     <div class="wrapper">
       <div class="mobile-menu-toggle">
@@ -261,6 +264,26 @@ mjx-container[display="true"] + br {
     
     <!-- 同分类文章 -->
     
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/KV-Cache/">KV Cache</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/Model-Quant/">Model Quantization</a>
+          </div>
+        
+      </div>
+    </div>
+    
     
     <!-- 标签列表 -->
     
@@ -274,31 +297,31 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/ECC/">ECC</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Ring-Reduce/">Ring Reduce</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
       </div>
@@ -324,6 +347,13 @@ mjx-container[display="true"] + br {
               <i class="fas fa-calendar-alt"></i>
               2025-04-17
             </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/ML-System/">ML System</a></li></ul>
+                </div>
+              </span>
+            
             
               <span class="tags">
                 <i class="fas fa-tags"></i>
@@ -432,9 +462,14 @@ mjx-container[display="true"] + br {
         <!-- 文章导航 -->
         <nav class="post-nav">
           
+            <a class="prev" href="/2025/04/19/Mermaid-Test/">
+              <i class="fas fa-chevron-left"></i>
+              Mermaid Diagram Test
+            </a>
           
-            <a class="next" href="/2023/09/17/Parentheses-Problems/">
-              括号问题
+          
+            <a class="next" href="/2025/04/17/MLSys/">
+              MLSys
               <i class="fas fa-chevron-right"></i>
             </a>
           

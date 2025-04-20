@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -151,7 +155,6 @@ mjx-container[display="true"] + br {
 }
 </style></head>
 
-
   <body>
     <div class="wrapper">
       <div class="mobile-menu-toggle">
@@ -264,41 +267,48 @@ mjx-container[display="true"] + br {
             <i class="fas fa-folder"></i>
             <a href="/categories/Algorithm/" class="category-link">
               <span>Algorithm</span>
+              <span class="count">(12)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Cloud-Computing/" class="category-link">
+              <span>Cloud Computing</span>
               <span class="count">(1)</span>
             </a>
           </div>
           <div class="folder">
             <i class="fas fa-folder"></i>
-            <a href="/categories/%E7%AE%97%E6%B3%95/" class="category-link">
-              <span>算法</span>
-              <span class="count">(6)</span>
+            <a href="/categories/System-Design/" class="category-link">
+              <span>System Design</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/ML-System/" class="category-link">
+              <span>ML System</span>
+              <span class="count">(3)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/OS/" class="category-link">
+              <span>OS</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Documentation/" class="category-link">
+              <span>Documentation</span>
+              <span class="count">(1)</span>
             </a>
           </div>
           <div class="folder">
             <i class="fas fa-folder"></i>
             <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" class="category-link">
               <span>系统设计</span>
-              <span class="count">(2)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/" class="category-link">
-              <span>云计算</span>
-              <span class="count">(1)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/AI/" class="category-link">
-              <span>AI</span>
-              <span class="count">(1)</span>
-            </a>
-          </div>
-          <div class="folder">
-            <i class="fas fa-folder"></i>
-            <a href="/categories/%E6%A6%82%E8%BF%B0/" class="category-link">
-              <span>概述</span>
               <span class="count">(1)</span>
             </a>
           </div>
@@ -314,7 +324,15 @@ mjx-container[display="true"] + br {
       <div class="section-content">
           <div class="file">
             <i class="fas fa-file-code"></i>
+            <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
             <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/17/MLSys/">MLSys</a>
           </div>
           <div class="file">
             <i class="fas fa-file-code"></i>
@@ -323,14 +341,6 @@ mjx-container[display="true"] + br {
           <div class="file">
             <i class="fas fa-file-code"></i>
             <a href="/2023/09/09/RateLimiter/">限流算法</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/09/08/Golang-Tutorial-1/">Golang Tutorial 1</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/09/08/Rust-Tutorial-1/">Rust Tutorial 1</a>
           </div>
       </div>
     </div>
@@ -345,12 +355,6 @@ mjx-container[display="true"] + br {
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/AI/">AI</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item">
-            <i class="fas fa-tag"></i>
             <a href="/tags/Backtracking/">Backtracking</a>
             <span class="count">(1)</span>
           </div>
@@ -358,7 +362,7 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Data-Structure/">Data Structure</a>
-            <span class="count">(2)</span>
+            <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
@@ -370,13 +374,13 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/ECC/">ECC</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
@@ -400,24 +404,36 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/ML-System/">ML System</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/MYSQL/">MYSQL</a>
             <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <a href="/tags/Quantization/">Quantization</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
             <a href="/tags/Ring-Reduce/">Ring Reduce</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/mermaid/">mermaid</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/test/">test</a>
             <span class="count">(1)</span>
           </div>
         
@@ -453,20 +469,20 @@ mjx-container[display="true"] + br {
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+            <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">快速幂</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
-            <span class="count">(3)</span>
+            <span class="count">(4)</span>
           </div>
         
           <div class="tag-item">
@@ -517,40 +533,6 @@ mjx-container[display="true"] + br {
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2023/08/08/Linux-System-Overview/">Linux系统概述</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-08
-              </span>
-                <span class="category">
-                  <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E6%A6%82%E8%BF%B0/">概述</a>
-                </span>
-            </div>
-            
-            <div class="post-excerpt">
-              Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。在这篇博客中，我们将探讨一些基础主题。
-文件系统你可以在这里找到更详细的文件系统层次结构。
-内核环境变量PATHPATH是最重要的环境变量之一。默认情况下，它的值为
-1/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:
-当你输入一个命令时，它会搜索上述所有文件...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/08/Linux-System-Overview/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
                 <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
               </span>
             </div>
@@ -562,7 +544,7 @@ mjx-container[display="true"] + br {
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                 </span>
             </div>
             
@@ -591,6 +573,10 @@ mjx-container[display="true"] + br {
                 <i class="fas fa-calendar-alt"></i>
                 2023-08-06
               </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
             </div>
             
             <div class="post-excerpt">
@@ -617,6 +603,10 @@ mjx-container[display="true"] + br {
                 <i class="fas fa-calendar-alt"></i>
                 2023-08-06
               </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
             </div>
             
             <div class="post-excerpt">
@@ -650,6 +640,10 @@ mjx-container[display="true"] + br {
                 <i class="fas fa-calendar-alt"></i>
                 2023-08-06
               </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
             </div>
             
             <div class="post-excerpt">
@@ -678,7 +672,7 @@ mjx-container[display="true"] + br {
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                 </span>
             </div>
             
@@ -716,7 +710,7 @@ mjx-container[display="true"] + br {
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                 </span>
             </div>
             
@@ -748,7 +742,7 @@ mjx-container[display="true"] + br {
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">系统设计</a>
+                  <a class="category-link" href="/categories/System-Design/">System Design</a>
                 </span>
             </div>
             
@@ -820,7 +814,7 @@ Partition Tolerance在CAP理论中,Partition Tolerance(分区容忍性)是指系
               </span>
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                 </span>
             </div>
             
@@ -832,6 +826,38 @@ Partition Tolerance在CAP理论中,Partition Tolerance(分区容忍性)是指系
             
             <div class="post-footer">
               <a href="/2023/08/06/Binary-Tree-Topics/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/06/Binary-Exponentiation/">二进制快速幂</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-06
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              二进制快速幂二进制快速幂（简称BE）是一种可以加速幂运算计算的技术。对于朴素的幂运算 ，时间复杂度是 ，而使用二进制快速幂，时间复杂度降为 。让我们从一个例子开始，
+假设  是一个32位整数，这意味着最多我们只需要计算32次，并检查  是否包含在内。
+123456789101112131415161718public int fastPower(int a, int exp) {    if (e...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/06/Binary-Exponentiation/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>

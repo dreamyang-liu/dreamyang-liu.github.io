@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -246,14 +249,28 @@
             <div class="folder">
               <i class="fas fa-folder"></i>
               <span>2025</span>
-              <span class="count">(1)</span>
+              <span class="count">(3)</span>
             </div>
             <div class="archive-posts">
               
                 <div class="file ">
                   <i class="fas fa-file-alt"></i>
+                  <a href="/2025/04/19/Mermaid-Test/">
+                    04-19 Mermaid Diagram Test
+                  </a>
+                </div>
+              
+                <div class="file ">
+                  <i class="fas fa-file-alt"></i>
                   <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">
                     04-17 MLSys 学习笔记 1
+                  </a>
+                </div>
+              
+                <div class="file ">
+                  <i class="fas fa-file-alt"></i>
+                  <a href="/2025/04/17/MLSys/">
+                    04-17 MLSys
                   </a>
                 </div>
               
@@ -264,7 +281,7 @@
             <div class="folder">
               <i class="fas fa-folder"></i>
               <span>2023</span>
-              <span class="count">(23)</span>
+              <span class="count">(21)</span>
             </div>
             <div class="archive-posts">
               
@@ -305,29 +322,8 @@
               
                 <div class="file ">
                   <i class="fas fa-file-alt"></i>
-                  <a href="/2023/08/20/LangChain/">
-                    08-20 LangChain
-                  </a>
-                </div>
-              
-                <div class="file ">
-                  <i class="fas fa-file-alt"></i>
                   <a href="/2023/08/15/Docker-Memo/">
-                    08-15 Docker备忘录
-                  </a>
-                </div>
-              
-                <div class="file ">
-                  <i class="fas fa-file-alt"></i>
-                  <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">
-                    08-13 SQL 第2章 各种JOINS
-                  </a>
-                </div>
-              
-                <div class="file ">
-                  <i class="fas fa-file-alt"></i>
-                  <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">
-                    08-13 SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL
+                    08-15 Docker 杂记
                   </a>
                 </div>
               
@@ -417,6 +413,13 @@
               
                 <div class="file ">
                   <i class="fas fa-file-alt"></i>
+                  <a href="/2023/08/06/Model-Quant/">
+                    08-06 Model Quantization
+                  </a>
+                </div>
+              
+                <div class="file ">
+                  <i class="fas fa-file-alt"></i>
                   <a href="/2023/08/06/Patience-Sorting/">
                     08-06 耐心排序
                   </a>
@@ -460,9 +463,33 @@
             <div class="year-header">
               <i class="fas fa-calendar-alt"></i>
               2025
-              <span class="year-count">(1 posts)</span>
+              <span class="year-count">(3 posts)</span>
             </div>
             <div class="year-posts">
+              
+                <div class="timeline-post">
+                  <div class="post-date">
+                    <i class="fas fa-clock"></i>
+                    04-19
+                  </div>
+                  <div class="post-info">
+                    <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
+                    <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Documentation/">Documentation</a>
+                        </span>
+                      
+                      
+                        <span class="tags">
+                          <i class="fas fa-tags"></i>
+                          <a class="tag-none-link" href="/tags/mermaid/" rel="tag">mermaid</a>, <a class="tag-none-link" href="/tags/test/" rel="tag">test</a>
+                        </span>
+                      
+                    </div>
+                  </div>
+                </div>
               
                 <div class="timeline-post">
                   <div class="post-date">
@@ -471,6 +498,30 @@
                   </div>
                   <div class="post-info">
                     <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+                    <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/ML-System/">ML System</a>
+                        </span>
+                      
+                      
+                        <span class="tags">
+                          <i class="fas fa-tags"></i>
+                          <a class="tag-none-link" href="/tags/ECC/" rel="tag">ECC</a>, <a class="tag-none-link" href="/tags/GPU/" rel="tag">GPU</a>, <a class="tag-none-link" href="/tags/Reduce-Scatter/" rel="tag">Reduce-Scatter</a>, <a class="tag-none-link" href="/tags/Ring-Reduce/" rel="tag">Ring Reduce</a>, <a class="tag-none-link" href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/" rel="tag">持久化模式</a>
+                        </span>
+                      
+                    </div>
+                  </div>
+                </div>
+              
+                <div class="timeline-post">
+                  <div class="post-date">
+                    <i class="fas fa-clock"></i>
+                    04-17
+                  </div>
+                  <div class="post-info">
+                    <a href="/2025/04/17/MLSys/">MLSys</a>
                     <div class="post-meta">
                       
                       
@@ -490,7 +541,7 @@
             <div class="year-header">
               <i class="fas fa-calendar-alt"></i>
               2023
-              <span class="year-count">(23 posts)</span>
+              <span class="year-count">(21 posts)</span>
             </div>
             <div class="year-posts">
               
@@ -505,7 +556,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       
@@ -587,83 +638,21 @@
                 <div class="timeline-post">
                   <div class="post-date">
                     <i class="fas fa-clock"></i>
-                    08-20
-                  </div>
-                  <div class="post-info">
-                    <a href="/2023/08/20/LangChain/">LangChain</a>
-                    <div class="post-meta">
-                      
-                        <span class="category">
-                          <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/AI/">AI</a>
-                        </span>
-                      
-                      
-                        <span class="tags">
-                          <i class="fas fa-tags"></i>
-                          <a class="tag-none-link" href="/tags/AI/" rel="tag">AI</a>, <a class="tag-none-link" href="/tags/LLM/" rel="tag">LLM</a>
-                        </span>
-                      
-                    </div>
-                  </div>
-                </div>
-              
-                <div class="timeline-post">
-                  <div class="post-date">
-                    <i class="fas fa-clock"></i>
                     08-15
                   </div>
                   <div class="post-info">
-                    <a href="/2023/08/15/Docker-Memo/">Docker备忘录</a>
+                    <a href="/2023/08/15/Docker-Memo/">Docker 杂记</a>
                     <div class="post-meta">
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/">云计算</a>
+                          <a class="category-link" href="/categories/Cloud-Computing/">Cloud Computing</a>
                         </span>
                       
                       
                         <span class="tags">
                           <i class="fas fa-tags"></i>
-                          <a class="tag-none-link" href="/tags/Docker/" rel="tag">Docker</a>, <a class="tag-none-link" href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag">容器</a>
-                        </span>
-                      
-                    </div>
-                  </div>
-                </div>
-              
-                <div class="timeline-post">
-                  <div class="post-date">
-                    <i class="fas fa-clock"></i>
-                    08-13
-                  </div>
-                  <div class="post-info">
-                    <a href="/2023/08/13/SQL-Chapter-2-%E5%90%84%E7%A7%8DJOINS/">SQL 第2章 各种JOINS</a>
-                    <div class="post-meta">
-                      
-                      
-                        <span class="tags">
-                          <i class="fas fa-tags"></i>
-                          <a class="tag-none-link" href="/tags/MYSQL/" rel="tag">MYSQL</a>
-                        </span>
-                      
-                    </div>
-                  </div>
-                </div>
-              
-                <div class="timeline-post">
-                  <div class="post-date">
-                    <i class="fas fa-clock"></i>
-                    08-13
-                  </div>
-                  <div class="post-info">
-                    <a href="/2023/08/13/SQL-Chapter-1-intro-LIKE-LIMIT-REGEXP-IS-NULL/">SQL 第1章 介绍/LIKE/LIMIT/REGEXP/IS NULL</a>
-                    <div class="post-meta">
-                      
-                      
-                        <span class="tags">
-                          <i class="fas fa-tags"></i>
-                          <a class="tag-none-link" href="/tags/MYSQL/" rel="tag">MYSQL</a>
+                          <a class="tag-none-link" href="/tags/Docker/" rel="tag">Docker</a>
                         </span>
                       
                     </div>
@@ -681,7 +670,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E6%A6%82%E8%BF%B0/">概述</a>
+                          <a class="category-link" href="/categories/OS/">OS</a>
                         </span>
                       
                       
@@ -705,7 +694,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       
@@ -727,6 +716,11 @@
                     <a href="/2023/08/06/Monotonic-Stack-Queue/">Monotonic Stack/Queue</a>
                     <div class="post-meta">
                       
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                        </span>
+                      
                       
                         <span class="tags">
                           <i class="fas fa-tags"></i>
@@ -745,6 +739,11 @@
                   <div class="post-info">
                     <a href="/2023/08/06/Union-Find/">并查集</a>
                     <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                        </span>
                       
                       
                         <span class="tags">
@@ -765,10 +764,15 @@
                     <a href="/2023/08/06/Trie-Tree/">Trie Tree</a>
                     <div class="post-meta">
                       
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                        </span>
+                      
                       
                         <span class="tags">
                           <i class="fas fa-tags"></i>
-                          <a class="tag-none-link" href="/tags/Data-Structure/" rel="tag">Data Structure</a>
+                          <a class="tag-none-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a>
                         </span>
                       
                     </div>
@@ -786,7 +790,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       
@@ -810,7 +814,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       
@@ -834,7 +838,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">系统设计</a>
+                          <a class="category-link" href="/categories/System-Design/">System Design</a>
                         </span>
                       
                       
@@ -877,7 +881,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       
@@ -899,6 +903,16 @@
                     <a href="/2023/08/06/Binary-Exponentiation/">二进制快速幂</a>
                     <div class="post-meta">
                       
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                        </span>
+                      
+                      
+                        <span class="tags">
+                          <i class="fas fa-tags"></i>
+                          <a class="tag-none-link" href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/" rel="tag">快速幂</a>
+                        </span>
                       
                     </div>
                   </div>
@@ -912,6 +926,11 @@
                   <div class="post-info">
                     <a href="/2023/08/06/KV-Cache/">KV Cache</a>
                     <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/ML-System/">ML System</a>
+                        </span>
                       
                       
                         <span class="tags">
@@ -929,8 +948,37 @@
                     08-06
                   </div>
                   <div class="post-info">
+                    <a href="/2023/08/06/Model-Quant/">Model Quantization</a>
+                    <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/ML-System/">ML System</a>
+                        </span>
+                      
+                      
+                        <span class="tags">
+                          <i class="fas fa-tags"></i>
+                          <a class="tag-none-link" href="/tags/LLM/" rel="tag">LLM</a>, <a class="tag-none-link" href="/tags/ML-System/" rel="tag">ML System</a>, <a class="tag-none-link" href="/tags/Quantization/" rel="tag">Quantization</a>
+                        </span>
+                      
+                    </div>
+                  </div>
+                </div>
+              
+                <div class="timeline-post">
+                  <div class="post-date">
+                    <i class="fas fa-clock"></i>
+                    08-06
+                  </div>
+                  <div class="post-info">
                     <a href="/2023/08/06/Patience-Sorting/">耐心排序</a>
                     <div class="post-meta">
+                      
+                        <span class="category">
+                          <i class="fas fa-folder"></i>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                        </span>
                       
                       
                         <span class="tags">
@@ -953,7 +1001,7 @@
                       
                         <span class="category">
                           <i class="fas fa-folder"></i>
-                          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                          <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
                         </span>
                       
                       

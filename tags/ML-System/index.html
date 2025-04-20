@@ -12,9 +12,13 @@
   <!-- 添加代码高亮样式 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <!-- 添加highlight.js库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  <link rel="stylesheet" href="/css/code.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
   <link rel="stylesheet" href="/css/code-custom.css">
   <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
 
   <link rel="stylesheet" href="/css/vscode.css">
   <link rel="stylesheet" href="/css/post.css">
@@ -38,7 +42,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
-
 
   <body>
     <div class="wrapper">
@@ -145,12 +148,6 @@
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
-            <a href="/tags/AI/">AI</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
             <a href="/tags/Backtracking/">Backtracking</a>
             <span class="count">(1)</span>
           </div>
@@ -158,7 +155,7 @@
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/Data-Structure/">Data Structure</a>
-            <span class="count">(2)</span>
+            <span class="count">(1)</span>
           </div>
         
           <div class="tag-item ">
@@ -170,13 +167,13 @@
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/ECC/">ECC</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
@@ -200,24 +197,36 @@
           <div class="tag-item active">
             <i class="fas fa-tag"></i>
             <a href="/tags/ML-System/">ML System</a>
-            <span class="count">(1)</span>
-          </div>
-        
-          <div class="tag-item ">
-            <i class="fas fa-tag"></i>
-            <a href="/tags/MYSQL/">MYSQL</a>
             <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
-            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <a href="/tags/Quantization/">Quantization</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
             <a href="/tags/Ring-Reduce/">Ring Reduce</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/mermaid/">mermaid</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/test/">test</a>
             <span class="count">(1)</span>
           </div>
         
@@ -253,20 +262,20 @@
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
-            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+            <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">快速幂</a>
             <span class="count">(1)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
-            <span class="count">(3)</span>
+            <span class="count">(4)</span>
           </div>
         
           <div class="tag-item ">
@@ -318,7 +327,7 @@
           <i class="fas fa-tag"></i>
           Tag: ML System
         </h1>
-        <span class="tag-count">1 posts</span>
+        <span class="tag-count">2 posts</span>
       </div>
 
       <div class="posts-container">
@@ -337,6 +346,11 @@
                 2023-08-06
               </span>
               
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
+              
             </div>
             
             <div class="post-excerpt">
@@ -347,6 +361,40 @@
             
             <div class="post-footer">
               <a href="/2023/08/06/KV-Cache/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+        
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/06/Model-Quant/">Model Quantization</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-06
+              </span>
+              
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
+              
+            </div>
+            
+            <div class="post-excerpt">
+              Model Quantization量化是一种用来减少模型大小和加速推理的技术。主要是通过把模型权重从较高精度的数据类型如FP32转换为较低精度的数据类型如FP16/INT8来实现的。当然也有更加激进的量化方式，比如把权重量化到INT4，甚至是二值化，BitNet恐怖如斯。
+这里可能要注意一下，量化到INT8和FP8是不一样的，INT8是整数，FP8是浮点数，两者的表示范围和精度是不一样的。一般来...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/06/Model-Quant/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>

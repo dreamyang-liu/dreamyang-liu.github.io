@@ -399,15 +399,15 @@ pre, pre code, .copy-button {
 /* 代码块容器样式 */
 .hljs {
   width: 100%;
-  max-width: 100%;
+  max-width: 769.2px;
   tab-size: 4;
   -moz-tab-size: 4;
-  white-space: pre-wrap;  /* 允许代码自动换行 */
+  white-space: pre;  /* 允许代码自动换行 */
   word-break: break-word; /* 允许在单词内换行 */
   word-wrap: break-word;
   overflow-x: auto;
   padding: 0.5em;
-  min-width: 100%;
+  min-width: auto;
   font-size: 14px;
   line-height: 1.5;
 }
