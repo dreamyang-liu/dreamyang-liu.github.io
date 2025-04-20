@@ -324,6 +324,10 @@ mjx-container[display="true"] + br {
       <div class="section-content">
           <div class="file">
             <i class="fas fa-file-code"></i>
+            <a href="/2025/04/19/Model-Quant/">Model Quantization</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
             <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
           </div>
           <div class="file">
@@ -337,10 +341,6 @@ mjx-container[display="true"] + br {
           <div class="file">
             <i class="fas fa-file-code"></i>
             <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2023/09/09/RateLimiter/">限流算法</a>
           </div>
       </div>
     </div>
@@ -533,6 +533,38 @@ mjx-container[display="true"] + br {
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
+                <a href="/2023/08/06/Binary-Exponentiation/">二进制快速幂</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-06
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              二进制快速幂二进制快速幂（简称BE）是一种可以加速幂运算计算的技术。对于朴素的幂运算 ，时间复杂度是 ，而使用二进制快速幂，时间复杂度降为 。让我们从一个例子开始，
+假设  是一个32位整数，这意味着最多我们只需要计算32次，并检查  是否包含在内。
+123456789101112131415161718public int fastPower(int a, int exp) {    if (e...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/06/Binary-Exponentiation/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
                 <a href="/2023/08/06/KV-Cache/">KV Cache</a>
               </span>
             </div>
@@ -556,37 +588,6 @@ mjx-container[display="true"] + br {
             
             <div class="post-footer">
               <a href="/2023/08/06/KV-Cache/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/08/06/Model-Quant/">Model Quantization</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-08-06
-              </span>
-                <span class="category">
-                  <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/ML-System/">ML System</a>
-                </span>
-            </div>
-            
-            <div class="post-excerpt">
-              Model Quantization量化是一种用来减少模型大小和加速推理的技术。主要是通过把模型权重从较高精度的数据类型如FP32转换为较低精度的数据类型如FP16/INT8来实现的。当然也有更加激进的量化方式，比如把权重量化到INT4，甚至是二值化，BitNet恐怖如斯。
-这里可能要注意一下，量化到INT8和FP8是不一样的，INT8是整数，FP8是浮点数，两者的表示范围和精度是不一样的。一般来...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/08/06/Model-Quant/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
