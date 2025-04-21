@@ -170,7 +170,7 @@
             <span class="count">(2)</span>
           </div>
         
-          <div class="tag-item active">
+          <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
             <span class="count">(2)</span>
@@ -212,7 +212,7 @@
             <span class="count">(1)</span>
           </div>
         
-          <div class="tag-item ">
+          <div class="tag-item active">
             <i class="fas fa-tag"></i>
             <a href="/tags/Rate-Limiter/">Rate Limiter</a>
             <span class="count">(1)</span>
@@ -329,7 +329,7 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-tag"></i>
-        <span>tag: GPU.md</span>
+        <span>tag: Rate%20Limiter.md</span>
       </div>
     </div>
     
@@ -337,9 +337,9 @@
       <div class="tag-header">
         <h1>
           <i class="fas fa-tag"></i>
-          Tag: GPU
+          Tag: Rate Limiter
         </h1>
-        <span class="tag-count">2 posts</span>
+        <span class="tag-count">1 posts</span>
       </div>
 
       <div class="posts-container">
@@ -348,71 +348,34 @@
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+                <a href="/2023/09/09/RateLimiter/">限流算法</a>
               </span>
             </div>
             
             <div class="post-meta">
               <span class="date">
                 <i class="fas fa-calendar-alt"></i>
-                2025-04-17
+                2023-09-09
               </span>
               
                 <span class="category">
                   <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                  <a class="category-link" href="/categories/System-Design/">System Design</a>
                 </span>
               
             </div>
             
             <div class="post-excerpt">
-              1. GPU ECC（Error‑Correcting Code）
-原理：在显存（VRAM）中为每 N 位数据生成冗余校验位，常见为 SECDED（单错纠正、双错检测）。  
-实现：  
-专业级卡（Tesla/Quadro/A100、AMD Instinct）默认支持 ECC，消费级卡多关闭或不支持。  
-ECC 逻辑集成在内存控制器，对程序透明。
+              限流器是分布式系统中的一个关键组件。通常，我们可以用它来防止DDoS或恶意请求。在这篇文章中，我们将介绍几种可用于限流的算法。
+令牌桶令牌桶是一个具有预定义容量的容器。令牌以预设的速率定期放入桶中。一旦桶满了，就不会再添加令牌。如图所示，令牌桶容量为4。填充器每秒向桶中放入2个令牌。一旦桶满了，多余的令牌就会溢出。
 
 
-优缺点：  
-优点：避免显存位翻转导致的 S...
+令牌桶可以处理突发请求，并且可以确保限制不会超过预设的容量。
+漏桶漏桶类似于令...
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
-        
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2025/04/17/MLSys/">MLSys</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2025-04-17
-              </span>
-              
-            </div>
-            
-            <div class="post-excerpt">
-              Flowchart Examplegraph TD
-  MLSystems["ML Systems"]
-
-  %% Major branches
-  MLSystems --&gt; Training["Training"]
-  MLSystems --&gt; Inference["Inference"]
-  MLSystems --&gt; Cross["Cross‑cutting &amp;...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2025/04/17/MLSys/" class="read-more">
+              <a href="/2023/09/09/RateLimiter/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
