@@ -172,6 +172,12 @@
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Finetune/">Finetune</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
             <a href="/tags/GPU/">GPU</a>
             <span class="count">(2)</span>
           </div>
@@ -185,7 +191,7 @@
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/LLM/">LLM</a>
-            <span class="count">(3)</span>
+            <span class="count">(4)</span>
           </div>
         
           <div class="tag-item ">
@@ -196,11 +202,23 @@
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
+            <a href="/tags/LoRA/">LoRA</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
             <a href="/tags/ML-System/">ML System</a>
             <span class="count">(2)</span>
           </div>
         
           <div class="tag-item active">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/PEFT/">PEFT</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/Peft/">Peft</a>
             <span class="count">(1)</span>
@@ -329,7 +347,7 @@
     <div class="tab-bar">
       <div class="tab active">
         <i class="fas fa-tag"></i>
-        <span>tag: Peft.md</span>
+        <span>tag: PEFT.md</span>
       </div>
     </div>
     
@@ -337,7 +355,7 @@
       <div class="tag-header">
         <h1>
           <i class="fas fa-tag"></i>
-          Tag: Peft
+          Tag: PEFT
         </h1>
         <span class="tag-count">1 posts</span>
       </div>
@@ -348,33 +366,34 @@
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/20/Peft/">Parameter Efficient Fine-Tuning</a>
+                <a href="/2025/04/27/Peft-Finetuning-SFT/">Peft Finetune LoRA Example</a>
               </span>
             </div>
             
             <div class="post-meta">
               <span class="date">
                 <i class="fas fa-calendar-alt"></i>
-                2025-04-20
+                2025-04-27
               </span>
-              
-                <span class="category">
-                  <i class="fas fa-folder"></i>
-                  <a class="category-link" href="/categories/Machine-Learning/">Machine Learning</a>
-                </span>
               
             </div>
             
             <div class="post-excerpt">
-              LLM Training StagesCurrently the training of Large Language Models (LLMs) can be divided into three stages:
-graph LR
-A[Pre-training] --&gt; B[Fine-tuning] --&gt; C[Inference]
+              Steps
+Get a pretrained model from Huggingface
+Load the model and tokenizer
+Prepare the dataset
+Prepare the training arguments
+Prepare the trainer
+Add the model 
+Train the model
+Save the model
 
-Pre-trainingPre-training...
+Get a p...
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/20/Peft/" class="read-more">
+              <a href="/2025/04/27/Peft-Finetuning-SFT/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
@@ -401,7 +420,7 @@ Pre-trainingPre-training...
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2025-04-21
+      2025-04-29
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
@@ -507,6 +526,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     <script>
       // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>
+��换
       $(document).ready(function() {
         $('.mobile-menu-toggle').click(function() {
           $('.sidebar-explorer').toggleClass('show');
