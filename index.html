@@ -324,7 +324,11 @@ mjx-container[display="true"] + br {
       <div class="section-content">
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2025/04/28/Peft-Finetuning-RL/"></a>
+            <a href="/2025/04/30/Create-a-Peft-Module-Guideline/">Create a PEFT Module Guideline</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/30/Peft-Finetuning-RL/">RLHF</a>
           </div>
           <div class="file">
             <i class="fas fa-file-code"></i>
@@ -337,10 +341,6 @@ mjx-container[display="true"] + br {
           <div class="file">
             <i class="fas fa-file-code"></i>
             <a href="/2025/04/19/Model-Quant/">Model Quantization</a>
-          </div>
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2025/04/19/Mermaid-Test/">Mermaid Diagram Test</a>
           </div>
       </div>
     </div>
@@ -355,7 +355,19 @@ mjx-container[display="true"] + br {
         
           <div class="tag-item">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Adapter/">Adapter</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
             <a href="/tags/Backtracking/">Backtracking</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/DPO/">DPO</a>
             <span class="count">(1)</span>
           </div>
         
@@ -410,7 +422,7 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/LoRA/">LoRA</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item">
@@ -422,6 +434,12 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/PEFT/">PEFT</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/PPO/">PPO</a>
             <span class="count">(1)</span>
           </div>
         
@@ -434,6 +452,12 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/Quantization/">Quantization</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/RLHF/">RLHF</a>
             <span class="count">(1)</span>
           </div>
         
@@ -563,14 +587,47 @@ mjx-container[display="true"] + br {
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/28/Peft-Finetuning-RL/"></a>
+                <a href="/2025/04/30/Create-a-Peft-Module-Guideline/">Create a PEFT Module Guideline</a>
               </span>
             </div>
             
             <div class="post-meta">
               <span class="date">
                 <i class="fas fa-calendar-alt"></i>
-                2025-04-28
+                2025-04-30
+              </span>
+            </div>
+            
+            <div class="post-excerpt">
+              概览想在自己的仓库里“魔改”PEFT，最常见的套路是：  
+
+Clone 官方 peft 源码  
+在 tuner/ 里新建一个模块目录  
+用可编辑安装（pip install -e）替换你项目中的 PEFT  
+按需写 config.py、layer.py、model.py
+
+下面我用 LoRA（低秩适配器）举例，带你一步步梳理如何从零创建一个可复用的 PEFT Module。读不懂的地方我会...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/30/Create-a-Peft-Module-Guideline/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2025/04/30/Peft-Finetuning-RL/">RLHF</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-30
               </span>
             </div>
             
@@ -579,7 +636,7 @@ mjx-container[display="true"] + br {
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/28/Peft-Finetuning-RL/" class="read-more">
+              <a href="/2025/04/30/Peft-Finetuning-RL/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
@@ -724,7 +781,7 @@ Flowchart Exampleflowchart TD
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+                <a href="/2025/04/17/MLSys-Misc%201/">MLSys 学习笔记 1</a>
               </span>
             </div>
             
@@ -752,7 +809,7 @@ ECC 逻辑集成在内存控制器，对程序透明。
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/" class="read-more">
+              <a href="/2025/04/17/MLSys-Misc%201/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
@@ -762,7 +819,7 @@ ECC 逻辑集成在内存控制器，对程序透明。
             <div class="post-header">
               <i class="fas fa-file-alt"></i>
               <span class="post-title">
-                <a href="/2025/04/17/MLSys/">MLSys</a>
+                <a href="/2025/04/17/Idea%20Misc/">Idea Misc</a>
               </span>
             </div>
             
@@ -774,17 +831,15 @@ ECC 逻辑集成在内存控制器，对程序透明。
             </div>
             
             <div class="post-excerpt">
-              Flowchart Examplegraph TD
-  MLSystems["ML Systems"]
+              最近看了一篇ICLR的文章，https://openreview.net/forum?id=GdXI5zCoAt，里面提到的一个idea，感觉很有意思，记录一下。
+Peft在减少参数方面的几种Principal
 
-  %% Major branches
-  MLSystems --&gt; Training["Training"]
-  MLSystems --&gt; Inference["Inference"]
-  MLSystems --&gt; Cross["Cross‑cutting &amp;...
+Sparse Training: 只训练一部分参数，其余参数保持不变。这样可以减少计算量和内存占用，但需要设计合适的稀疏模式和更新策略。
+Low-Rank Training: 将参数矩阵...
             </div>
             
             <div class="post-footer">
-              <a href="/2025/04/17/MLSys/" class="read-more">
+              <a href="/2025/04/17/Idea%20Misc/" class="read-more">
                 <i class="fas fa-code"></i>
                 Read More
               </a>
@@ -864,32 +919,6 @@ ECC 逻辑集成在内存控制器，对程序透明。
               </a>
             </div>
           </div>
-          <div class="post-card">
-            <div class="post-header">
-              <i class="fas fa-file-alt"></i>
-              <span class="post-title">
-                <a href="/2023/09/08/Golang-Tutorial-1/">Golang Tutorial 1</a>
-              </span>
-            </div>
-            
-            <div class="post-meta">
-              <span class="date">
-                <i class="fas fa-calendar-alt"></i>
-                2023-09-08
-              </span>
-            </div>
-            
-            <div class="post-excerpt">
-              ...
-            </div>
-            
-            <div class="post-footer">
-              <a href="/2023/09/08/Golang-Tutorial-1/" class="read-more">
-                <i class="fas fa-code"></i>
-                Read More
-              </a>
-            </div>
-          </div>
       </div>
       
         <nav class="pagination-container">
@@ -916,7 +945,7 @@ ECC 逻辑集成在内存控制器，对程序透明。
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2025-04-30
+      2025-05-03
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>

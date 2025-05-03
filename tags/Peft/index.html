@@ -148,7 +148,19 @@
         
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
+            <a href="/tags/Adapter/">Adapter</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
             <a href="/tags/Backtracking/">Backtracking</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/DPO/">DPO</a>
             <span class="count">(1)</span>
           </div>
         
@@ -203,7 +215,7 @@
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/LoRA/">LoRA</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
           <div class="tag-item ">
@@ -215,6 +227,12 @@
           <div class="tag-item active">
             <i class="fas fa-tag"></i>
             <a href="/tags/PEFT/">PEFT</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/PPO/">PPO</a>
             <span class="count">(1)</span>
           </div>
         
@@ -227,6 +245,12 @@
           <div class="tag-item ">
             <i class="fas fa-tag"></i>
             <a href="/tags/Quantization/">Quantization</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item ">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/RLHF/">RLHF</a>
             <span class="count">(1)</span>
           </div>
         
@@ -357,10 +381,45 @@
           <i class="fas fa-tag"></i>
           Tag: PEFT
         </h1>
-        <span class="tag-count">1 posts</span>
+        <span class="tag-count">2 posts</span>
       </div>
 
       <div class="posts-container">
+        
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2025/04/30/Create-a-Peft-Module-Guideline/">Create a PEFT Module Guideline</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-30
+              </span>
+              
+            </div>
+            
+            <div class="post-excerpt">
+              概览想在自己的仓库里“魔改”PEFT，最常见的套路是：  
+
+Clone 官方 peft 源码  
+在 tuner/ 里新建一个模块目录  
+用可编辑安装（pip install -e）替换你项目中的 PEFT  
+按需写 config.py、layer.py、model.py
+
+下面我用 LoRA（低秩适配器）举例，带你一步步梳理如何从零创建一个可复用的 PEFT Module。读不懂的地方我会...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/30/Create-a-Peft-Module-Guideline/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
         
           <div class="post-card">
             <div class="post-header">
@@ -420,7 +479,7 @@ Get a p...
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2025-04-30
+      2025-05-03
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
@@ -526,15 +585,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     <script>
       // 移动端菜单切换
-      $(document).ready(function() {
-        $('.mobile-menu-toggle').click(function() {
-          $('.sidebar-explorer').toggleClass('show');
-        });
-      });
-    </script>
-  </body>
-</html>
-��换
       $(document).ready(function() {
         $('.mobile-menu-toggle').click(function() {
           $('.sidebar-explorer').toggleClass('show');
