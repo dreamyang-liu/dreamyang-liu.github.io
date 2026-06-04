@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title> | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <div class="sidebar-explorer">
+    <div class="explorer-header">
+      <span class="explorer-title">
+        <i class="fas fa-folder-open"></i> EXPLORER
+      </span>
+    </div>
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-chevron-down"></i>
+        <span>BLOG CONTENTS</span>
+      </div>
+      
+      <div class="section-content">
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Algorithm/" class="category-link">
+              <span>Algorithm</span>
+              <span class="count">(10)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/System-Design/" class="category-link">
+              <span>System Design</span>
+              <span class="count">(3)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/Cloud-Computing/" class="category-link">
+              <span>Cloud Computing</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/ML-System/" class="category-link">
+              <span>ML System</span>
+              <span class="count">(4)</span>
+            </a>
+          </div>
+          <div class="folder">
+            <i class="fas fa-folder"></i>
+            <a href="/categories/OS/" class="category-link">
+              <span>OS</span>
+              <span class="count">(1)</span>
+            </a>
+          </div>
+      </div>
+    </div>
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-chevron-down"></i>
+        <span>RECENT POSTS</span>
+      </div>
+      
+      <div class="section-content">
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/20/Peft/">Parameter Efficient Fine-Tuning</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/19/Model-Quant/">Model Quantization</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
+          </div>
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/09/09/RateLimiter/">限流算法</a>
+          </div>
+      </div>
+    </div>
+
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-chevron-down"></i>
+        <span>TAGS</span>
+      </div>
+      
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Docker/">Docker</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/ECC/">ECC</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/GPU/">GPU</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/KV-Cache/">KV Cache</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/LLM/">LLM</a>
+            <span class="count">(3)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Linux/">Linux</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/ML-System/">ML System</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Peft/">Peft</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Quantization/">Quantization</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Ring-Reduce/">Ring Reduce</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/">一致性哈希</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">二分查找</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97%E6%8A%80%E5%B7%A7/">位运算技巧</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%88%86%E6%B2%BB%E6%B3%95/">分治法</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%9B%9E%E6%BA%AF/">回溯</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/">字符串</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/">快速幂</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+            <span class="count">(3)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%95%B0%E7%BB%84/">数组</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/">最长递增子序列</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E7%90%86%E8%AE%BA/">理论</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">系统设计</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E7%BA%BF%E6%AE%B5%E6%A0%91/">线段树</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E9%99%90%E6%B5%81/">限流</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E9%9A%8F%E6%9C%BA%E5%8C%96/">随机化</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-home"></i>
+        <span>welcome.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <div class="posts-container">
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2025/04/20/Peft/">Parameter Efficient Fine-Tuning</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-20
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              LLM Training StagesCurrently the training of Large Language Models (LLMs) can be divided into three stages:
+graph LR
+A[Pre-training] --&gt; B[Fine-tuning] --&gt; C[Inference]
+
+Pre-trainingPre-training...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/20/Peft/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2025/04/19/Model-Quant/">Model Quantization</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-19
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              Model Quantization量化是一种用来减少模型大小和加速推理的技术。主要是通过把模型权重从较高精度的数据类型如FP32转换为较低精度的数据类型如FP16/INT8来实现的。当然也有更加激进的量化方式，比如把权重量化到INT4，甚至是二值化，BitNet恐怖如斯。
+这里可能要注意一下，量化到INT8和FP8是不一样的，INT8是整数，FP8是浮点数，两者的表示范围和精度是不一样的。一般来...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/19/Model-Quant/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/">MLSys 学习笔记 1</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2025-04-17
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/ML-System/">ML System</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              1. GPU ECC（Error‑Correcting Code）
+原理：在显存（VRAM）中为每 N 位数据生成冗余校验位，常见为 SECDED（单错纠正、双错检测）。  
+实现：  
+专业级卡（Tesla/Quadro/A100、AMD Instinct）默认支持 ECC，消费级卡多关闭或不支持。  
+ECC 逻辑集成在内存控制器，对程序透明。
+
+
+优缺点：  
+优点：避免显存位翻转导致的 S...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2025/04/17/MLSys-%E6%9D%82%E8%AE%B01/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-09-17
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              括号是一类有趣的问题，主要与有效括号相关，例如：
+
+检查字符串是否是有效括号
+在子串中找到最长的有效括号（子串）
+在子串中找到最长的有效括号（子序列）
+为给定长度生成所有有效括号
+…
+
+在深入探讨每个主题之前，让我们定义什么是有效括号。()、()()()()和((((((()))))))(())()。
+123456789101112131415161718192021def isValidPare...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/09/17/Parentheses-Problems/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/09/09/RateLimiter/">限流算法</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-09-09
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/System-Design/">System Design</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              限流器是分布式系统中的一个关键组件。通常，我们可以用它来防止DDoS或恶意请求。在这篇文章中，我们将介绍几种可用于限流的算法。
+令牌桶令牌桶是一个具有预定义容量的容器。令牌以预设的速率定期放入桶中。一旦桶满了，就不会再添加令牌。如图所示，令牌桶容量为4。填充器每秒向桶中放入2个令牌。一旦桶满了，多余的令牌就会溢出。
+
+
+令牌桶可以处理突发请求，并且可以确保限制不会超过预设的容量。
+漏桶漏桶类似于令...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/09/09/RateLimiter/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-09-02
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              回溯算法回溯算法通常用于搜索解空间。这样的解空间往往是组合爆炸式增长的，比如排列问题就是一个典型示例。
+给定一个数字 ，打印出区间  中所有数字的排列。
+对于 ，期望输出：
+1234561,2,31,3,22,1,32,3,13,2,13,1,2
+
+在这种情况下，我们需要使用回溯来解决问题。回溯会在每次做出决策、选择一个候选项扩展时保存一个“检查点”。
+下面给出回溯算法的模板：
+123456789...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/09/02/Backtracking-Template/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/15/Docker-Memo/">Docker 杂记</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-15
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Cloud-Computing/">Cloud Computing</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              DockerfileDockerfile是一个包含容器镜像定义的文本文件，可用于启动容器。这个定义包含命令、基础镜像、配置等。在这篇文章中，我们将介绍每个组件，并讨论在什么场景下使用它们。让我们开始吧。
+Docker镜像在深入了解各个组件之前，我们可能想知道Docker镜像到底是什么。参考：镜像的结构
+
+镜像是一个只读模板，包含创建Docker容器的指令。通常，一个镜像是基于另一个镜像，并进行一些...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/15/Docker-Memo/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/08/Linux-System-Overview/">Linux系统概述</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-08
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/OS/">OS</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              Linux可能是世界上使用最广泛的操作系统。了解Linux系统的基础知识对开发者在很多方面都有益处。
+文件系统你可以在这里找到更详细的文件系统层次结构。
+内核环境变量PATHPATH是最重要的环境变量之一。默认情况下，它的值为
+1/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:
+当你输入一个命令时，它会搜索上述所有文件夹，并查找是否存在同名的可执行文件。用...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/08/Linux-System-Overview/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-08
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              带权重的 random()random() 是一个重要的函数，它会以相同的概率返回一个随机数。带权重的 random() 要求我们生成具有不同权重的随机数。
+12345例如：A = [10, 50, 20, 20]，如果我们用 P(x) 表示返回 x 的概率，则有：P(0) = 10 / 100 = 0.1P(1) = 50 / 100 = 0.5P(2) = 20 / 100 = 0.2P(3)...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/08/Random-Algorithm/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+          <div class="post-card">
+            <div class="post-header">
+              <i class="fas fa-file-alt"></i>
+              <span class="post-title">
+                <a href="/2023/08/06/Union-Find/">并查集</a>
+              </span>
+            </div>
+            
+            <div class="post-meta">
+              <span class="date">
+                <i class="fas fa-calendar-alt"></i>
+                2023-08-06
+              </span>
+                <span class="category">
+                  <i class="fas fa-folder"></i>
+                  <a class="category-link" href="/categories/Algorithm/">Algorithm</a>
+                </span>
+            </div>
+            
+            <div class="post-excerpt">
+              class UnionFind &#123;
+    private int[] parent;
+    private int[] rank;
+    private int count;
+    public UnionFind(int n) &#123;
+        parent = new int[n];
+        rank = new int[n];
+        count...
+            </div>
+            
+            <div class="post-footer">
+              <a href="/2023/08/06/Union-Find/" class="read-more">
+                <i class="fas fa-code"></i>
+                Read More
+              </a>
+            </div>
+          </div>
+      </div>
+      
+        <nav class="pagination-container">
+          <div class="pagination-info">
+            <i class="fas fa-file-code"></i>
+            Page 1 of 2
+          </div>
+          <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">&lt;i class&#x3D;&quot;fas fa-chevron-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+        </nav>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-03
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

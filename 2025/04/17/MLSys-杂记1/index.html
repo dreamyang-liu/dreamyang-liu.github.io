@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>MLSys 学习笔记 1 | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-GPU-ECC%EF%BC%88Error%E2%80%91Correcting-Code%EF%BC%89"><span class="toc-text">1. GPU ECC（Error‑Correcting Code）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-NVIDIA-Persistence-Mode%EF%BC%88%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="toc-text">2. NVIDIA Persistence Mode（持久化模式）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Ring-Reduce%EF%BC%88All%E2%80%91Reduce%EF%BC%89%E7%AE%97%E6%B3%95%E6%A6%82%E8%A7%88"><span class="toc-text">3. Ring Reduce（All‑Reduce）算法概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Reduce%E2%80%91Scatter-%E8%AF%A6%E7%BB%86%E7%A4%BA%E4%BE%8B%EF%BC%884-%E8%8A%82%E7%82%B9%E3%80%81%E5%90%91%E9%87%8F%E9%95%BF-4%EF%BC%89"><span class="toc-text">4. Reduce‑Scatter 详细示例（4 节点、向量长 4）</span></a></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/20/Peft/">Parameter Efficient Fine-Tuning</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2025/04/19/Model-Quant/">Model Quantization</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2023/08/06/KV-Cache/">KV Cache</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/GPU/">GPU</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/ECC/">ECC</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/">持久化模式</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Ring-Reduce/">Ring Reduce</a>
+            <span class="count">(1)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/Reduce-Scatter/">Reduce-Scatter</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>MLSys 学习笔记 1.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>MLSys 学习笔记 1</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2025-04-17
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/ML-System/">ML System</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/ECC/" rel="tag">ECC</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/GPU/" rel="tag">GPU</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Reduce-Scatter/" rel="tag">Reduce-Scatter</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/Ring-Reduce/" rel="tag">Ring Reduce</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%BC%8F/" rel="tag">持久化模式</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <h2 id="1-GPU-ECC（Error‑Correcting-Code）"><a href="#1-GPU-ECC（Error‑Correcting-Code）" class="headerlink" title="1. GPU ECC（Error‑Correcting Code）"></a>1. GPU ECC（Error‑Correcting Code）</h2><ul>
+<li><strong>原理</strong>：在显存（VRAM）中为每 N 位数据生成冗余校验位，常见为 SECDED（单错纠正、双错检测）。  </li>
+<li><strong>实现</strong>：  <ul>
+<li>专业级卡（Tesla/Quadro/A100、AMD Instinct）默认支持 ECC，消费级卡多关闭或不支持。  </li>
+<li>ECC 逻辑集成在内存控制器，对程序透明。</li>
+</ul>
+</li>
+<li><strong>优缺点</strong>：  <ul>
+<li>优点：避免显存位翻转导致的 Silent Data Corruption，可监控纠错/未纠错计数。  </li>
+<li>缺点：约 12.5% 显存开销、5–12% 带宽与延迟损失。</li>
+</ul>
+</li>
+<li><strong>开启与监控（NVIDIA 举例）</strong>:</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看 ECC 状态</span><br>nvidia-smi -i 0 --query-gpu=ecc.mode.current --format=csv<br><br><span class="hljs-comment"># 启用 ECC（需重启驱动/机器）</span><br><span class="hljs-built_in">sudo</span> nvidia-smi -i 0 --ecc-mode=ENABLED<br><br><span class="hljs-comment"># 监控纠错计数</span><br>nvidia-smi \<br>--query-gpu=memory.ecc.corrected.volatile,memory.ecc.uncorrected.volatile \<br>--format=csv<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-NVIDIA-Persistence-Mode（持久化模式）"><a href="#2-NVIDIA-Persistence-Mode（持久化模式）" class="headerlink" title="2. NVIDIA Persistence Mode（持久化模式）"></a>2. NVIDIA Persistence Mode（持久化模式）</h2><ul>
+<li><strong>作用</strong>：驱动在无客户端时依然保持 GPU 上下文初始化，减少短作业启动延迟；保持稳定 P‑state。  </li>
+<li><strong>命令</strong>：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启用持久化模式</span><br><span class="hljs-built_in">sudo</span> nvidia-smi -pm 1<br><br><span class="hljs-comment"># 禁用持久化模式</span><br><span class="hljs-built_in">sudo</span> nvidia-smi -pm 0<br><br><span class="hljs-comment"># 查看状态</span><br>nvidia-smi -q -d PERSISTENCE<br></code></pre></td></tr></table></figure>
+<ul>
+<li><strong>注意</strong>：功耗略增；可配合 <code>nvidia-persistenced</code> 守护进程跨重启生效。</li>
+</ul>
+<h2 id="3-Ring-Reduce（All‑Reduce）算法概览"><a href="#3-Ring-Reduce（All‑Reduce）算法概览" class="headerlink" title="3. Ring Reduce（All‑Reduce）算法概览"></a>3. Ring Reduce（All‑Reduce）算法概览</h2><ul>
+<li><strong>分段（Scatter）</strong>：将张量平分 N 段，每轮只在环上沿顺时针传递一段。  </li>
+<li><strong>Reduce‑Scatter</strong>：经过 N–1 轮，每段在环上累加所有节点后恰好落在一个归属节点上。  </li>
+<li><strong>All‑Gather</strong>：再用同样方式广播各段结果，让所有节点拿到完整聚合值。  </li>
+<li><strong>通信成本</strong>：  <ul>
+<li>Reduce‑Scatter：每节点发送/接收 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.781ex;" xmlns="http://www.w3.org/2000/svg" width="11.717ex" height="2.8ex" role="img" focusable="false" viewBox="0 -892.5 5178.8 1237.5"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mfrac"><g data-mml-node="mi" transform="translate(305.9,394) scale(0.707)"><path data-c="1D446" d="M308 24Q367 24 416 76T466 197Q466 260 414 284Q308 311 278 321T236 341Q176 383 176 462Q176 523 208 573T273 648Q302 673 343 688T407 704H418H425Q521 704 564 640Q565 640 577 653T603 682T623 704Q624 704 627 704T632 705Q645 705 645 698T617 577T585 459T569 456Q549 456 549 465Q549 471 550 475Q550 478 551 494T553 520Q553 554 544 579T526 616T501 641Q465 662 419 662Q362 662 313 616T263 510Q263 480 278 458T319 427Q323 425 389 408T456 390Q490 379 522 342T554 242Q554 216 546 186Q541 164 528 137T492 78T426 18T332 -20Q320 -22 298 -22Q199 -22 144 33L134 44L106 13Q83 -14 78 -18T65 -22Q52 -22 52 -14Q52 -11 110 221Q112 227 130 227H143Q149 221 149 216Q149 214 148 207T144 186T142 153Q144 114 160 87T203 47T255 29T308 24Z"></path></g><g data-mml-node="mi" transform="translate(220,-345) scale(0.707)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><rect width="827.9" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(1290.1,0)"><path data-c="22C5" d="M78 250Q78 274 95 292T138 310Q162 310 180 294T199 251Q199 226 182 208T139 190T96 207T78 250Z"></path></g><g data-mml-node="mo" transform="translate(1790.4,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(2179.4,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(3289.6,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(4289.8,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(4789.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 数据量  </li>
+<li>All‑Gather：同理  </li>
+<li>合计 All‑Reduce：<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.781ex;" xmlns="http://www.w3.org/2000/svg" width="14.482ex" height="2.8ex" role="img" focusable="false" viewBox="0 -892.5 6401.2 1237.5"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mo" transform="translate(722.2,0)"><path data-c="22C5" d="M78 250Q78 274 95 292T138 310Q162 310 180 294T199 251Q199 226 182 208T139 190T96 207T78 250Z"></path></g><g data-mml-node="mfrac" transform="translate(1222.4,0)"><g data-mml-node="mi" transform="translate(305.9,394) scale(0.707)"><path data-c="1D446" d="M308 24Q367 24 416 76T466 197Q466 260 414 284Q308 311 278 321T236 341Q176 383 176 462Q176 523 208 573T273 648Q302 673 343 688T407 704H418H425Q521 704 564 640Q565 640 577 653T603 682T623 704Q624 704 627 704T632 705Q645 705 645 698T617 577T585 459T569 456Q549 456 549 465Q549 471 550 475Q550 478 551 494T553 520Q553 554 544 579T526 616T501 641Q465 662 419 662Q362 662 313 616T263 510Q263 480 278 458T319 427Q323 425 389 408T456 390Q490 379 522 342T554 242Q554 216 546 186Q541 164 528 137T492 78T426 18T332 -20Q320 -22 298 -22Q199 -22 144 33L134 44L106 13Q83 -14 78 -18T65 -22Q52 -22 52 -14Q52 -11 110 221Q112 227 130 227H143Q149 221 149 216Q149 214 148 207T144 186T142 153Q144 114 160 87T203 47T255 29T308 24Z"></path></g><g data-mml-node="mi" transform="translate(220,-345) scale(0.707)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><rect width="827.9" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(2512.6,0)"><path data-c="22C5" d="M78 250Q78 274 95 292T138 310Q162 310 180 294T199 251Q199 226 182 208T139 190T96 207T78 250Z"></path></g><g data-mml-node="mo" transform="translate(3012.8,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(3401.8,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(4512,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(5512.2,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(6012.2,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container></li>
+</ul>
+</li>
+</ul>
+<h2 id="4-Reduce‑Scatter-详细示例（4-节点、向量长-4）"><a href="#4-Reduce‑Scatter-详细示例（4-节点、向量长-4）" class="headerlink" title="4. Reduce‑Scatter 详细示例（4 节点、向量长 4）"></a>4. Reduce‑Scatter 详细示例（4 节点、向量长 4）</h2><ol>
+<li><strong>初始数据</strong></li>
+</ol>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-keyword">Node</span> 0:<span class="hljs-title"> [ 1</span>,  <span class="hljs-number">2</span>,  <span class="hljs-number">3</span>,  <span class="hljs-number">4</span>]<br><span class="hljs-keyword">Node</span> 1:<span class="hljs-title"> [ 5</span>,  <span class="hljs-number">6</span>,  <span class="hljs-number">7</span>,  <span class="hljs-number">8</span>]<br><span class="hljs-keyword">Node</span> 2:<span class="hljs-title"> [ 9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">11</span>, <span class="hljs-number">12</span>]<br><span class="hljs-keyword">Node</span> 3:<span class="hljs-title"> [13</span>, <span class="hljs-number">14</span>, <span class="hljs-number">15</span>, <span class="hljs-number">16</span>]<br></code></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>分段规则</strong>：下标 0→Seg 0，1→Seg 1，…，3→Seg 3。  </li>
+<li><strong>3 轮累加</strong>：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">Segment</th>
+<th align="center">轮 1 累加结果</th>
+<th align="center">轮 2 累加结果</th>
+<th align="center">轮 3 累加结果</th>
+<th align="center">最终归属节点</th>
+<th align="center">全局和</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">5 + 1 = 6</td>
+<td align="center">9 + 6 = 15</td>
+<td align="center">13 + 15 = 28</td>
+<td align="center">Node 3</td>
+<td align="center">28</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">10 + 6 = 16</td>
+<td align="center">14 + 16 = 30</td>
+<td align="center">2 + 30 = 32</td>
+<td align="center">Node 0</td>
+<td align="center">32</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">15 + 11 = 26</td>
+<td align="center">3 + 26 = 29</td>
+<td align="center">7 + 29 = 36</td>
+<td align="center">Node 1</td>
+<td align="center">36</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">4 + 16 = 20</td>
+<td align="center">8 + 20 = 28</td>
+<td align="center">12 + 28 = 40</td>
+<td align="center">Node 2</td>
+<td align="center">40</td>
+</tr>
+</tbody></table>
+<ol start="4">
+<li><strong>结果</strong>：各节点分别持有自己负责 Segment 的全局和，为后续 All‑Gather 做准备。</li>
+</ol>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2025/04/19/Model-Quant/">
+              <i class="fas fa-chevron-left"></i>
+              Model Quantization
+            </a>
+          
+          
+            <a class="next" href="/2023/09/17/Parentheses-Problems/">
+              括号问题
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-03
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>
