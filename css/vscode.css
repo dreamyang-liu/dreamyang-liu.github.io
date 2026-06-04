@@ -115,10 +115,9 @@
   max-width: 100%;
   overflow-x: auto;
 }
-.post-content table {
-  display: block;
-  overflow-x: auto;
-}
+/* NOTE: avoid `display: block` on <table> — it kills the normal table sizing
+   so short tables shrink to content width and leave a gap on the right.
+   For a genuinely too-wide table, wrap it in a scrollable div explicitly. */
 
 .tab-bar {
   height: 35px;
