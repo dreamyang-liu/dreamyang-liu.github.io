@@ -55,23 +55,59 @@ body {
 
 <script>
 (function() {
-    // True 1F1B schedule: for each stage s, (p-s) warmup forwards, then
-    // alternate B/F until all forwards done, then cooldown of remaining backwards.
+    // True 1F1B schedule built by an ASAP simulation that respects data
+    // dependencies. On each device the op ORDER is fixed (warmup forwards, then
+    // 1F-1B pairs, then cooldown backwards); the TIMING is then derived so that:
+    //   F(s,m) waits for F(s-1,m)  -> forward flows DOWN the stages
+    //   B(s,m) waits for B(s+1,m)  -> backward flows UP the stages
+    // Because of the backward dependency, the backward pass of a micro-batch is
+    // a staggered diagonal across devices, NOT a single vertical column.
     // Reference: https://arxiv.org/abs/2104.04473 (Megatron-LM PP), Figure 4.
-    // For p=m=4, totalTime = 2*(m+p-1) = 14.
+    // For p=m=4 the makespan is 2*(m+p-1) = 14.
     function generate1F1B(p, m) {
-        const totalTime = 2 * (m + p - 1);
-        const grid = Array.from({ length: p }, () => Array(totalTime).fill(null));
+        // 1) Fixed per-device operation order.
+        const order = Array.from({ length: p }, () => []);
         for (let s = 0; s < p; s++) {
-            let t = s, fwd = 0, bwd = 0;
-            const warmup = Math.min(p - s, m);
-            for (let i = 0; i < warmup; i++) { grid[s][t++] = ['F', fwd++ + 1]; }
-            while (fwd < m) {
-                grid[s][t++] = ['B', bwd++ + 1];
-                if (fwd < m) grid[s][t++] = ['F', fwd++ + 1];
-            }
-            while (bwd < m) { grid[s][t++] = ['B', bwd++ + 1]; }
+            const warmup = Math.min(p - 1 - s, m);
+            const steady = m - warmup;
+            let fwd = 0, bwd = 0;
+            for (let i = 0; i < warmup; i++) order[s].push(['F', ++fwd]);
+            for (let i = 0; i < steady; i++) { order[s].push(['F', ++fwd]); order[s].push(['B', ++bwd]); }
+            while (bwd < m) order[s].push(['B', ++bwd]);
         }
+        // 2) ASAP simulation (1 time unit per op) respecting dependencies.
+        const finishF = Array.from({ length: p }, () => ({}));
+        const finishB = Array.from({ length: p }, () => ({}));
+        const ptr = Array(p).fill(0);
+        const devTime = Array(p).fill(0);
+        const startAt = Array.from({ length: p }, () => []);
+        let remaining = order.reduce((a, o) => a + o.length, 0);
+        while (remaining > 0) {
+            let progressed = false;
+            for (let s = 0; s < p; s++) {
+                while (ptr[s] < order[s].length) {
+                    const [type, mb] = order[s][ptr[s]];
+                    let dep = 0, ready = true;
+                    if (type === 'F' && s > 0) {
+                        if (finishF[s - 1][mb] === undefined) ready = false; else dep = finishF[s - 1][mb];
+                    } else if (type === 'B' && s < p - 1) {
+                        if (finishB[s + 1][mb] === undefined) ready = false; else dep = finishB[s + 1][mb];
+                    }
+                    if (!ready) break;
+                    const start = Math.max(devTime[s], dep);
+                    startAt[s][ptr[s]] = start;
+                    if (type === 'F') finishF[s][mb] = start + 1; else finishB[s][mb] = start + 1;
+                    devTime[s] = start + 1;
+                    ptr[s]++; remaining--; progressed = true;
+                }
+            }
+            if (!progressed) break; // safety against an unsatisfiable dependency
+        }
+        // 3) Lay the scheduled ops onto a time grid.
+        let totalTime = 0;
+        for (let s = 0; s < p; s++) for (let i = 0; i < startAt[s].length; i++) totalTime = Math.max(totalTime, startAt[s][i] + 1);
+        const grid = Array.from({ length: p }, () => Array(totalTime).fill(null));
+        for (let s = 0; s < p; s++) for (let i = 0; i < order[s].length; i++) grid[s][startAt[s][i]] = order[s][i];
         return { grid, totalTime };
     }
 

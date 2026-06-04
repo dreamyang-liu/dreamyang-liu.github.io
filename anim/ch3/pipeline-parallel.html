@@ -91,23 +91,55 @@ function ppGenerateGPipeSchedule(p, m) {
 }
 
 function ppGenerate1F1BSchedule(p, m) {
-  const totalTime = 2 * (m + p - 1);
-  const grid = Array.from({length: p}, () => Array(totalTime).fill(null));
+  // True 1F1B via an ASAP simulation that respects data dependencies:
+  //   F(s,mb) waits for F(s-1,mb)  -> forward flows DOWN the stages
+  //   B(s,mb) waits for B(s+1,mb)  -> backward flows UP the stages
+  // The backward of a micro-batch is therefore a staggered diagonal across
+  // stages (it must propagate from the last stage back to the first), not a
+  // single vertical column at one timestep.
+  // 1) Fixed per-device operation order.
+  const order = Array.from({length: p}, () => []);
   for (let s = 0; s < p; s++) {
-    let t = s;
-    let fwdDone = 0, bwdDone = 0;
-    const warmupCount = Math.min(p - s, m);
-    for (let i = 0; i < warmupCount; i++) {
-      if (t < totalTime) { grid[s][t] = {type: 'F', mb: fwdDone}; fwdDone++; t++; }
-    }
-    while (fwdDone < m) {
-      if (t < totalTime) { grid[s][t] = {type: 'B', mb: bwdDone}; bwdDone++; t++; }
-      if (t < totalTime && fwdDone < m) { grid[s][t] = {type: 'F', mb: fwdDone}; fwdDone++; t++; }
-    }
-    while (bwdDone < m) {
-      if (t < totalTime) { grid[s][t] = {type: 'B', mb: bwdDone}; bwdDone++; t++; }
-    }
+    const warmup = Math.min(p - 1 - s, m);
+    const steady = m - warmup;
+    let fwd = 0, bwd = 0;
+    for (let i = 0; i < warmup; i++) order[s].push({type: 'F', mb: fwd++});
+    for (let i = 0; i < steady; i++) { order[s].push({type: 'F', mb: fwd++}); order[s].push({type: 'B', mb: bwd++}); }
+    while (bwd < m) order[s].push({type: 'B', mb: bwd++});
   }
+  // 2) ASAP simulation (1 time unit per op).
+  const finishF = Array.from({length: p}, () => ({}));
+  const finishB = Array.from({length: p}, () => ({}));
+  const ptr = Array(p).fill(0);
+  const devTime = Array(p).fill(0);
+  const startAt = Array.from({length: p}, () => []);
+  let remaining = order.reduce((a, o) => a + o.length, 0);
+  while (remaining > 0) {
+    let progressed = false;
+    for (let s = 0; s < p; s++) {
+      while (ptr[s] < order[s].length) {
+        const op = order[s][ptr[s]];
+        let dep = 0, ready = true;
+        if (op.type === 'F' && s > 0) {
+          if (finishF[s - 1][op.mb] === undefined) ready = false; else dep = finishF[s - 1][op.mb];
+        } else if (op.type === 'B' && s < p - 1) {
+          if (finishB[s + 1][op.mb] === undefined) ready = false; else dep = finishB[s + 1][op.mb];
+        }
+        if (!ready) break;
+        const start = Math.max(devTime[s], dep);
+        startAt[s][ptr[s]] = start;
+        if (op.type === 'F') finishF[s][op.mb] = start + 1; else finishB[s][op.mb] = start + 1;
+        devTime[s] = start + 1;
+        ptr[s]++; remaining--; progressed = true;
+      }
+    }
+    if (!progressed) break; // safety against an unsatisfiable dependency
+  }
+  // 3) Lay the scheduled ops onto a time grid.
+  let totalTime = 0;
+  for (let s = 0; s < p; s++) for (let i = 0; i < startAt[s].length; i++) totalTime = Math.max(totalTime, startAt[s][i] + 1);
+  const grid = Array.from({length: p}, () => Array(totalTime).fill(null));
+  for (let s = 0; s < p; s++) for (let i = 0; i < order[s].length; i++) grid[s][startAt[s][i]] = order[s][i];
   return {grid, totalTime, p, m};
 }
 
