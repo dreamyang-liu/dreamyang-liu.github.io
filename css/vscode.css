@@ -16,6 +16,7 @@
 /* 左侧资源管理器样式 */
 .sidebar-explorer {
   width: 250px;
+  flex-shrink: 0; /* 不要被宽内容(动画iframe、宽表格、长代码行)挤瘪 */
   background: var(--vscode-sidebar);
   border-right: 1px solid var(--vscode-border);
   padding: 10px 0;
@@ -100,7 +101,23 @@
 /* 主要内容区域样式 */
 .editor-content {
   flex: 1;
+  min-width: 0; /* 关键: flex 子项默认 min-width:auto 会被宽内容(动画/表格)撑大,反挤侧栏 */
   background: var(--vscode-bg);
+}
+
+/* 防御性: 文章里的宽元素自适应容器,溢出时滚动而不是撑爆布局 */
+.post-content iframe.tc-anim-frame,
+.post-content img,
+.post-content table {
+  max-width: 100%;
+}
+.post-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.post-content table {
+  display: block;
+  overflow-x: auto;
 }
 
 .tab-bar {
