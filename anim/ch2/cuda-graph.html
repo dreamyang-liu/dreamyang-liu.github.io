@@ -44,6 +44,14 @@ const cgAnim = (() => {
   const canvas = document.getElementById('cudaGraphCanvas');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
+  // HiDPI crisp rendering: scale the backing store by devicePixelRatio while
+  // keeping the logical W/H coordinate system (CSS caps display width).
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = W + 'px';
+  canvas.style.height = 'auto';
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
 
   // Layout
   const marginLeft = 90, marginRight = 30;

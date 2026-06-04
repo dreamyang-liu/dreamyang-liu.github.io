@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DP Attention Data Flow</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:transparent; color:#e0e0e0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:4px; line-height:1.6; }
+.section { max-width:1000px; margin:0 auto; }
+.section-title { font-size:1.1rem; font-weight:bold; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #333; color:#4caf50; }
+.canvas-wrap { text-align:center; margin:16px 0; }
+canvas { border-radius:10px; background:#0d0d20; max-width:100%; }
+.controls { text-align:center; margin:14px 0; }
+button { background:linear-gradient(135deg,#00d2ff,#667eea); border:none; color:#fff; padding:9px 18px; border-radius:6px; font-size:0.88rem; cursor:pointer; margin:0 5px; font-weight:bold; }
+button:hover { opacity:0.9; }
+button:disabled { opacity:0.35; cursor:not-allowed; }
+button.secondary { background:#333; border:1px solid #555; color:#ccc; }
+.step-label { color:#fbbf24; font-size:0.9rem; margin-top:10px; min-height:1.4em; text-align:center; }
+.step-count { color:#888; font-size:0.8rem; margin-top:4px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="section">
+  <div class="section-title">DP Attention 数据流：一个 batch 怎么流过一层</div>
+  <div class="canvas-wrap">
+    <canvas id="flowCanvas" width="950" height="640"></canvas>
+  </div>
+  <div class="controls">
+    <button class="secondary" id="btnReset" onclick="flow.reset()">↺ 重置</button>
+    <button id="btnPrev" onclick="flow.prev()">← 上一步</button>
+    <button id="btnNext" onclick="flow.next()">下一步 →</button>
+    <button id="btnAuto" onclick="flow.auto()">▶ 自动播放</button>
+  </div>
+  <div class="step-label" id="stepLabel"></div>
+  <div class="step-count" id="stepCount"></div>
+</div>
+
+<script>
+const flow = (() => {
+  const canvas = document.getElementById('flowCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  // HiDPI crisp rendering: scale the backing store by devicePixelRatio while
+  // keeping the logical W/H coordinate system (CSS caps display width).
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = W + 'px';
+  canvas.style.height = 'auto';
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  const N = 4;                 // GPUs / DP ranks
+  const TOK = 3;               // tokens per sequence
+  const gpuColors = ['#ff6b6b', '#4caf50', '#667eea', '#fbbf24'];
+  const TOTAL_STEPS = 7;       // steps 0..6
+
+  // deterministic top-1 routing: route[g][k] = expert id (0..7) for token k of GPU g.
+  // Each sequence spreads to >=2 distinct destination GPUs (destGpu = expert>>1).
+  const route = [[1,3,4],[2,5,7],[0,3,6],[1,4,7]];
+
+  // ---- layout ----
+  const marginX = 20, gpuGap = 18;
+  const gpuW = (W - 2*marginX - (N-1)*gpuGap) / N;
+  const gpuTop = 70, gpuH = 520, gpuBottom = gpuTop + gpuH;
+  const kvY = gpuTop + 14, kvH = 68;
+  const attnY = kvY + kvH + 14, attnH = 78;
+  const tokRowY = attnY + attnH + 20, tokRowH = 46;
+  const expY = gpuBottom - 92, expH = 80;
+  const tokW = 30, tokH = 24, tokGap = 8;
+
+  const gpuX = (i) => marginX + i * (gpuW + gpuGap);
+
+  // origin resting position (top-left) of token k in GPU g's token row
+  function homePos(g, k) {
+    const totalW = TOK*tokW + (TOK-1)*tokGap;
+    const sx = gpuX(g) + (gpuW - totalW)/2;
+    return { x: sx + k*(tokW+tokGap), y: tokRowY + (tokRowH - tokH)/2 };
+  }
+
+  // destination position (top-left) of token k of GPU g at its target expert,
+  // precomputed so co-located tokens don't fully overlap.
+  const destPos = (() => {
+    const pos = Array.from({length:N}, () => []);
+    const bins = {}; // key `${d}-${slot}` -> array of {g,k}
+    for (let g=0; g<N; g++) for (let k=0; k<TOK; k++) {
+      const e = route[g][k], d = e>>1, slot = e&1;
+      (bins[`${d}-${slot}`] = bins[`${d}-${slot}`] || []).push({g,k});
+    }
+    for (const key in bins) {
+      const parts = key.split('-').map(Number);
+      const d = parts[0], slot = parts[1];
+      const halfW = (gpuW - 30) / 2;
+      const baseX = gpuX(d) + 15 + slot*halfW;
+      bins[key].forEach((t, idx) => {
+        const cx = baseX + halfW/2 - tokW/2;
+        const cy = expY + 26 + idx*(tokH+3);
+        pos[t.g][t.k] = { x: cx, y: Math.min(cy, expY + expH - tokH - 4) };
+      });
+    }
+    return pos;
+  })();
+
+  // token position (top-left) for a given step
+  function posAt(g, k, step) {
+    if (step === 3 || step === 4) return destPos[g][k];
+    return homePos(g, k);   // steps 0,1,2,5,6 -> origin
+  }
+
+  // ---- state ----
+  let step = 0;
+
+  const STEP_TEXT = [
+    '初始：一个 batch 的 4 条 sequence 按 DP 切分，每卡 1 条。KV Cache 只存本地这条 → 零冗余',
+    'Attention (DP)：每卡用自己的 KV 对本地 sequence 做完整 attention，各算各的，🚫 零跨卡通信',
+    'Router：每条 sequence 碎成 token，router 给每个 token 选 expert（这里画 top-1，真实是 top-k）',
+    'All-to-All dispatch：每个 token 飞到它的目标 expert 所在的 GPU',
+    'Expert compute：各 GPU 的 expert 本地计算收到的 token（FFN）',
+    'All-to-All combine：算完飞回原 GPU，拼回原来的 sequence',
+    '完成一层：Attention 零通信 + KV 零冗余，唯一跨卡通信是 MoE 的 2× All-to-All ↓ 进入下一层'
+  ];
+
+  // ---- drawing helpers ----
+  function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+
+  function drawGPU(i) {
+    const x = gpuX(i), c = gpuColors[i];
+    ctx.fillStyle = '#12122a'; roundRect(x, gpuTop, gpuW, gpuH, 8); ctx.fill();
+    ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1;
+    ctx.fillStyle = c; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('GPU ' + i, x + gpuW/2, gpuTop - 8);
+
+    // KV cache (local only)
+    ctx.fillStyle = c + '20'; ctx.fillRect(x+12, kvY, gpuW-24, kvH);
+    ctx.strokeStyle = c + '70'; ctx.strokeRect(x+12, kvY, gpuW-24, kvH);
+    ctx.fillStyle = c; ctx.font = 'bold 10px monospace';
+    ctx.fillText('KV Cache (仅本地)', x+gpuW/2, kvY+16);
+    ctx.fillStyle = c; ctx.font = '10px monospace';
+    ctx.fillText('Seq ' + i + ' 的 KV', x+gpuW/2, kvY+36);
+    ctx.fillStyle = '#4caf50'; ctx.font = 'bold 9px monospace';
+    ctx.fillText('✓ 零冗余', x+gpuW/2, kvY+56);
+
+    // attention
+    const attnHot = step === 1;
+    ctx.fillStyle = attnHot ? c + '35' : '#1a1a2e'; ctx.fillRect(x+12, attnY, gpuW-24, attnH);
+    ctx.strokeStyle = attnHot ? c : '#333'; ctx.strokeRect(x+12, attnY, gpuW-24, attnH);
+    ctx.fillStyle = attnHot ? c : '#888'; ctx.font = 'bold 10px monospace';
+    ctx.fillText('Attention (全 heads)', x+gpuW/2, attnY+18);
+    ctx.fillStyle = '#888'; ctx.font = '9px monospace';
+    ctx.fillText('只处理本地 Seq ' + i, x+gpuW/2, attnY+36);
+    if (attnHot) { ctx.fillStyle = '#4caf50'; ctx.font='bold 9px monospace'; ctx.fillText('⚡ 独立计算', x+gpuW/2, attnY+56); }
+
+    // experts (2 per GPU)
+    const expHot = step === 4;
+    const halfW = (gpuW - 30)/2;
+    for (let s=0; s<2; s++) {
+      const ex = gpuX(i) + 15 + s*halfW;
+      ctx.fillStyle = expHot ? '#fbbf2430' : '#1a1a2e'; ctx.fillRect(ex, expY, halfW-6, expH);
+      ctx.strokeStyle = expHot ? '#fbbf24' : '#333'; ctx.strokeRect(ex, expY, halfW-6, expH);
+      ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 10px monospace'; ctx.textAlign='center';
+      ctx.fillText('E' + (i*2+s), ex + (halfW-6)/2, expY+15);
+    }
+  }
+
+  function drawToken(x, y, color, label) {
+    ctx.fillStyle = color; roundRect(x, y, tokW, tokH, 4); ctx.fill();
+    ctx.fillStyle = '#0d0d20'; ctx.font = 'bold 9px monospace'; ctx.textAlign='center';
+    ctx.fillText(label, x + tokW/2, y + tokH/2 + 3);
+  }
+
+  function drawSeqBlock(g) {
+    const totalW = TOK*tokW + (TOK-1)*tokGap;
+    const sx = gpuX(g) + (gpuW - totalW)/2;
+    const y = tokRowY + (tokRowH - tokH)/2;
+    ctx.fillStyle = gpuColors[g]; roundRect(sx, y, totalW, tokH, 5); ctx.fill();
+    ctx.fillStyle = '#0d0d20'; ctx.font = 'bold 10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Seq ' + g + ' (' + TOK + ' tok)', sx + totalW/2, y + tokH/2 + 3);
+  }
+
+  function drawBanner(text, color, y) {
+    ctx.fillStyle = color; ctx.font = 'bold 12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(text, W/2, y);
+  }
+
+  // render a full frame. If `interp` (0..1) and `fromStep` are given, token
+  // positions are linearly tweened from fromStep -> step.
+  function render(interp, fromStep) {
+    ctx.clearRect(0,0,W,H);
+    drawBanner('DP Attention 一层数据流', '#4caf50', 24);
+
+    for (let i=0; i<N; i++) drawGPU(i);
+
+    if (step === 1) drawBanner('🚫 Attention 阶段零跨卡通信（各 GPU 独立）', '#4caf50', 50);
+    if (step === 3) drawBanner('↔ All-to-All：dispatch tokens → expert GPU', '#fbbf24', 50);
+    if (step === 5) drawBanner('↔ All-to-All：combine results → 原 GPU', '#fbbf24', 50);
+
+    const blockMode = (step === 0 || step === 1 || step === 6);
+    if (blockMode) {
+      for (let g=0; g<N; g++) drawSeqBlock(g);
+    } else {
+      for (let g=0; g<N; g++) for (let k=0; k<TOK; k++) {
+        let p = posAt(g,k,step);
+        if (interp !== undefined && fromStep !== undefined) {
+          const a = posAt(g,k,fromStep);
+          p = { x: a.x + (p.x - a.x)*interp, y: a.y + (p.y - a.y)*interp };
+        }
+        drawToken(p.x, p.y, gpuColors[g], 'E' + route[g][k]);
+      }
+    }
+
+    document.getElementById('stepLabel').textContent = STEP_TEXT[step];
+    document.getElementById('stepCount').textContent = 'Step ' + step + ' / ' + (TOTAL_STEPS-1);
+    document.getElementById('btnPrev').disabled = (step === 0);
+    document.getElementById('btnNext').disabled = (step === TOTAL_STEPS-1);
+    document.getElementById('btnAuto').disabled = (step === TOTAL_STEPS-1);
+  }
+
+  // ---- controls (tween forward, snap backward) ----
+  let animId = null, autoOn = false;
+  function goNext() {
+    if (step >= TOTAL_STEPS-1) { autoOn = false; return; }
+    const from = step; step++;
+    if (animId) cancelAnimationFrame(animId);
+    const dur = 550; let t0 = null;
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      const interp = Math.min((ts - t0) / dur, 1);
+      render(interp, from);
+      if (interp < 1) { animId = requestAnimationFrame(frame); }
+      else { animId = null; render(); if (autoOn) setTimeout(goNext, 450); }
+    }
+    animId = requestAnimationFrame(frame);
+  }
+  function next() { autoOn = false; goNext(); }
+  function prev() { autoOn = false; if (animId) { cancelAnimationFrame(animId); animId = null; } if (step > 0) step--; render(); }
+  function reset() { autoOn = false; if (animId) { cancelAnimationFrame(animId); animId = null; } step = 0; render(); }
+  function auto() { if (animId) return; if (step >= TOTAL_STEPS-1) { step = 0; render(); } autoOn = true; goNext(); }
+
+  render();
+  return { next, prev, reset, auto };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

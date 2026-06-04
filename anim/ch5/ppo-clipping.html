@@ -55,14 +55,21 @@ p { margin: 12px 0; color: #ccc; }
 
     function resizeCanvas() {
         const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        // HiDPI crisp rendering: scale the backing store by devicePixelRatio
+        // while keeping the logical (CSS-pixel) coordinate system.
+        const dpr = window.devicePixelRatio || 1;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     function drawPPOGraph() {
         resizeCanvas();
-        const W = canvas.width;
-        const H = canvas.height;
+        const dpr = window.devicePixelRatio || 1;
+        const W = canvas.width / dpr;
+        const H = canvas.height / dpr;
         const eps = parseFloat(epsSlider.value);
         const adv = parseFloat(advSlider.value);
 

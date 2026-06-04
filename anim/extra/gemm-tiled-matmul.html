@@ -162,6 +162,20 @@ const ctxA = canvasA.getContext('2d');
 const ctxB = canvasB.getContext('2d');
 const ctxC = canvasC.getContext('2d');
 
+// HiDPI crisp rendering: scale each backing store by devicePixelRatio while
+// keeping the fixed 240x240 logical coordinate system used by draw().
+(function () {
+  const dpr = window.devicePixelRatio || 1;
+  [[canvasA, ctxA], [canvasB, ctxB], [canvasC, ctxC]].forEach(([cv, c]) => {
+    const lw = cv.width, lh = cv.height;
+    cv.style.width = lw + 'px';
+    cv.style.height = lh + 'px';
+    cv.width = lw * dpr;
+    cv.height = lh * dpr;
+    c.scale(dpr, dpr);
+  });
+})();
+
 const cellSize = 30;
 
 function getStepInfo(step) {

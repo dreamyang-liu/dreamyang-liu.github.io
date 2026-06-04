@@ -211,12 +211,20 @@ function getNodePosition(index, w, h) {
 
 function resizeFloydCanvas() {
   const rect = floydCanvas.parentElement.getBoundingClientRect();
-  floydCanvas.width = rect.width - 40;
-  floydCanvas.height = 320;
+  // HiDPI crisp rendering: scale the backing store by devicePixelRatio while
+  // keeping the logical (CSS-pixel) coordinate system used by drawFloyd().
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = rect.width - 40, cssH = 320;
+  floydCanvas.style.width = cssW + 'px';
+  floydCanvas.style.height = cssH + 'px';
+  floydCanvas.width = cssW * dpr;
+  floydCanvas.height = cssH * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function drawFloyd() {
-  const w = floydCanvas.width, h = floydCanvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  const w = floydCanvas.width / dpr, h = floydCanvas.height / dpr;
   ctx.clearRect(0, 0, w, h);
 
   // Draw edges
