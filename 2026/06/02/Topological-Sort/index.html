@@ -154,7 +154,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-text">核心思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kahn-BFS-%E6%B3%95%E6%A8%A1%E6%9D%BF"><span class="toc-text">Kahn &#x2F; BFS 法模板</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DFS-%E6%B3%95%EF%BC%88%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%EF%BC%89"><span class="toc-text">DFS 法（三色标记）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8"><span class="toc-text">应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9ABFS-%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E8%BF%87%E7%A8%8B"><span class="toc-text">动画：BFS 拓扑排序过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E8%BA%AB"><span class="toc-text">热身</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6"><span class="toc-text">进阶</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94-DAG-%E4%B8%8A%E7%9A%84%E2%80%9D%E5%85%88%E6%9D%A5%E5%90%8E%E5%88%B0%E2%80%9D"><span class="toc-text">直觉 — DAG 上的”先来后到”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E5%AE%9E%E7%8E%B0-%E2%80%94-Kahn-BFS-%E5%92%8C-DFS-%E5%90%8E%E5%BA%8F"><span class="toc-text">两种实现 — Kahn (BFS) 和 DFS 后序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kahn-%E7%AE%97%E6%B3%95-%E2%80%94-%E5%85%A5%E5%BA%A6%E4%B8%BA-0-%E7%9A%84%E6%89%94%E8%BF%9B%E9%98%9F%E5%88%97"><span class="toc-text">Kahn 算法 — 入度为 0 的扔进队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DFS-%E5%90%8E%E5%BA%8F%E9%80%86%E5%BA%8F-%E2%80%94-%E5%87%BA%E6%A0%88%E9%A1%BA%E5%BA%8F%E5%B0%B1%E6%98%AF%E6%8B%93%E6%89%91%E5%BA%8F"><span class="toc-text">DFS 后序逆序 — 出栈顺序就是拓扑序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E9%80%89"><span class="toc-text">怎么选</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%BA%E4%BE%BF%E6%A3%80%E6%B5%8B%E7%8E%AF-%E2%80%94-%E6%80%8E%E4%B9%88%E7%94%A8%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E5%88%A4-DAG"><span class="toc-text">顺便检测环 — 怎么用拓扑排序判 DAG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E9%A2%98-%E2%80%94-%E8%AF%BE%E7%A8%8B%E8%A1%A8-%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-text">经典题 — 课程表 &#x2F; 任务调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95"><span class="toc-text">记忆法</span></a></li></ol>
       </div>
     </div>
     
@@ -274,21 +274,19 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>每次取入度为 0 的点输出，删掉它的出边。全部输出 → 无环。本文正文为 markdown，配有 BFS 拓扑排序的可交互动画。</p>
+          <p>DAG 里给所有节点排个序,使得<strong>每条边都从靠前的指向靠后的</strong>。两种实现各背一份:Kahn 算法(BFS 入度法)和 DFS 后序逆序。顺手就把环检测做了。</p>
 <span id="more"></span>
 
-<h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>想象大学选课：有些课有先修要求。拓扑排序就是找一个上课顺序，保证每门课的先修课都排在它前面。</p>
-<p><strong>做法</strong>：找到没有先修课（入度&#x3D;0）的课先上，上完后把它从图中”删掉”（它后继的入度减 1）。重复直到所有课都排完，或者发现排不完（有环）。</p>
-<h2 id="Kahn-BFS-法模板"><a href="#Kahn-BFS-法模板" class="headerlink" title="Kahn &#x2F; BFS 法模板"></a>Kahn &#x2F; BFS 法模板</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">topo_sort</span>(<span class="hljs-params">n, edges</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    indeg = [<span class="hljs-number">0</span>] * n<br>    <span class="hljs-keyword">for</span> u, v <span class="hljs-keyword">in</span> edges:<br>        g[u].append(v)<br>        indeg[v] += <span class="hljs-number">1</span><br>    q = deque(i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n) <span class="hljs-keyword">if</span> indeg[i] == <span class="hljs-number">0</span>)<br>    order = []<br>    <span class="hljs-keyword">while</span> q:<br>        u = q.popleft()<br>        order.append(u)<br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>            indeg[v] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> indeg[v] == <span class="hljs-number">0</span>:<br>                q.append(v)<br>    <span class="hljs-keyword">return</span> order <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(order) == n <span class="hljs-keyword">else</span> []  <span class="hljs-comment"># 空 = 有环</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="DFS-法（三色标记）"><a href="#DFS-法（三色标记）" class="headerlink" title="DFS 法（三色标记）"></a>DFS 法（三色标记）</h2><p>白色&#x3D;未访问，灰色&#x3D;正在访问（在递归栈中），黑色&#x3D;已完成。</p>
-<p><strong>灰色碰灰色就是环！</strong> 完成顺序的逆序就是拓扑序。</p>
-<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><ul>
-<li><strong>课程表</strong>：判断能否修完所有课（LC 207&#x2F;210）。</li>
-<li><strong>字典序最小拓扑序</strong>：把队列换成最小堆。</li>
-<li><strong>DAG 上 DP</strong>：按拓扑序处理，每个节点的 DP 值只依赖已算好的前驱。</li>
+<h2 id="直觉-—-DAG-上的”先来后到”"><a href="#直觉-—-DAG-上的”先来后到”" class="headerlink" title="直觉 — DAG 上的”先来后到”"></a>直觉 — DAG 上的”先来后到”</h2><p>拓扑排序解决的就一个问题:<strong>一堆有依赖关系的事,排出一个能挨个做完的顺序</strong>。</p>
+<p>形式化点说:给定一张有向无环图(DAG),把所有节点排成一列,使得每一条边 <code>u → v</code>,<code>u</code> 都排在 <code>v</code> 前面。</p>
+<p>类比:</p>
+<ul>
+<li>选课:先修课排在后修课前面。</li>
+<li><code>make</code> 构建:被依赖的目标先编译。</li>
+<li>任务调度:前置任务先做。</li>
 </ul>
-<h2 id="动画：BFS-拓扑排序过程"><a href="#动画：BFS-拓扑排序过程" class="headerlink" title="动画：BFS 拓扑排序过程"></a>动画：BFS 拓扑排序过程</h2><p>下面动画演示 DAG <code>0→2, 0→3, 1→3, 2→4, 3→4, 3→5</code> 的 Kahn 算法：白色&#x3D;未处理、橙色&#x3D;队列中、绿色&#x3D;完成，右侧实时显示入度数组和输出序列：</p>
+<p>关键前提是<strong>无环</strong>。有环的话谁先谁后说不清,所以拓扑排序天然顺手能判 DAG。</p>
+<p>下面的动画用 6 节点 DAG <code>0→2, 0→3, 1→3, 2→4, 3→4, 3→5</code> 演示 Kahn 算法的全过程。<strong>重点盯两个东西</strong>:右侧的入度数组怎么变,和输出序列里节点入队的顺序。看完再回来读模板,代码就只是把动画里那几个动作翻译成 Python。</p>
 
 <script>
 (function () {
@@ -304,44 +302,108 @@
     }
   });
 })();
-</script><iframe class="tc-anim-frame" src="/anim/algo/topological-sort.html" loading="lazy" style="width:100%;height:520px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+</script><iframe class="tc-anim-frame" src="/anim/algo/topological-sort.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
-<h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
-<details>
-<summary><strong>BFS 法和 DFS 法各有什么优势？</strong></summary>
+<h2 id="两种实现-—-Kahn-BFS-和-DFS-后序"><a href="#两种实现-—-Kahn-BFS-和-DFS-后序" class="headerlink" title="两种实现 — Kahn (BFS) 和 DFS 后序"></a>两种实现 — Kahn (BFS) 和 DFS 后序</h2><h3 id="Kahn-算法-—-入度为-0-的扔进队列"><a href="#Kahn-算法-—-入度为-0-的扔进队列" class="headerlink" title="Kahn 算法 — 入度为 0 的扔进队列"></a>Kahn 算法 — 入度为 0 的扔进队列</h3><p>一句话:<strong>统计入度,把入度&#x3D;0 的丢进队列;弹出一个就把它的邻居入度 -1,变 0 的再入队</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">topo_sort_kahn</span>(<span class="hljs-params">n, edges</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    indeg = [<span class="hljs-number">0</span>] * n<br>    <span class="hljs-keyword">for</span> u, v <span class="hljs-keyword">in</span> edges:<br>        g[u].append(v)<br>        indeg[v] += <span class="hljs-number">1</span><br>    q = deque(i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n) <span class="hljs-keyword">if</span> indeg[i] == <span class="hljs-number">0</span>)<br>    order = []<br>    <span class="hljs-keyword">while</span> q:<br>        u = q.popleft()<br>        order.append(u)<br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>            indeg[v] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> indeg[v] == <span class="hljs-number">0</span>:<br>                q.append(v)<br>    <span class="hljs-keyword">return</span> order <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(order) == n <span class="hljs-keyword">else</span> []  <span class="hljs-comment"># 空 = 有环</span><br></code></pre></td></tr></table></figure>
 
-<p>BFS (Kahn) 直观、容易理解，天然产生拓扑序，方便改成”字典序最小”版本（用堆）。DFS 法代码更短，适合判环（灰碰灰），且后序逆序天然是拓扑序，适合需要逆拓扑序的场景（如 SCC）。</p>
-</details>
-</div>
+<p>直观、可控、易改。要字典序最小的拓扑序,把 <code>deque</code> 换成最小堆 (<code>heapq</code>) 即可。</p>
+<h3 id="DFS-后序逆序-—-出栈顺序就是拓扑序"><a href="#DFS-后序逆序-—-出栈顺序就是拓扑序" class="headerlink" title="DFS 后序逆序 — 出栈顺序就是拓扑序"></a>DFS 后序逆序 — 出栈顺序就是拓扑序</h3><p>一句话:<strong>DFS 完一个节点就压栈,最后倒序就是拓扑序</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">topo_sort_dfs</span>(<span class="hljs-params">n, edges</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    <span class="hljs-keyword">for</span> u, v <span class="hljs-keyword">in</span> edges:<br>        g[u].append(v)<br>    color = [<span class="hljs-number">0</span>] * n  <span class="hljs-comment"># 0=白未访问, 1=灰在栈中, 2=黑完成</span><br>    order = []<br>    has_cycle = <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">u</span>):<br>        <span class="hljs-keyword">nonlocal</span> has_cycle<br>        color[u] = <span class="hljs-number">1</span><br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>            <span class="hljs-keyword">if</span> color[v] == <span class="hljs-number">1</span>:        <span class="hljs-comment"># 灰碰灰 → 环</span><br>                has_cycle = <span class="hljs-literal">True</span><br>            <span class="hljs-keyword">elif</span> color[v] == <span class="hljs-number">0</span>:<br>                dfs(v)<br>        color[u] = <span class="hljs-number">2</span><br>        order.append(u)              <span class="hljs-comment"># 后序入栈</span><br><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>        <span class="hljs-keyword">if</span> color[i] == <span class="hljs-number">0</span>:<br>            dfs(i)<br>    <span class="hljs-keyword">return</span> [] <span class="hljs-keyword">if</span> has_cycle <span class="hljs-keyword">else</span> order[::-<span class="hljs-number">1</span>]<br></code></pre></td></tr></table></figure>
 
-<div class="exercise">
-<details>
-<summary><strong>如果要求字典序最小的拓扑序怎么做？</strong></summary>
+<p>为什么后序逆序就是拓扑序?因为节点 <code>u</code> 在出栈前,它所有后继都已经出栈了。<strong>出栈晚的反而要排在前面</strong>,所以最后翻转一下。</p>
+<h3 id="怎么选"><a href="#怎么选" class="headerlink" title="怎么选"></a>怎么选</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>选谁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>想要稳定、可控、按层处理</td>
+<td>Kahn</td>
+</tr>
+<tr>
+<td>要字典序最小</td>
+<td>Kahn + 最小堆</td>
+</tr>
+<tr>
+<td>代码尽量短 &#x2F; 顺便求 SCC</td>
+<td>DFS</td>
+</tr>
+<tr>
+<td>需要逆拓扑序(DAG DP 从汇点回推)</td>
+<td>DFS(后序直接就是)</td>
+</tr>
+<tr>
+<td>图非常大,递归怕爆栈</td>
+<td>Kahn</td>
+</tr>
+</tbody></table>
+<h2 id="顺便检测环-—-怎么用拓扑排序判-DAG"><a href="#顺便检测环-—-怎么用拓扑排序判-DAG" class="headerlink" title="顺便检测环 — 怎么用拓扑排序判 DAG"></a>顺便检测环 — 怎么用拓扑排序判 DAG</h2><p>拓扑排序的副产物就是环检测,<strong>两种实现都自带</strong>,不需要另外写算法。</p>
+<p><strong>Kahn 法</strong>:跑完看 <code>len(order)</code>。如果 <code>&lt; n</code>,说明还有节点入度永远 &gt;0,被卡在环里出不来 → 有环。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">order = topo_sort_kahn(n, edges)<br>is_dag = <span class="hljs-built_in">len</span>(order) == n<br></code></pre></td></tr></table></figure>
 
-<p>把 BFS 的普通队列换成最小堆（优先队列）。每次从入度为 0 的节点中取编号最小的。注意这和”最短路径”无关，只是输出顺序的要求。</p>
-</details>
-</div>
+<p><strong>DFS 法</strong>:三色标记里<strong>灰碰灰就是环</strong>。因为灰色代表”在当前 DFS 路径上”,再次碰到灰色节点意味着走回了自己,形成了反向边(back edge)。</p>
+<p>两点提醒:</p>
+<ol>
+<li>无向图判环不能用拓扑排序(无向图没有”入度”的概念),用并查集或 DFS 看是否有非父节点的访问。</li>
+<li>只判环不输出序时,Kahn 法可以只数计数,不存 <code>order</code>,省点内存。</li>
+</ol>
+<h2 id="经典题-—-课程表-任务调度"><a href="#经典题-—-课程表-任务调度" class="headerlink" title="经典题 — 课程表 &#x2F; 任务调度"></a>经典题 — 课程表 &#x2F; 任务调度</h2><p><strong>LC 207. 课程表</strong>:给你 <code>numCourses</code> 和先修关系 <code>prerequisites = [[a, b], ...]</code>(修 <code>a</code> 之前要先修 <code>b</code>),问能不能修完。本质就是判 DAG。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">canFinish</span>(<span class="hljs-params">self, n, prerequisites</span>):<br>        g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>        indeg = [<span class="hljs-number">0</span>] * n<br>        <span class="hljs-keyword">for</span> a, b <span class="hljs-keyword">in</span> prerequisites:<br>            g[b].append(a)            <span class="hljs-comment"># 先修 b 才能修 a,所以边 b→a</span><br>            indeg[a] += <span class="hljs-number">1</span><br>        q = deque(i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n) <span class="hljs-keyword">if</span> indeg[i] == <span class="hljs-number">0</span>)<br>        done = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">while</span> q:<br>            u = q.popleft()<br>            done += <span class="hljs-number">1</span><br>            <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>                indeg[v] -= <span class="hljs-number">1</span><br>                <span class="hljs-keyword">if</span> indeg[v] == <span class="hljs-number">0</span>:<br>                    q.append(v)<br>        <span class="hljs-keyword">return</span> done == n<br></code></pre></td></tr></table></figure>
 
-<div class="exercise">
-<details>
-<summary><strong>拓扑排序和 DAG 上的 DP 有什么关系？</strong></summary>
-
-<p>DAG 上 DP 的转移顺序就是拓扑序：当你处理节点 u 时，它的所有前驱都已经被处理完了，所以 dp[u] 可以从前驱的 dp 值转移过来。经典例子：DAG 最长路径（LC 329）。</p>
-</details>
-</div>
-
-<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><h3 id="热身"><a href="#热身" class="headerlink" title="热身"></a>热身</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/course-schedule/">207. 课程表</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/course-schedule-ii/">210. 课程表 II</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-eventual-safe-states/">802. 找到最终的安全状态</a></li>
+<p><strong>LC 210. 课程表 II</strong>:同样的图,输出修课顺序。把 <code>done += 1</code> 换成 <code>order.append(u)</code>,最后 <code>return order if len(order) == n else []</code>。</p>
+<p><strong>易踩坑</strong>:边的方向。题目说”修 a 前要先修 b”,意思是 b 是 a 的先修,所以图里应该是 <code>b → a</code>(b 排在 a 前)。方向画反一遍 WA 是经典操作。</p>
+<p>其他必刷:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-eventual-safe-states/">LC 802. 找到最终的安全状态</a> — 反图 + 拓扑,定义安全 &#x3D; 所有路径都终止</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/alien-dictionary/">LC 269. 火星词典</a> — 从相邻单词的第一个不同字符建边,跑拓扑</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">LC 310. 最小高度树</a> — 类拓扑,每轮剥掉叶子(度&#x3D;1),最后剩 1~2 个就是答案</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-path-in-a-matrix/">LC 329. 矩阵中的最长递增路径</a> — DAG 上 DP,可用记忆化 DFS 或拓扑序递推</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/">LC 2192. 有向无环图中一个节点的所有祖先</a> — 拓扑序上做集合合并</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/largest-color-value-in-a-directed-graph/">LC 1857. 有向图中最大颜色值</a> — 拓扑序 + 颜色计数 DP,自带环检测</li>
 </ul>
-<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/alien-dictionary/">269. 火星词典</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">310. 最小高度树</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-path-in-a-matrix/">329. 矩阵中的最长递增路径</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/">2192. 有向无环图中一个节点的所有祖先</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/largest-color-value-in-a-directed-graph/">1857. 有向图中最大颜色值</a></li>
+<h2 id="记忆法"><a href="#记忆法" class="headerlink" title="记忆法"></a>记忆法</h2><p>一句话:<strong>入度 0 的先走,走一个减一圈</strong>。</p>
+<p>三个对仗:</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Kahn (BFS)</th>
+<th>DFS 后序</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>入口</td>
+<td>入度为 0 的点入队</td>
+<td>任选未访问节点 DFS</td>
+</tr>
+<tr>
+<td>推进</td>
+<td>出队 → 邻居入度 -1</td>
+<td>递归到底 → 出栈</td>
+</tr>
+<tr>
+<td>判环</td>
+<td>输出数 &lt; n</td>
+<td>灰碰灰</td>
+</tr>
+<tr>
+<td>顺序</td>
+<td>自然得到拓扑序</td>
+<td>后序数组翻转</td>
+</tr>
+</tbody></table>
+<p>判题口诀:</p>
+<ul>
+<li>看到”先修”、”依赖”、”前置任务” → 拓扑排序。</li>
+<li>题目问”能否完成” → 判环就够,Kahn 数计数。</li>
+<li>题目问”输出顺序” → Kahn 存 <code>order</code>,或 DFS 后序逆。</li>
+<li>要求”字典序最小” → Kahn 把 <code>deque</code> 换 <code>heapq</code>。</li>
+<li>DAG 上做 DP → 按拓扑序递推,前驱已算好,直接转移。</li>
 </ul>
+<p>记住一件事:<strong>拓扑排序不是排序算法,是依赖求解算法</strong>。它产生的”序”是一个合法的执行顺序,可能不唯一。</p>
 
         </div>
         

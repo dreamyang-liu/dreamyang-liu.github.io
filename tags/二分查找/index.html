@@ -734,8 +734,7 @@
             </div>
             
             <div class="post-excerpt">
-              二分查找二分查找可用于在有序序列中搜索或确定元素或枢轴。这里我们有三种使用二分查找的场景。
-在唯一元素数组中查找元素123456789101112def basic_binary_search(arr, target):    left = 0    right = len(arr) - 1    while left &lt;= right:        mid = left + (right...
+              <p>二分查找写错，99% 是因为没把循环不变量 (loop invariant) 想清楚。锁死一个半开区间 <code>[lo, hi)</code> 的模板，<code>&gt;=</code>、<code>&gt;</code>、<code>&lt;=</code>、<code>&lt;</code> 四种边界全用同一份代码。</p>...
             </div>
             
             <div class="post-footer">

@@ -41,7 +41,119 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
   <body>
     <div class="wrapper">
@@ -154,7 +266,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%9C%80%E7%AE%80%E6%A8%A1%E6%9D%BF%EF%BC%88%E6%8C%89%E5%B1%82%E9%81%8D%E5%8E%86%EF%BC%89"><span class="toc-text">1. 最简模板（按层遍历）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%85%B3%E9%94%AE%E7%82%B9"><span class="toc-text">2. 关键点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%BD%91%E6%A0%BC-BFS"><span class="toc-text">3. 网格 BFS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A4%9A%E6%BA%90-BFS"><span class="toc-text">4. 多源 BFS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%8F%8C%E5%90%91-BFS"><span class="toc-text">5. 双向 BFS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-BFS-vs-DFS-%E9%80%89%E6%8B%A9"><span class="toc-text">6. BFS vs DFS 选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E6%BC%94%E7%A4%BA"><span class="toc-text">动画演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E8%BA%AB"><span class="toc-text">热身</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6"><span class="toc-text">进阶</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89"><span class="toc-text">直觉</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%EF%BC%88%E8%83%8C%E8%BF%99%E4%B8%AA%E5%B0%B1%E5%A4%9F%E4%BA%86%EF%BC%89"><span class="toc-text">模板（背这个就够了）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%98%E7%A7%8D"><span class="toc-text">变种</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E6%A0%BC-BFS"><span class="toc-text">网格 BFS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%BA%90-BFS"><span class="toc-text">多源 BFS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-BFS"><span class="toc-text">0-1 BFS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E5%90%91-BFS"><span class="toc-text">双向 BFS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BFS-vs-DFS-%E6%80%8E%E4%B9%88%E9%80%89"><span class="toc-text">BFS vs DFS 怎么选</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E9%A2%98"><span class="toc-text">经典题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95-%E6%98%93%E9%94%99%E7%82%B9"><span class="toc-text">记忆法 &amp; 易错点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li></ol>
       </div>
     </div>
     
@@ -274,23 +386,17 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>一层一层往外扩。第一次访问到某点的步数 &#x3D; 最短步数（边权为 1）。本文正文为 markdown，配有可交互动画演示 BFS 的逐层扩散。</p>
+          <p><strong>一句话</strong>：BFS = 把图当池塘，从起点丢颗石头，看波纹一圈圈扩出去。<strong>第一次碰到目标的那一圈，就是最短步数</strong>（边权为 1）。</p>
 <span id="more"></span>
 
-<h2 id="1-最简模板（按层遍历）"><a href="#1-最简模板（按层遍历）" class="headerlink" title="1. 最简模板（按层遍历）"></a>1. 最简模板（按层遍历）</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">bfs</span>(<span class="hljs-params">start</span>):<br>    q = deque([start])<br>    visited = &#123;start&#125;<br>    step = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">while</span> q:<br>        <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(q)):<br>            node = q.popleft()<br>            <span class="hljs-keyword">if</span> is_target(node): <span class="hljs-keyword">return</span> step<br>            <span class="hljs-keyword">for</span> nxt <span class="hljs-keyword">in</span> neighbors(node):<br>                <span class="hljs-keyword">if</span> nxt <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> visited:<br>                    visited.add(nxt)<br>                    q.append(nxt)<br>        step += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="2-关键点"><a href="#2-关键点" class="headerlink" title="2. 关键点"></a>2. 关键点</h2><blockquote>
-<p><strong>入队时就标记 visited</strong>（不是出队时！）否则同一个节点可能被多次入队，导致超时或错误结果。</p>
-</blockquote>
-<h2 id="3-网格-BFS"><a href="#3-网格-BFS" class="headerlink" title="3. 网格 BFS"></a>3. 网格 BFS</h2><p>方向数组：<code>dirs = [(-1,0),(1,0),(0,-1),(0,1)]</code>，判断越界 + 判断障碍 + 判断是否已访问。</p>
-<h2 id="4-多源-BFS"><a href="#4-多源-BFS" class="headerlink" title="4. 多源 BFS"></a>4. 多源 BFS</h2><p>所有起点一开始就塞进队列，相当于加了一个”超级源点”连接所有起点。典型题：腐烂的橘子、01 矩阵。</p>
-<h2 id="5-双向-BFS"><a href="#5-双向-BFS" class="headerlink" title="5. 双向 BFS"></a>5. 双向 BFS</h2><p>从起点和终点同时扩散，每次扩展较小的那一边。时间从 O(b^d) 降到 O(b^(d&#x2F;2))，其中 b 是分支因子，d 是深度。</p>
-<h2 id="6-BFS-vs-DFS-选择"><a href="#6-BFS-vs-DFS-选择" class="headerlink" title="6. BFS vs DFS 选择"></a>6. BFS vs DFS 选择</h2><ul>
-<li>最短步数 &#x2F; 最少操作次数 → <strong>BFS</strong></li>
-<li>所有路径 &#x2F; 排列组合 &#x2F; 连通分量 → <strong>DFS</strong></li>
-<li>拓扑排序 → BFS (Kahn) 或 DFS 都行</li>
+<h2 id="直觉"><a href="#直觉" class="headerlink" title="直觉"></a>直觉</h2><p>想象你站在迷宫入口往里喊话。声音不会”挑一条路深入”，而是同时充满当前这一圈空气，再充满下一圈。BFS 就是把声音的扩散过程写成代码：</p>
+<ul>
+<li><strong>当前波前</strong>（队列里的节点）= 距起点恰好 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.179ex" height="1.595ex" role="img" focusable="false" viewBox="0 -694 521 705"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g></g></g></svg></mjx-container> 步的所有点</li>
+<li><strong>下一波前</strong> = 当前波前的所有邻居（去掉访问过的）</li>
+<li>第一次把目标包进波前的那个 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.179ex" height="1.595ex" role="img" focusable="false" viewBox="0 -694 521 705"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g></g></g></svg></mjx-container>，就是答案</li>
 </ul>
-<h2 id="动画演示"><a href="#动画演示" class="headerlink" title="动画演示"></a>动画演示</h2><p>下面两个动画分别展示网格 BFS 的最短路径搜索，以及多源 BFS（腐烂的橘子）的同步扩散过程：</p>
+<p>DFS 是”先一条路走到黑再回头”，BFS 是”齐步走、同时推进”。<strong>只要问的是”最少几步”，几乎都是 BFS</strong>。</p>
+<p>下面动画把这层”波纹”画了出来。点 [开始] 看队列怎么一层层吞掉网格、第几步碰到终点；切到第二个动画，看”多源 BFS”——多颗石头同时丢进池塘，波纹相遇即停。</p>
 
 <script>
 (function () {
@@ -308,11 +414,60 @@
 })();
 </script><iframe class="tc-anim-frame" src="/anim/algo/bfs.html" loading="lazy" style="width:100%;height:560px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
+<h2 id="模板（背这个就够了）"><a href="#模板（背这个就够了）" class="headerlink" title="模板（背这个就够了）"></a>模板（背这个就够了）</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">bfs</span>(<span class="hljs-params">start</span>):<br>    q = deque([start])<br>    visited = {start}<br>    step = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">while</span> q:<br>        <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(q)):          <span class="hljs-comment"># 锁定"当前这一层"的大小</span><br>            node = q.popleft()<br>            <span class="hljs-keyword">if</span> is_target(node):<br>                <span class="hljs-keyword">return</span> step<br>            <span class="hljs-keyword">for</span> nxt <span class="hljs-keyword">in</span> neighbors(node):<br>                <span class="hljs-keyword">if</span> nxt <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> visited:<br>                    visited.add(nxt)     <span class="hljs-comment"># 入队就标记，不要等到出队！</span><br>                    q.append(nxt)<br>        step += <span class="hljs-number">1</span>                        <span class="hljs-comment"># 一整层处理完才 +1</span><br>    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>三个锁死的细节</strong>（错一个就 WA 或 TLE）：</p>
+<ol>
+<li><code>for _ in range(len(q))</code> —— 先把 <code>len(q)</code> 冻住，再循环。否则你边出队边入队，分不清”哪些属于当前层”。</li>
+<li><strong>入队时</strong>就 <code>visited.add(nxt)</code>，不是出队时。出队时标记，同一个点会被 4 个邻居各塞一次，队列爆炸（动画里看得很清楚：放开这个限制，橙色单元会反复闪）。</li>
+<li><code>step += 1</code> 放在 <code>for</code> 外面，不是里面。<code>step</code> 是层号，不是节点号。</li>
+</ol>
+<h2 id="变种"><a href="#变种" class="headerlink" title="变种"></a>变种</h2><h3 id="网格-BFS"><a href="#网格-BFS" class="headerlink" title="网格 BFS"></a>网格 BFS</h3><p>最常考。<code>neighbors</code> 换成方向数组：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">DIRS = [(-<span class="hljs-number">1</span>,<span class="hljs-number">0</span>),(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>),(<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>),(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>)]   <span class="hljs-comment"># 上下左右</span><br><span class="hljs-keyword">for</span> dr, dc <span class="hljs-keyword">in</span> DIRS:<br>    nr, nc = r+dr, c+dc<br>    <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt;= nr &lt; R <span class="hljs-keyword">and</span> <span class="hljs-number">0</span> &lt;= nc &lt; C <span class="hljs-keyword">and</span> grid[nr][nc] != <span class="hljs-string">'#'</span> <span class="hljs-keyword">and</span> (nr,nc) <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> visited:<br>        ...<br></code></pre></td></tr></table></figure>
+
+<h3 id="多源-BFS"><a href="#多源-BFS" class="headerlink" title="多源 BFS"></a>多源 BFS</h3><p><strong>起点不止一个</strong>？全部一次性塞进初始队列。等价于在外面挂一个虚拟超级源点，连向每个起点，边权 0。模板<strong>一行不改</strong>，只改初始化。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">q = deque(all_starts)<br>visited = <span class="hljs-built_in">set</span>(all_starts)<br></code></pre></td></tr></table></figure>
+
+<p>经典题：腐烂的橘子（动画 2）、01 矩阵到最近 0 的距离。</p>
+<h3 id="0-1-BFS"><a href="#0-1-BFS" class="headerlink" title="0-1 BFS"></a>0-1 BFS</h3><p>边权只有 0 和 1。普通队列换成 <code>deque</code>：权 0 走 <code>appendleft</code>，权 1 走 <code>append</code>。O(V+E) 替代 Dijkstra 的 O(E log V)。</p>
+<h3 id="双向-BFS"><a href="#双向-BFS" class="headerlink" title="双向 BFS"></a>双向 BFS</h3><p>起点终点同时扩散，每轮<strong>总是扩较小的一边</strong>，两边相遇即返回。搜索空间从 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.477ex" height="2.497ex" role="img" focusable="false" viewBox="0 -853.7 2420.7 1103.7"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1152,0)"><g data-mml-node="mi"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="mi" transform="translate(462,363) scale(0.707)"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g><g data-mml-node="mo" transform="translate(2031.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 砍到 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="7.076ex" height="2.587ex" role="img" focusable="false" viewBox="0 -893.3 3127.8 1143.3"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1152,0)"><g data-mml-node="mi"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="TeXAtom" transform="translate(462,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(520,0)"><g data-mml-node="mo"><path data-c="2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path></g></g><g data-mml-node="mn" transform="translate(1020,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g><g data-mml-node="mo" transform="translate(2738.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>，指数减半。条件：终点明确、邻居可反向推。典型题：127 单词接龙、752 转盘锁。</p>
+<h3 id="BFS-vs-DFS-怎么选"><a href="#BFS-vs-DFS-怎么选" class="headerlink" title="BFS vs DFS 怎么选"></a>BFS vs DFS 怎么选</h3><ul>
+<li>最短步数 / 最少操作 → <strong>BFS</strong></li>
+<li>所有路径 / 排列组合 / 连通块大小 → <strong>DFS</strong></li>
+<li>拓扑排序 → 都行（Kahn 是 BFS）</li>
+</ul>
+<h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-level-order-traversal/">102. 二叉树层序遍历</a> —— 最纯粹的 BFS，验证你模板背没背熟</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-islands/">200. 岛屿数量</a> —— 网格 BFS 求连通块</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/rotting-oranges/">994. 腐烂的橘子</a> —— 多源 BFS 原型</li>
+</ul>
+<p><strong>进阶</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/word-ladder/">127. 单词接龙</a> —— 隐式图 BFS，双向 BFS 提速</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/open-the-lock/">752. 打开转盘锁</a> —— 状态空间 BFS</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/01-matrix/">542. 01 矩阵</a> —— 反向想：从所有 0 出发的多源 BFS</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/shortest-path-in-a-grid-with-obstacles-elimination/">1293. 网格中的最短路径（消除障碍）</a> —— 状态加一维 <code>(r,c,剩余消除次数)</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/shortest-path-visiting-all-nodes/">847. 访问所有节点的最短路径</a> —— 状态压缩 + BFS</li>
+</ul>
+<h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 & 易错点"></a>记忆法 &amp; 易错点</h2><p>记住三个画面就行：</p>
+<ol>
+<li><strong>池塘波纹</strong> —— BFS 的本质。第一次碰到目标的波纹半径 = 答案。</li>
+<li><strong>冻住的 <code>len(q)</code></strong> —— 区分”这一层”和”下一层”的唯一手段。</li>
+<li><strong>入队即标记</strong> —— 不是出队，不是出队，不是出队。</li>
+</ol>
+<p>常见坑：</p>
+<ul>
+<li>把 <code>step += 1</code> 写到内层 for 里 → 答案变成”访问了几个节点”，错的离谱。</li>
+<li>边权不是 1 还用 BFS → 错答案。该上 Dijkstra 或 0-1 BFS。</li>
+<li>网格题忘记判断越界 → IndexError 或绕到对面。</li>
+<li>求”是否能到达”用 BFS → 没问题但浪费；DFS 写起来更短。<strong>只有问最短才必须 BFS</strong>。</li>
+</ul>
 <h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
 <details>
 <summary><strong>为什么 BFS 能保证找到最短路径（边权为 1 时）？</strong></summary>
 
-<p>因为 BFS 按层扩散，第 k 层的节点离起点的距离恰好是 k。第一次到达目标节点时，经过的层数就是最小步数。后续再到达目标的路径，层数只会更大或相等，不会更小。</p>
+<p>按层扩散，第 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.179ex" height="1.595ex" role="img" focusable="false" viewBox="0 -694 521 705"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g></g></g></svg></mjx-container> 层的节点离起点的距离<strong>恰好</strong>是 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.179ex" height="1.595ex" role="img" focusable="false" viewBox="0 -694 521 705"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g></g></g></svg></mjx-container>（不会更少：更少的话之前的层就该访问到了；不会更多：相邻层差 1）。第一次访问目标时所在的层数就是最短步数。</p>
 </details>
 </div>
 
@@ -320,32 +475,17 @@
 <details>
 <summary><strong>"入队时标记" vs "出队时标记" 有什么区别？</strong></summary>
 
-<p><strong>入队时标记</strong>：一个节点只会入队一次，队列大小 &#x3D; O(节点数)。</p>
-<p><strong>出队时标记</strong>：同一个节点可能被多个邻居同时入队，队列可能膨胀到 O(边数)，在网格题中容易超时（比如 4 个邻居都把同一个点入队了）。对于无权图求最短路，两者结果一样，但后者浪费时间和空间。</p>
+<p>入队时标记：每个节点最多入队一次，队列大小 = O(V)。<br>出队时标记：同一节点可能被多个邻居重复入队（网格里 4 个方向都可能塞同一个点），队列膨胀到 O(E)，时间空间都浪费。结果都对，但后者经常 TLE。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>双向 BFS 的时间复杂度优势是什么？什么时候适合用？</strong></summary>
+<summary><strong>双向 BFS 何时适用？</strong></summary>
 
-<p>单向 BFS 搜索空间为 O(b^d)，双向 BFS 为 O(2 · b^(d&#x2F;2))，指数级缩小。</p>
-<p><strong>适用条件</strong>：已知起点和终点，且能反向扩展邻居（如 Word Ladder）。不适合：终点不明确或无法反向搜索的场景。</p>
+<p>需要：起点终点都明确 + 邻居能反向推。指数级缩小搜索空间（<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="10.231ex" height="2.046ex" role="img" focusable="false" viewBox="0 -893.3 4522.1 904.3"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mi"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="mi" transform="translate(462,363) scale(0.707)"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g><g data-mml-node="mo" transform="translate(1157.5,0)"><path data-c="2192" d="M56 237T56 250T70 270H835Q719 357 692 493Q692 494 692 496T691 499Q691 511 708 511H711Q720 511 723 510T729 506T732 497T735 481T743 456Q765 389 816 336T935 261Q944 258 944 250Q944 244 939 241T915 231T877 212Q836 186 806 152T761 85T740 35T732 4Q730 -6 727 -8T711 -11Q691 -11 691 0Q691 7 696 25Q728 151 835 230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(2435.3,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="msup" transform="translate(2935.3,0)"><g data-mml-node="mi"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="TeXAtom" transform="translate(462,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(520,0)"><g data-mml-node="mo"><path data-c="2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path></g></g><g data-mml-node="mn" transform="translate(1020,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></g></g></svg></mjx-container>）。<br>不适用：终点未知（如”找最远点”）、邻居只能单向（有向图无反图）。</p>
 </details>
 </div>
-
-<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><h3 id="热身"><a href="#热身" class="headerlink" title="热身"></a>热身</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-level-order-traversal/">102. 二叉树的层序遍历</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-islands/">200. 岛屿数量</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/rotting-oranges/">994. 腐烂的橘子</a></li>
-</ul>
-<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/word-ladder/">127. 单词接龙</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/open-the-lock/">752. 打开转盘锁</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/01-matrix/">542. 01 矩阵</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/shortest-path-in-a-grid-with-obstacles-elimination/">1293. 网格中的最短路径（消除障碍）</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/shortest-path-visiting-all-nodes/">847. 访问所有节点的最短路径</a></li>
-</ul>
 
         </div>
         

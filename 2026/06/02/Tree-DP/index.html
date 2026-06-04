@@ -41,7 +41,119 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
   <body>
     <div class="wrapper">
@@ -154,7 +266,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-text">核心思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E5%A4%A7%E6%A8%A1%E5%BC%8F"><span class="toc-text">四大模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-1%EF%BC%9A%E5%8D%95%E7%8A%B6%E6%80%81%EF%BC%88%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6%EF%BC%89"><span class="toc-text">模式 1：单状态（最大深度）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-2%EF%BC%9A%E4%B8%A4%E4%B8%AA%E8%BF%94%E5%9B%9E%E5%80%BC%E8%AF%80%E7%AA%8D%EF%BC%88%E7%9B%B4%E5%BE%84-%E6%9C%80%E5%A4%A7%E8%B7%AF%E5%BE%84%E5%92%8C%EF%BC%89"><span class="toc-text">模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-3%EF%BC%9A%E9%80%89-%E4%B8%8D%E9%80%89%E6%A8%A1%E6%9D%BF%EF%BC%88%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D-III%EF%BC%89"><span class="toc-text">模式 3：选&#x2F;不选模板（打家劫舍 III）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-4%EF%BC%9A%E6%8D%A2%E6%A0%B9-DP%EF%BC%88%E6%9C%80%E9%9A%BE%EF%BC%89"><span class="toc-text">模式 4：换根 DP（最难）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9A%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9B%B4%E5%BE%84%E8%AE%A1%E7%AE%97"><span class="toc-text">动画：二叉树直径计算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94-DFS-%E5%90%8E%E5%BA%8F-%E5%AD%90%E6%A0%91%E8%81%9A%E5%90%88"><span class="toc-text">直觉 — DFS 后序 + 子树聚合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-%E2%80%94-Python-dfs-%E8%BF%94%E5%9B%9E-tuple"><span class="toc-text">模板 — Python (dfs 返回 tuple)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A4%E7%B1%BB%E7%BB%8F%E5%85%B8"><span class="toc-text">两类经典</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E6%A0%91%E8%81%9A%E5%90%88-%E2%80%94-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9B%B4%E5%BE%84-LC-543"><span class="toc-text">子树聚合 — 二叉树直径 (LC 543)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%89-%E4%B8%8D%E9%80%89-%E2%80%94-%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D-III-LC-337"><span class="toc-text">选&#x2F;不选 — 打家劫舍 III (LC 337)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6-%E6%8D%A2%E6%A0%B9-DP-%E4%B8%A4%E6%AC%A1-DFS"><span class="toc-text">进阶: 换根 DP (两次 DFS)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95-%E6%98%93%E9%94%99%E7%82%B9"><span class="toc-text">记忆法 &#x2F; 易错点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
       </div>
     </div>
     
@@ -274,38 +386,20 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>后序遍历 + 在每个节点汇总子树信息，返回状态让父节点组合答案。本文正文为 markdown，二叉树直径计算配有可交互动画。</p>
+          <p>一句话: <strong>DFS 一遍, 每个节点的答案 = 子树聚合 + 自己的贡献</strong>。本质是后序遍历 + 状态在节点上传递, 自底向上 return。</p>
 <span id="more"></span>
 
-<h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>树形 DP 的套路：<strong>从叶子往根算</strong>（后序遍历）。每个节点处理完所有子节点后，把子节点的结果组合成自己的答案，再返回给父节点。</p>
+<h2 id="直觉-—-DFS-后序-子树聚合"><a href="#直觉-—-DFS-后序-子树聚合" class="headerlink" title="直觉 — DFS 后序 + 子树聚合"></a>直觉 — DFS 后序 + 子树聚合</h2><p>线性 DP 是”从左往右抄前面的状态”, 树形 DP 是”从叶子往根抄子树的状态”。换句话说, 树根本不需要新算法, 只是把”前一个状态”换成了”所有子节点的返回值”。</p>
+<p>核心套路就一句话:</p>
 <blockquote>
-<p>口诀：选当前 → 子不能选；不选当前 → 子取最大。</p>
+<p>写一个 <code>dfs(node)</code>, 后序递归两个孩子, 把孩子的返回值组合一下, 再 return 给父亲。</p>
 </blockquote>
-<h2 id="四大模式"><a href="#四大模式" class="headerlink" title="四大模式"></a>四大模式</h2><h3 id="模式-1：单状态（最大深度）"><a href="#模式-1：单状态（最大深度）" class="headerlink" title="模式 1：单状态（最大深度）"></a>模式 1：单状态（最大深度）</h3><p>最简单。每个节点返回”以我为根的子树深度”。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">maxDepth</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> root: <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> + <span class="hljs-built_in">max</span>(maxDepth(root.left), maxDepth(root.right))<br></code></pre></td></tr></table></figure>
-
-<h3 id="模式-2：两个返回值诀窍（直径-最大路径和）"><a href="#模式-2：两个返回值诀窍（直径-最大路径和）" class="headerlink" title="模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）"></a>模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）</h3><blockquote>
-<p><strong>关键区分：</strong></p>
-<ul>
-<li><strong>“经过我的路径”</strong> &#x3D; 左链 + 右链 + 我 → 只用来更新全局 ans</li>
-<li><strong>“给上面用的链”</strong> &#x3D; max(左链, 右链) + 我 → 作为返回值给父节点</li>
-</ul>
-<p>为什么？因为路径不能分叉！往上传的只能是一条直链。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">diameterOfBinaryTree</span>(<span class="hljs-params">root</span>):<br>    ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">nonlocal</span> ans<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>        left = dfs(node.left)      <span class="hljs-comment"># 左子树最长链</span><br>        right = dfs(node.right)    <span class="hljs-comment"># 右子树最长链</span><br>        ans = <span class="hljs-built_in">max</span>(ans, left + right)  <span class="hljs-comment"># 经过我的路径（更新全局）</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(left, right) + <span class="hljs-number">1</span>   <span class="hljs-comment"># 给上面用的（只能选一边）</span><br>    dfs(root)<br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
-
-<h3 id="模式-3：选-不选模板（打家劫舍-III）"><a href="#模式-3：选-不选模板（打家劫舍-III）" class="headerlink" title="模式 3：选&#x2F;不选模板（打家劫舍 III）"></a>模式 3：选&#x2F;不选模板（打家劫舍 III）</h3><p>每个节点返回 <code>(选我的最大值, 不选我的最大值)</code> 元组。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">rob</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        left = dfs(node.left)<br>        right = dfs(node.right)<br>        rob_me = node.val + left[<span class="hljs-number">1</span>] + right[<span class="hljs-number">1</span>]      <span class="hljs-comment"># 选我，子不能选</span><br>        skip_me = <span class="hljs-built_in">max</span>(left) + <span class="hljs-built_in">max</span>(right)             <span class="hljs-comment"># 不选我，子随意</span><br>        <span class="hljs-keyword">return</span> (rob_me, skip_me)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(root))<br></code></pre></td></tr></table></figure>
-
-<h3 id="模式-4：换根-DP（最难）"><a href="#模式-4：换根-DP（最难）" class="headerlink" title="模式 4：换根 DP（最难）"></a>模式 4：换根 DP（最难）</h3><blockquote>
-<p><strong>思路：</strong> 如果要求”以每个节点为根时的答案”，暴力要 $O(n^2)$。换根 DP 用两次 DFS：</p>
+<p>到节点 <code>u</code> 时, 我手上已经有 <code>dfs(u.left)</code> 和 <code>dfs(u.right)</code> 的结果。我要决定两件事:</p>
 <ol>
-<li>第一次 DFS：以节点 0 为根，算出 dp[0] 的答案</li>
-<li>第二次 DFS：从根往下，利用父节点的答案<strong>增量更新</strong>子节点的答案</li>
+<li><strong>当前节点贡献什么</strong>(更新全局答案 or 累加进自己的状态)</li>
+<li><strong>往上返回什么</strong>(父亲需要知道我子树的哪些信息才能继续算)</li>
 </ol>
-<p>关键公式：dp[child] &#x3D; dp[parent] − child 对 parent 的贡献 + parent 对 child 的贡献。</p>
-</blockquote>
-<h2 id="动画：二叉树直径计算"><a href="#动画：二叉树直径计算" class="headerlink" title="动画：二叉树直径计算"></a>动画：二叉树直径计算</h2><p>后序遍历，每个节点计算”返回给父亲的深度”（蓝色 ↑）和”经过我的路径长度”（绿色），并更新全局 ans（红色）：</p>
+<p>这两件事经常不一样。下面的动画用二叉树直径(LC 543)演示得最清楚: 节点要更新的”经过我的路径”是左链+右链, 但能往上返回的”延伸链”只能选一边 —— 因为路径不能在父亲那里分叉。</p>
 
 <script>
 (function () {
@@ -321,34 +415,76 @@
     }
   });
 })();
-</script><iframe class="tc-anim-frame" src="/anim/algo/tree-dp.html" loading="lazy" style="width:100%;height:560px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+</script><iframe class="tc-anim-frame" src="/anim/algo/tree-dp.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
+<p>对照动画看后序顺序: 叶子 4 → 叶子 6 → 节点 5 → 节点 2 → 叶子 3 → 根 1。<strong>每访问一个节点, 蓝色 ↑ 是它返回给父亲的深度, 绿色是经过它的最长路径, 红色全局 ans 只在需要时被刷新</strong>。看完这段, 后面所有模板都是同一个骨架。</p>
+<h2 id="模板-—-Python-dfs-返回-tuple"><a href="#模板-—-Python-dfs-返回-tuple" class="headerlink" title="模板 — Python (dfs 返回 tuple)"></a>模板 — Python (dfs 返回 tuple)</h2><p>骨架长这样, 几乎所有树形 DP 题都是它的变体:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">solve</span>(<span class="hljs-params">root</span>):<br>    ans = <span class="hljs-number">0</span>  <span class="hljs-comment"># 如有全局答案就放外面</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">nonlocal</span> ans<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node:<br>            <span class="hljs-keyword">return</span> (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, ...)            <span class="hljs-comment"># 空节点的"零元"</span><br>        L = dfs(node.left)<br>        R = dfs(node.right)<br>        <span class="hljs-comment"># 1. 用 L, R, node.val 更新全局 ans (如有)</span><br>        <span class="hljs-comment"># 2. 算出当前节点要返回给父亲的状态 tuple</span><br>        <span class="hljs-keyword">return</span> (state1, state2, ...)<br>    dfs(root)<br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<p>三件事必须想清楚再下笔:</p>
+<ol>
+<li><strong>空节点返回什么</strong> —— 决定递归基。一般是 0 或 <code>(0, 0)</code>, 但有些题(如最大路径和)是 <code>-inf</code>。</li>
+<li><strong>返回 tuple 里放几个状态</strong> —— 单状态(深度)/ 两个状态(选 vs 不选)/ 更多(监控二叉树有 3 个)。</li>
+<li><strong>当前节点的贡献是局部还是全局</strong> —— “经过我的”用来更新全局 ans, “延伸到我的”才能往上 return。两者不能混。</li>
+</ol>
+<h2 id="两类经典"><a href="#两类经典" class="headerlink" title="两类经典"></a>两类经典</h2><h3 id="子树聚合-—-二叉树直径-LC-543"><a href="#子树聚合-—-二叉树直径-LC-543" class="headerlink" title="子树聚合 — 二叉树直径 (LC 543)"></a>子树聚合 — 二叉树直径 (LC 543)</h3><p>直径 = 任意两节点之间的最长路径。<strong>关键区分</strong>: 路径可以在某个节点”拐弯”, 但拐弯的那一段不能再往上传。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">diameterOfBinaryTree</span>(<span class="hljs-params">root</span>):<br>    ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">nonlocal</span> ans<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>        L = dfs(node.left)              <span class="hljs-comment"># 左子树最长延伸链</span><br>        R = dfs(node.right)             <span class="hljs-comment"># 右子树最长延伸链</span><br>        ans = <span class="hljs-built_in">max</span>(ans, L + R)           <span class="hljs-comment"># 经过我的路径(可拐弯, 更新全局)</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(L, R) + <span class="hljs-number">1</span>            <span class="hljs-comment"># 给父亲的链(不能拐弯, 只能选一边)</span><br>    dfs(root)<br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<p>同款骨架直接套: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/">LC 124 最大路径和</a> (空节点返回 0, 负贡献用 <code>max(L, 0)</code> 截断); <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-univalue-path/">LC 687 最长同值路径</a> (儿子值相同才能延伸)。</p>
+<h3 id="选-不选-—-打家劫舍-III-LC-337"><a href="#选-不选-—-打家劫舍-III-LC-337" class="headerlink" title="选/不选 — 打家劫舍 III (LC 337)"></a>选/不选 — 打家劫舍 III (LC 337)</h3><p>每个节点要么偷要么不偷, 偷了的话孩子就不能偷。返回 <code>(偷我的最大值, 不偷我的最大值)</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">rob</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        L = dfs(node.left)<br>        R = dfs(node.right)<br>        rob_me  = node.val + L[<span class="hljs-number">1</span>] + R[<span class="hljs-number">1</span>]    <span class="hljs-comment"># 偷我 → 孩子必须不偷</span><br>        skip_me = <span class="hljs-built_in">max</span>(L) + <span class="hljs-built_in">max</span>(R)           <span class="hljs-comment"># 不偷我 → 孩子选最大的</span><br>        <span class="hljs-keyword">return</span> (rob_me, skip_me)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(root))<br></code></pre></td></tr></table></figure>
+
+<p>注意 <code>skip_me</code> 取的是 <code>max(L)</code>, 不是 <code>L[1]</code> —— 不偷自己时, 孩子可偷可不偷, 取大的那个。这条同款骨架的扩展:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-cameras/">LC 968 监控二叉树</a> — 每个节点 3 个状态(放摄像头 / 被覆盖 / 没覆盖), 返回 3 元组。</li>
+<li>树上独立集 / 最小点覆盖 —— 全是这套”选 vs 不选”。</li>
+</ul>
+<h2 id="进阶-换根-DP-两次-DFS"><a href="#进阶-换根-DP-两次-DFS" class="headerlink" title="进阶: 换根 DP (两次 DFS)"></a>进阶: 换根 DP (两次 DFS)</h2><p>上面的模板都是”指定根之后的答案”。如果题目要”以每个节点为根时的答案”(如 <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sum-of-distances-in-tree/">LC 834 树中距离之和</a>), 暴力对每个根跑一遍 DFS 就是 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.832ex" height="2.452ex" role="img" focusable="false" viewBox="0 -833.9 2577.6 1083.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1152,0)"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mn" transform="translate(633,363) scale(0.707)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g><g data-mml-node="mo" transform="translate(2188.6,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
+<p>换根 DP 用两次 DFS:</p>
+<ol>
+<li>第一次 DFS(后序): 钦定节点 0 为根, 算出 <code>dp[0]</code>。</li>
+<li>第二次 DFS(前序): 从根往下传, <strong>增量更新</strong> <code>dp[child] = dp[parent] + 偏移量</code>。</li>
+</ol>
+<p>关键是想出”父→子换根时, 答案的增量是什么”。一般是 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.618ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2041 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mn" transform="translate(1152,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(1652,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 的算式, 总复杂度 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.844ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2141 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1752,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
+<h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><p><strong>一句话口诀</strong>: 后序递归两个孩子, 拼成 tuple 往上传, 全局答案在路上更。</p>
+<p>3 个反复出错的点:</p>
+<ol>
+<li><strong>更新全局 vs return 给父亲是两件事</strong> —— 直径 / 最大路径和题一旦把”拐弯路径”往上 return, 父亲那里就分叉, 全错。</li>
+<li><strong>空节点的零元</strong> —— 求最大值且节点值可能为负时, 别想当然 return 0; 见 LC 124 用负贡献截断。</li>
+<li><strong>选/不选的 <code>skip</code></strong> —— 不选当前节点时, 孩子能选可以不选, <strong>取 <code>max(L)</code> 不是 <code>L[1]</code></strong>。这个坑写打家劫舍 III 时几乎人人踩。</li>
+</ol>
+<p>判题口诀:</p>
+<ul>
+<li>问”树上某种最优路径/直径” → 子树聚合, return 一条延伸链。</li>
+<li>问”选一些节点, 父子互斥” → 选/不选, return tuple。</li>
+<li>问”以每个节点为根时的答案” → 换根 DP, 两次 DFS。</li>
+</ul>
 <h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
 <details>
-<summary><strong>1. 为什么树形 DP 要用后序遍历？前序行不行？</strong></summary>
+<summary><strong>1. 为什么树形 DP 要用后序遍历? 前序行不行?</strong></summary>
 
-<p>后序遍历意味着”先处理子节点，再处理当前节点”。树形 DP 中，当前节点的答案需要子节点的结果才能计算，所以必须后序。前序是先处理自己再处理子节点，此时子节点信息还没算出来，无法组合。唯一例外是换根 DP 的第二次 DFS，那是用父节点信息更新子节点，所以用前序。</p>
+<p>后序意味着”先处理子节点, 再处理当前”。当前节点的答案依赖子节点的返回值, 所以必须后序。前序时子节点还没算, 没法组合。唯一例外是换根 DP 的第二次 DFS, 用父节点信息增量更新子节点, 那一趟用前序。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>2. "经过当前节点的路径"和"延伸到当前节点的链"有什么区别？</strong></summary>
+<summary><strong>2. "经过当前节点的路径"和"延伸到当前节点的链"为什么不能混?</strong></summary>
 
-<p>“经过当前节点的路径” &#x3D; 左子树最长链 + 当前节点 + 右子树最长链，形成一个倒 V 字形，可能是全局最优解。”延伸到当前节点的链” &#x3D; max(左链, 右链) + 当前节点，是一条直线，只能选一个方向。区别本质：路径可以在当前节点”拐弯”（两边都用），但传给父节点时不能拐弯（只能选一边），否则父节点那里就会出现分叉。</p>
+<p>“经过我的路径” = 左链 + 我 + 右链, 是个倒 V, 可以是全局最优解。”延伸到我的链” = max(左, 右) + 我, 是直线。区别就在于路径可以在我这里拐弯, 但<strong>传给父亲的不能拐</strong>, 否则父亲那里就出现分叉, 父亲再往上就更乱了。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>3. 换根 DP 为什么只需要两次 DFS？</strong></summary>
+<summary><strong>3. 换根 DP 为什么只要两次 DFS?</strong></summary>
 
-<p>第一次 DFS 确定了一个基准答案（以某个节点为根）。换根时，从 parent 到 child 只发生了一个变化：child 的子树从 parent 的”下方”变成了”上方”。这个变化是 O(1) 可计算的增量。所以从根往下逐层传递，每个节点都能 O(1) 算出自己为根的答案。两次 DFS 总复杂度 O(n)，比暴力 O(n^2) 快得多。</p>
+<p>第一次 DFS 确定了”以 0 为根”的基准。换根从 parent 到 child, 只发生一个 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.618ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2041 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mn" transform="translate(1152,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(1652,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 的拓扑变化: child 的子树从”parent 下方”变成”parent 上方”。增量可算, 沿前序从上往下递推一遍即可, 共 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.844ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2141 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1752,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
 </details>
 </div>
 
-<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-depth-of-binary-tree/">104. 二叉树的最大深度</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/diameter-of-binary-tree/">543. 二叉树的直径</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/balanced-binary-tree/">110. 平衡二叉树</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-univalue-path/">687. 最长同值路径</a></p>
-<p><strong>进阶</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/">124. 二叉树中的最大路径和</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/house-robber-iii/">337. 打家劫舍 III</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-cameras/">968. 监控二叉树</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sum-of-distances-in-tree/">834. 树中距离之和</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">310. 最小高度树</a></p>
+<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-depth-of-binary-tree/">104 最大深度</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/diameter-of-binary-tree/">543 直径</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/balanced-binary-tree/">110 平衡二叉树</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-univalue-path/">687 最长同值路径</a></p>
+<p><strong>进阶</strong>: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/">124 最大路径和</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/house-robber-iii/">337 打家劫舍 III</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-cameras/">968 监控二叉树</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sum-of-distances-in-tree/">834 树中距离之和</a> · <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">310 最小高度树</a></p>
 
         </div>
         

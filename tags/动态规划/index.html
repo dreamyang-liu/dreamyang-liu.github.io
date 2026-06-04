@@ -734,7 +734,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>后序遍历 + 在每个节点汇总子树信息，返回状态让父节点组合答案。本文正文为 markdown，二叉树直径计算配有可交互动画。</p>...
+              <p>一句话: <strong>DFS 一遍, 每个节点的答案 = 子树聚合 + 自己的贡献</strong>。本质是后序遍历 + 状态在节点上传递, 自底向上 return。</p>...
             </div>
             
             <div class="post-footer">
@@ -767,7 +767,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>dp[i][j] &#x3D; 区间 [i, j] 上的最优答案，长度从小到大枚举。本文正文为 markdown，石子合并填表过程配有可交互动画。</p>...
+              <p>状态 <code>dp[i][j]</code> 是一段区间的最优答案,转移枚举区间内的”分割点” k。<strong>关键不是公式,而是枚举顺序</strong>: 必须从短区间到长区间,因为 <code>dp[i][j]</code> 要先有 <code>dp[i][k]</code> 和 <code>dp[k+1][j]</code> 才算得出来。记住这一句,石子合并、戳气球、矩阵链乘就是同一道题。</p>...
             </div>
             
             <div class="post-footer">
@@ -800,7 +800,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>动态规划 = 带记忆化的递归。把重叠子问题算一次存起来。本文正文为 markdown，关键填表过程配有可交互动画（点按钮逐步演示）。</p>...
+              <p>DP = 子问题 + 不重复计算。把指数级搜索压成多项式，全靠”算过的别再算”。</p>...
             </div>
             
             <div class="post-footer">

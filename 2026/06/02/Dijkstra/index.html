@@ -41,7 +41,119 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
   <body>
     <div class="wrapper">
@@ -154,7 +266,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E4%BB%A3%E7%A0%81"><span class="toc-text">模板代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E5%85%B3%E9%94%AE%E7%82%B9"><span class="toc-text">三个关键点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%98%E4%BD%93%E4%B8%8E%E8%BE%B9%E7%95%8C"><span class="toc-text">变体与边界</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E4%BD%93"><span class="toc-text">变体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%95%E6%97%B6%E4%B8%8D%E7%94%A8-Dijkstra"><span class="toc-text">何时不用 Dijkstra</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E6%BC%94%E7%A4%BA"><span class="toc-text">动画演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E8%BA%AB"><span class="toc-text">热身</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6"><span class="toc-text">进阶</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94%E2%80%94-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-%E2%80%9CBFS-%E8%B4%AA%E5%BF%83%E2%80%9D"><span class="toc-text">直觉 —— 为什么是 “BFS + 贪心”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%9F%E6%9D%83%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E7%A0%B4%E5%9D%8F%E5%AE%83"><span class="toc-text">负权为什么会破坏它</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB-%E2%80%94%E2%80%94-%E8%B7%9F%E7%9D%80%E5%A0%86%E7%9A%84%E5%BC%B9%E5%87%BA%E9%A1%BA%E5%BA%8F%E8%B5%B0%E4%B8%80%E9%81%8D"><span class="toc-text">动画 —— 跟着堆的弹出顺序走一遍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-%E2%80%94%E2%80%94-Python-with-heapq"><span class="toc-text">模板 —— Python with heapq</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%98%E7%A7%8D-%E2%80%94%E2%80%94-%E5%90%8C%E4%B8%80%E6%A1%86%E6%9E%B6%E7%9A%84%E4%B8%8D%E5%90%8C%E6%8D%A2%E7%9A%AE"><span class="toc-text">变种 —— 同一框架的不同换皮</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E9%A2%98"><span class="toc-text">经典题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95-%E6%98%93%E9%94%99%E7%82%B9"><span class="toc-text">记忆法 &#x2F; 易错点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li></ol>
       </div>
     </div>
     
@@ -274,27 +386,25 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>带优先队列的 BFS：每次取当前已知距离最小的未确定节点去松弛邻居。只适用于非负边权。本文正文为 markdown，配有逐步演示动画。</p>
+          <p>Dijkstra = BFS + 贪心。把 FIFO 队列换成优先队列，每次从未确定的节点里挑距离最小的那个去松弛邻居。前提:边权非负——因为已确定节点的距离一旦敲定就不再回头。</p>
 <span id="more"></span>
 
-<h2 id="模板代码"><a href="#模板代码" class="headerlink" title="模板代码"></a>模板代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> heapq<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dijkstra</span>(<span class="hljs-params">n, edges, src</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    <span class="hljs-keyword">for</span> u, v, w <span class="hljs-keyword">in</span> edges:<br>        g[u].append((v, w))<br>    dist = [<span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)] * n<br>    dist[src] = <span class="hljs-number">0</span><br>    pq = [(<span class="hljs-number">0</span>, src)]<br>    <span class="hljs-keyword">while</span> pq:<br>        d, u = heapq.heappop(pq)<br>        <span class="hljs-keyword">if</span> d &gt; dist[u]:           <span class="hljs-comment"># 跳过过期条目</span><br>            <span class="hljs-keyword">continue</span><br>        <span class="hljs-keyword">for</span> v, w <span class="hljs-keyword">in</span> g[u]:<br>            nd = d + w<br>            <span class="hljs-keyword">if</span> nd &lt; dist[v]:<br>                dist[v] = nd<br>                heapq.heappush(pq, (nd, v))<br>    <span class="hljs-keyword">return</span> dist<br></code></pre></td></tr></table></figure>
+<h2 id="直觉-——-为什么是-“BFS-贪心”"><a href="#直觉-——-为什么是-“BFS-贪心”" class="headerlink" title="直觉 —— 为什么是 “BFS + 贪心”"></a>直觉 —— 为什么是 “BFS + 贪心”</h2><p>BFS 在等权图里是对的:从起点一层一层扩,第一次摸到某节点就是最短路。原因是 FIFO 保证”先入队的距离小”。</p>
+<p>边权不等怎么办?把队列升级成<strong>优先队列</strong>(小顶堆),依然每次取出”目前距离最小”的节点。这个节点的距离从此就敲定了——其他人想绕路过来,只会更远(因为边权 ≥ 0)。这就是贪心的来源。</p>
+<p>口诀:<strong>“挑最近的未确定节点,扩它的邻居”</strong>。整个算法就这一句话。</p>
+<h3 id="负权为什么会破坏它"><a href="#负权为什么会破坏它" class="headerlink" title="负权为什么会破坏它"></a>负权为什么会破坏它</h3><p>贪心的根基是”已确定的不再变”。一旦有负边,绕远路反而可能更短,刚敲定的距离就会被推翻。举个反例:</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-selector-tag">A</span>→<span class="hljs-selector-tag">B</span>: <span class="hljs-number">1</span><br><span class="hljs-selector-tag">A</span>→<span class="hljs-selector-tag">C</span>: <span class="hljs-number">5</span><br><span class="hljs-selector-tag">C</span>→<span class="hljs-selector-tag">B</span>: <span class="hljs-selector-tag">-10</span><br></code></pre></td></tr></table></figure>
 
-<h2 id="三个关键点"><a href="#三个关键点" class="headerlink" title="三个关键点"></a>三个关键点</h2><ol>
-<li>堆里存 <code>(距离, 节点)</code> 这个元组，保证 <code>heappop</code> 按距离排序。</li>
-<li>弹出时检查 <code>if d &gt; dist[u]: continue</code> —— 跳过过期的旧条目。</li>
-<li>松弛成功后再 push 新的 <code>(nd, v)</code>，不要提前 push。</li>
+<p>从 A 出发,Dijkstra 先弹出 B,敲定 <code>dist[B]=1</code>,然后再也不看 B 了。但真实最短是 A→C→B = 5 + (-10) = -5。算法已经走过头,回不去。</p>
+<blockquote>
+<p>边权全 1 → 普通 BFS。边权 0/1 → 0-1 BFS(双端队列)。有负权 → Bellman-Ford / SPFA。</p>
+</blockquote>
+<h2 id="动画-——-跟着堆的弹出顺序走一遍"><a href="#动画-——-跟着堆的弹出顺序走一遍" class="headerlink" title="动画 —— 跟着堆的弹出顺序走一遍"></a>动画 —— 跟着堆的弹出顺序走一遍</h2><p>下面动画从节点 0 出发。<strong>重点看两件事</strong>:</p>
+<ol>
+<li><strong>每一步弹出的节点</strong>——一定是当前 <code>dist</code> 数组里(未确定节点中)的最小值。</li>
+<li><strong>松弛后哪些格子被刷黄</strong>——只有”新距离 &lt; 旧距离”才更新,被更新的节点会重新进堆。</li>
 </ol>
-<h2 id="变体与边界"><a href="#变体与边界" class="headerlink" title="变体与边界"></a>变体与边界</h2><h3 id="变体"><a href="#变体" class="headerlink" title="变体"></a>变体</h3><ul>
-<li><strong>A* 搜索</strong>：加启发式函数，优先探索”更有希望”的方向。</li>
-<li><strong>分层图 &#x2F; 状态扩维</strong>：节点变成 <code>(node, state)</code>，如限制 K 次免费通行。</li>
-<li><strong>0-1 BFS</strong>：边权只有 0&#x2F;1 时，用双端队列代替堆，O(V+E)。</li>
-</ul>
-<h3 id="何时不用-Dijkstra"><a href="#何时不用-Dijkstra" class="headerlink" title="何时不用 Dijkstra"></a>何时不用 Dijkstra</h3><ul>
-<li>边权全 1 → 普通 BFS 就行。</li>
-<li>边权只有 0&#x2F;1 → 0-1 BFS 更快。</li>
-<li>有负权边 → Bellman-Ford &#x2F; SPFA。</li>
-</ul>
-<h2 id="动画演示"><a href="#动画演示" class="headerlink" title="动画演示"></a>动画演示</h2><p>下面动画从节点 0 出发，逐步弹出距离最小的节点并松弛邻居，下方表格实时显示 <code>dist</code> 数组：</p>
+<p>看完一遍后,把它和”BFS 一层一层扩”对比:Dijkstra 不是按层,而是按<strong>已知距离从小到大</strong>逐个敲定。</p>
 
 <script>
 (function () {
@@ -310,44 +420,103 @@
     }
   });
 })();
-</script><iframe class="tc-anim-frame" src="/anim/algo/dijkstra.html" loading="lazy" style="width:100%;height:480px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+</script><iframe class="tc-anim-frame" src="/anim/algo/dijkstra.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
+<h2 id="模板-——-Python-with-heapq"><a href="#模板-——-Python-with-heapq" class="headerlink" title="模板 —— Python with heapq"></a>模板 —— Python with heapq</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> heapq<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dijkstra</span>(<span class="hljs-params">n, edges, src</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    <span class="hljs-keyword">for</span> u, v, w <span class="hljs-keyword">in</span> edges:<br>        g[u].append((v, w))<br>    dist = [<span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>)] * n<br>    dist[src] = <span class="hljs-number">0</span><br>    pq = [(<span class="hljs-number">0</span>, src)]<br>    <span class="hljs-keyword">while</span> pq:<br>        d, u = heapq.heappop(pq)<br>        <span class="hljs-keyword">if</span> d &gt; dist[u]:           <span class="hljs-comment"># 过期条目,跳过</span><br>            <span class="hljs-keyword">continue</span><br>        <span class="hljs-keyword">for</span> v, w <span class="hljs-keyword">in</span> g[u]:<br>            nd = d + w<br>            <span class="hljs-keyword">if</span> nd &lt; dist[v]:<br>                dist[v] = nd<br>                heapq.heappush(pq, (nd, v))<br>    <span class="hljs-keyword">return</span> dist<br></code></pre></td></tr></table></figure>
+
+<p>三个写法上的关键点:</p>
+<ol>
+<li><strong>堆里存 <code>(距离, 节点)</code></strong>——元组比较从第一个元素开始,自动按距离排序。</li>
+<li><strong><code>if d &gt; dist[u]: continue</code></strong>——堆里可能有同一节点的多份旧条目(Python 的 <code>heapq</code> 不支持 decrease-key,只能反复 push)。这行跳过过期的,正确性可以不要,但不加会做大量无用松弛。</li>
+<li><strong>先更新 <code>dist[v]</code> 再 push</strong>——不要”先 push 再判断”,会让堆爆炸。</li>
+</ol>
+<p>复杂度 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="16.866ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 7454.8 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mo" transform="translate(1152,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1541,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(2532.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(3532.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(4296.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mi" transform="translate(4852.1,0)"><path data-c="6C" d="M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z"></path><path data-c="6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z" transform="translate(278,0)"></path><path data-c="67" d="M329 409Q373 453 429 453Q459 453 472 434T485 396Q485 382 476 371T449 360Q416 360 412 390Q410 404 415 411Q415 412 416 414V415Q388 412 363 393Q355 388 355 386Q355 385 359 381T368 369T379 351T388 325T392 292Q392 230 343 187T222 143Q172 143 123 171Q112 153 112 133Q112 98 138 81Q147 75 155 75T227 73Q311 72 335 67Q396 58 431 26Q470 -13 470 -72Q470 -139 392 -175Q332 -206 250 -206Q167 -206 107 -175Q29 -140 29 -75Q29 -39 50 -15T92 18L103 24Q67 55 67 108Q67 155 96 193Q52 237 52 292Q52 355 102 398T223 442Q274 442 318 416L329 409ZM299 343Q294 371 273 387T221 404Q192 404 171 388T145 343Q142 326 142 292Q142 248 149 227T179 192Q196 182 222 182Q244 182 260 189T283 207T294 227T299 242Q302 258 302 292T299 343ZM403 -75Q403 -50 389 -34T348 -11T299 -2T245 0H218Q151 0 138 -6Q118 -15 107 -34T95 -74Q95 -84 101 -97T122 -127T170 -155T250 -167Q319 -167 361 -139T403 -75Z" transform="translate(778,0)"></path></g><g data-mml-node="mo" transform="translate(6130.1,0)"><path data-c="2061" d=""></path></g><g data-mml-node="mi" transform="translate(6296.8,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(7065.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
+<h2 id="变种-——-同一框架的不同换皮"><a href="#变种-——-同一框架的不同换皮" class="headerlink" title="变种 —— 同一框架的不同换皮"></a>变种 —— 同一框架的不同换皮</h2><table>
+<thead>
+<tr>
+<th>变种</th>
+<th>改动</th>
+<th>何时用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A*</strong></td>
+<td>堆的 key 改成 <code>g(n) + h(n)</code>,h 是到终点的启发式估计</td>
+<td>单源单点,有几何/距离先验,如游戏寻路</td>
+</tr>
+<tr>
+<td><strong>双向 Dijkstra</strong></td>
+<td>从起点和终点各跑一遍,在中间相遇</td>
+<td>单源单点,需要剪掉大量无关搜索</td>
+</tr>
+<tr>
+<td><strong>0-1 BFS</strong></td>
+<td>边权只有 0/1,把堆换成 deque,0 加队头、1 加队尾</td>
+<td>边权 0/1,<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.72ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4296.4 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(2143.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(3143.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(3907.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container></td>
+</tr>
+<tr>
+<td><strong>分层图 / 状态扩维</strong></td>
+<td>节点变成 <code>(node, state)</code>,如剩余免费次数</td>
+<td>状态影响转移代价</td>
+</tr>
+<tr>
+<td><strong>Bellman-Ford</strong></td>
+<td>不用堆,V 轮松弛所有边</td>
+<td>有负权,<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.955ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 3074 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mi" transform="translate(1921,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(2685,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container></td>
+</tr>
+<tr>
+<td><strong>SPFA</strong></td>
+<td>队列版 Bellman-Ford,平均更快</td>
+<td>有负权,稀疏图</td>
+</tr>
+</tbody></table>
+<p>记住骨架:<strong>“用什么数据结构维护待扩展节点”</strong>——FIFO 是 BFS,小顶堆是 Dijkstra,deque 是 0-1 BFS,全扫一遍是 Bellman-Ford。</p>
+<h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身</strong>:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/network-delay-time/">743. 网络延迟时间</a> —— 模板</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a> —— “路径权”改成 max 而非 sum</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cheapest-flights-within-k-stops/">787. K 站中转内最便宜的航班</a> —— 状态扩维 <code>(node, stops)</code></li>
+</ul>
+<p><strong>进阶</strong>:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-maximum-probability/">1514. 概率最大的路径</a> —— 大顶堆 + log 转化(乘法变加法)</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-cost-to-reach-destination-in-time/">1928. 规定时间内到达终点的最小花费</a> —— <code>(cost, time, node)</code> 双维度</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/second-minimum-time-to-reach-destination/">2045. 到达目的地的第二短时间</a> —— 维护前两小距离</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-ways-to-arrive-at-destination/">1976. 到达目的地的方案数</a> —— Dijkstra 顺便数路径</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/trapping-rain-water-ii/">407. 接雨水 II</a> —— 堆 + 从边界向内”灌水”</li>
+</ul>
+<h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><p><strong>记忆法</strong>:一句话——“挑最近的未确定节点,扩它的邻居”。看到”非负边权 + 单源最短路”,立刻条件反射 heapq。</p>
+<p><strong>易错点</strong>:</p>
+<ul>
+<li><strong>过期条目没跳过</strong>:<code>if d &gt; dist[u]: continue</code> 不写就 TLE。</li>
+<li><strong>负权</strong>:看到负边立刻换 Bellman-Ford,别硬上 Dijkstra。</li>
+<li><strong>路径权不是 sum</strong>:1631 这种 max-of-edges,松弛时用 <code>max(d, w)</code> 而非 <code>d + w</code>。模板要灵活。</li>
+<li><strong>状态需要扩维</strong>:出现”K 次免费”、”限制时间”等约束,节点必须变成元组。</li>
+<li><strong>大顶堆</strong>:Python 的 heapq 是小顶堆,要大顶堆就 push 负数。</li>
+</ul>
 <h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
 <details>
-<summary><strong>为什么 Dijkstra 不能处理负权边？给一个反例。</strong></summary>
+<summary><strong>为什么 Dijkstra 不能处理负权边?给一个反例。</strong></summary>
 
-<p>Dijkstra 贪心地”确定”当前最小距离节点，一旦确定就不再更新。如果后面有负权边能让已确定节点距离更短，算法无法回头修正。反例：A→B(1)、A→C(5)、C→B(-10)，从 A 出发先确定 B&#x3D;1，但实际最短是 A→C→B&#x3D;-5。</p>
+<p>贪心地”确定”当前最小距离节点,确定后不再更新。若后续负边能让已确定节点更短,无法回头。反例:A→B(1)、A→C(5)、C→B(-10),从 A 出发先确定 <code>dist[B]=1</code>,但实际最短 A→C→B = -5。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong><code>if d > dist[u]: continue</code> 这一行的作用是什么？不加会怎样？</summary>
+<summary><strong><code>if d &gt; dist[u]: continue</code> 这一行不加会怎样?</strong></summary>
 
-<p>堆中可能有同一节点的多个旧条目。这行跳过过期条目，避免用旧距离去松弛邻居。不加不影响正确性，但会做大量无用松弛，时间复杂度退化。</p>
+<p>堆里可能有同一节点的多份旧条目(因为 heapq 不支持 decrease-key)。不跳过过期条目,正确性不受影响,但会用旧距离去松弛邻居,做大量无用功,复杂度退化。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>0-1 BFS 为什么比 Dijkstra 更快（边权只有 0/1 时）？</summary>
+<summary><strong>0-1 BFS 为什么比 Dijkstra 更快(边权只有 0/1 时)?</strong></summary>
 
-<p>0-1 BFS 用双端队列：权 0 的边加到队头，权 1 的边加到队尾。不需要堆操作，时间 O(V+E)，而 Dijkstra 是 O((V+E)logV)。</p>
+<p>用双端队列:权 0 的边加到队头,权 1 的边加到队尾。每个节点最多入队两次,无 heap 比较的 log,<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.72ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4296.4 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(2143.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(3143.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(3907.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> vs Dijkstra 的 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="16.866ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 7454.8 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mo" transform="translate(1152,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1541,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(2532.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(3532.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(4296.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mi" transform="translate(4852.1,0)"><path data-c="6C" d="M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z"></path><path data-c="6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z" transform="translate(278,0)"></path><path data-c="67" d="M329 409Q373 453 429 453Q459 453 472 434T485 396Q485 382 476 371T449 360Q416 360 412 390Q410 404 415 411Q415 412 416 414V415Q388 412 363 393Q355 388 355 386Q355 385 359 381T368 369T379 351T388 325T392 292Q392 230 343 187T222 143Q172 143 123 171Q112 153 112 133Q112 98 138 81Q147 75 155 75T227 73Q311 72 335 67Q396 58 431 26Q470 -13 470 -72Q470 -139 392 -175Q332 -206 250 -206Q167 -206 107 -175Q29 -140 29 -75Q29 -39 50 -15T92 18L103 24Q67 55 67 108Q67 155 96 193Q52 237 52 292Q52 355 102 398T223 442Q274 442 318 416L329 409ZM299 343Q294 371 273 387T221 404Q192 404 171 388T145 343Q142 326 142 292Q142 248 149 227T179 192Q196 182 222 182Q244 182 260 189T283 207T294 227T299 242Q302 258 302 292T299 343ZM403 -75Q403 -50 389 -34T348 -11T299 -2T245 0H218Q151 0 138 -6Q118 -15 107 -34T95 -74Q95 -84 101 -97T122 -127T170 -155T250 -167Q319 -167 361 -139T403 -75Z" transform="translate(778,0)"></path></g><g data-mml-node="mo" transform="translate(6130.1,0)"><path data-c="2061" d=""></path></g><g data-mml-node="mi" transform="translate(6296.8,0)"><path data-c="1D449" d="M52 648Q52 670 65 683H76Q118 680 181 680Q299 680 320 683H330Q336 677 336 674T334 656Q329 641 325 637H304Q282 635 274 635Q245 630 242 620Q242 618 271 369T301 118L374 235Q447 352 520 471T595 594Q599 601 599 609Q599 633 555 637Q537 637 537 648Q537 649 539 661Q542 675 545 679T558 683Q560 683 570 683T604 682T668 681Q737 681 755 683H762Q769 676 769 672Q769 655 760 640Q757 637 743 637Q730 636 719 635T698 630T682 623T670 615T660 608T652 599T645 592L452 282Q272 -9 266 -16Q263 -18 259 -21L241 -22H234Q216 -22 216 -15Q213 -9 177 305Q139 623 138 626Q133 637 76 637H59Q52 642 52 648Z"></path></g><g data-mml-node="mo" transform="translate(7065.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
 </details>
 </div>
-
-<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><h3 id="热身"><a href="#热身" class="headerlink" title="热身"></a>热身</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/network-delay-time/">743. 网络延迟时间</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cheapest-flights-within-k-stops/">787. K 站中转内最便宜的航班</a></li>
-</ul>
-<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-maximum-probability/">1514. 概率最大的路径</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-cost-to-reach-destination-in-time/">1928. 规定时间内到达终点的最小花费</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/second-minimum-time-to-reach-destination/">2045. 到达目的地的第二短时间</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-ways-to-arrive-at-destination/">1976. 到达目的地的方案数</a></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/trapping-rain-water-ii/">407. 接雨水 II</a></li>
-</ul>
 
         </div>
         

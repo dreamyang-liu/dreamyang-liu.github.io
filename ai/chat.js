@@ -128,7 +128,13 @@
     return fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
-      body: JSON.stringify({ model: MODEL, messages: messages, stream: true, temperature: 0.2 }),
+      // gpt-5 family rejects custom `temperature` (only 1.0 supported). Build the
+      // body conditionally so older models (gpt-4o-mini etc.) still get the
+      // grounded-low-variance setting, but gpt-5.x doesn't 400.
+      body: JSON.stringify(Object.assign(
+        { model: MODEL, messages: messages, stream: true },
+        /^gpt-5/.test(MODEL) ? {} : { temperature: 0.2 }
+      )),
     }).then(function (res) {
       if (!res.ok) throw httpError('chat', res.status);
       if (!res.body) throw new Error('chat no-stream-body');

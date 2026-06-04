@@ -266,7 +266,7 @@ mjx-container[display="true"] + br {
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-DP-%E5%9B%9B%E6%AD%A5%E8%B5%B0"><span class="toc-text">1. DP 四步走</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%80%E7%BB%B4-DP"><span class="toc-text">2. 一维 DP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%88%AC%E6%A5%BC%E6%A2%AF%E5%9E%8B%EF%BC%88%E7%BA%BF%E6%80%A7%E9%80%92%E6%8E%A8%EF%BC%89"><span class="toc-text">爬楼梯型（线性递推）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97-LIS"><span class="toc-text">最长递增子序列 (LIS)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BA%8C%E7%BB%B4-DP"><span class="toc-text">3. 二维 DP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97-LCS"><span class="toc-text">最长公共子序列 (LCS)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LCS-%E5%A1%AB%E8%A1%A8%E5%8A%A8%E7%94%BB"><span class="toc-text">LCS 填表动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB"><span class="toc-text">编辑距离</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98"><span class="toc-text">4. 背包问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-%E8%83%8C%E5%8C%85"><span class="toc-text">0&#x2F;1 背包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85"><span class="toc-text">完全背包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E5%8C%85%E5%8F%98%E5%BD%A2%E6%80%BB%E7%BB%93"><span class="toc-text">背包变形总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%AE%B0%E5%BF%86%E5%8C%96%E9%80%92%E5%BD%92"><span class="toc-text">5. 记忆化递归</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94-%E5%AD%90%E9%97%AE%E9%A2%98%E4%B8%8D%E9%87%8D%E5%A4%8D"><span class="toc-text">直觉 — 子问题不重复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E7%A7%8D%E8%8C%83%E5%BC%8F"><span class="toc-text">三种范式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E6%80%A7-DP-%E2%80%94-%E7%88%AC%E6%A5%BC%E6%A2%AF%E5%9E%8B"><span class="toc-text">线性 DP — 爬楼梯型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LIS-%E2%80%94-%E5%BA%8F%E5%88%97%E9%87%8C%E6%8C%91%E5%AD%90%E5%BA%8F%E5%88%97"><span class="toc-text">LIS — 序列里挑子序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E5%8C%85-%E2%80%94-%E5%A4%9A%E9%98%B6%E6%AE%B5%E5%86%B3%E7%AD%96"><span class="toc-text">背包 — 多阶段决策</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-%E2%80%94-Python"><span class="toc-text">模板 — Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A9%BA%E9%97%B4%E4%BC%98%E5%8C%96-%E2%80%94-%E6%BB%9A%E5%8A%A8%E6%95%B0%E7%BB%84"><span class="toc-text">空间优化 — 滚动数组</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95-%E6%98%93%E9%94%99%E7%82%B9"><span class="toc-text">记忆法 &#x2F; 易错点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
       </div>
     </div>
     
@@ -380,32 +380,25 @@ mjx-container[display="true"] + br {
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>动态规划 = 带记忆化的递归。把重叠子问题算一次存起来。本文正文为 markdown，关键填表过程配有可交互动画（点按钮逐步演示）。</p>
+          <p>DP = 子问题 + 不重复计算。把指数级搜索压成多项式，全靠”算过的别再算”。</p>
 <span id="more"></span>
 
-<h2 id="1-DP-四步走"><a href="#1-DP-四步走" class="headerlink" title="1. DP 四步走"></a>1. DP 四步走</h2><p>做任何 DP 题，按这个顺序想：</p>
+<h2 id="直觉-—-子问题不重复"><a href="#直觉-—-子问题不重复" class="headerlink" title="直觉 — 子问题不重复"></a>直觉 — 子问题不重复</h2><p>DP 本质上就两步，背下来：</p>
 <ol>
-<li><strong>定义状态</strong> —— dp[i] 代表什么？（最关键的一步）</li>
-<li><strong>写转移方程</strong> —— dp[i] 跟谁有关？怎么算？</li>
-<li><strong>初始化</strong> —— 边界条件是什么？</li>
-<li><strong>遍历顺序</strong> —— 从小到大？从大到小？</li>
+<li><strong>状态定义</strong>：<code>dp[i][j]</code> 表示”前 i 个 / 前 j 个” 的某个性质（长度、个数、是否可行、最值）。状态定对了，题就做完了一半。</li>
+<li><strong>转移方程</strong>：当前 <code>dp[i][j]</code> 怎么从更小的子问题拼出来。</li>
 </ol>
-<blockquote>
-<p>记住：状态定义决定一切。状态定义对了，转移方程自然就出来了。</p>
-</blockquote>
-<h2 id="2-一维-DP"><a href="#2-一维-DP" class="headerlink" title="2. 一维 DP"></a>2. 一维 DP</h2><h3 id="爬楼梯型（线性递推）"><a href="#爬楼梯型（线性递推）" class="headerlink" title="爬楼梯型（线性递推）"></a>爬楼梯型（线性递推）</h3><p>当前状态只依赖前面有限个状态：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 爬楼梯: 每次1步或2步，到第n阶有多少种走法</span><br>dp[i] = dp[i-<span class="hljs-number">1</span>] + dp[i-<span class="hljs-number">2</span>]<br><span class="hljs-comment"># 初始化: dp[0]=1, dp[1]=1</span><br></code></pre></td></tr></table></figure>
-
-<h3 id="最长递增子序列-LIS"><a href="#最长递增子序列-LIS" class="headerlink" title="最长递增子序列 (LIS)"></a>最长递增子序列 (LIS)</h3><p>dp[i] = 以 nums[i] 结尾的最长递增子序列长度：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># O(n^2) 做法</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    dp[i] = <span class="hljs-number">1</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(i):<br>        <span class="hljs-keyword">if</span> nums[j] &lt; nums[i]:<br>            dp[i] = <span class="hljs-built_in">max</span>(dp[i], dp[j] + <span class="hljs-number">1</span>)<br>ans = <span class="hljs-built_in">max</span>(dp)<br></code></pre></td></tr></table></figure>
-
-<blockquote>
-<p>LIS 还有 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.847ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4352.3 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(1918.7,0)"><path data-c="6C" d="M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z"></path><path data-c="6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z" transform="translate(278,0)"></path><path data-c="67" d="M329 409Q373 453 429 453Q459 453 472 434T485 396Q485 382 476 371T449 360Q416 360 412 390Q410 404 415 411Q415 412 416 414V415Q388 412 363 393Q355 388 355 386Q355 385 359 381T368 369T379 351T388 325T392 292Q392 230 343 187T222 143Q172 143 123 171Q112 153 112 133Q112 98 138 81Q147 75 155 75T227 73Q311 72 335 67Q396 58 431 26Q470 -13 470 -72Q470 -139 392 -175Q332 -206 250 -206Q167 -206 107 -175Q29 -140 29 -75Q29 -39 50 -15T92 18L103 24Q67 55 67 108Q67 155 96 193Q52 237 52 292Q52 355 102 398T223 442Q274 442 318 416L329 409ZM299 343Q294 371 273 387T221 404Q192 404 171 388T145 343Q142 326 142 292Q142 248 149 227T179 192Q196 182 222 182Q244 182 260 189T283 207T294 227T299 242Q302 258 302 292T299 343ZM403 -75Q403 -50 389 -34T348 -11T299 -2T245 0H218Q151 0 138 -6Q118 -15 107 -34T95 -74Q95 -84 101 -97T122 -127T170 -155T250 -167Q319 -167 361 -139T403 -75Z" transform="translate(778,0)"></path></g><g data-mml-node="mo" transform="translate(3196.7,0)"><path data-c="2061" d=""></path></g><g data-mml-node="mi" transform="translate(3363.3,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(3963.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 的贪心 + 二分做法，面试时两种都要会。</p>
-</blockquote>
-<h2 id="3-二维-DP"><a href="#3-二维-DP" class="headerlink" title="3. 二维 DP"></a>3. 二维 DP</h2><h3 id="最长公共子序列-LCS"><a href="#最长公共子序列-LCS" class="headerlink" title="最长公共子序列 (LCS)"></a>最长公共子序列 (LCS)</h3><p>dp[i][j] = text1 前 i 个字符和 text2 前 j 个字符的 LCS 长度：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>] + <span class="hljs-number">1</span>    <span class="hljs-comment"># 相等看左上角+1</span><br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-built_in">max</span>(dp[i-<span class="hljs-number">1</span>][j], dp[i][j-<span class="hljs-number">1</span>])  <span class="hljs-comment"># 不等看左和上的max</span><br></code></pre></td></tr></table></figure>
-
-<h3 id="LCS-填表动画"><a href="#LCS-填表动画" class="headerlink" title="LCS 填表动画"></a>LCS 填表动画</h3><p>下面动画用 <code>"ABCDE"</code> vs <code>"ACE"</code> 逐格填表，绿色是当前格、半透明绿是它依赖的左、上、左上三个格：</p>
+<p><strong>能用 DP 的两个标志</strong>：</p>
+<ul>
+<li><strong>最优子结构</strong>：大问题的最优解，由小问题的最优解组合得到。</li>
+<li><strong>无后效性</strong>：当前状态确定后，后面怎么走和”之前是怎么走到这”无关。</li>
+</ul>
+<p>两种写法等价，挑顺手的：</p>
+<ul>
+<li><strong>记忆化递归（自顶向下）</strong>：写法接近暴搜，加个 <code>@cache</code> 就成 DP。不用想遍历顺序，只算访问到的子问题。</li>
+<li><strong>迭代填表（自底向上）</strong>：先算小的再算大的，循环顺序就是依赖顺序。没有递归栈，方便空间优化。</li>
+</ul>
+<p>下面动画用 <code>"ABCDE"</code> vs <code>"ACE"</code> 逐格填 LCS 表，绿色是当前格、半透明绿是它依赖的左、上、左上三个格；下半部分把 0/1 背包（倒序）和完全背包（正序）放在一组数据上对比。看动画时盯一件事：<strong>当前格的值，永远只来自已经填好的格子</strong> —— 这就是”无后效性”。</p>
 
 <script>
 (function () {
@@ -423,72 +416,108 @@ mjx-container[display="true"] + br {
 })();
 </script><iframe class="tc-anim-frame" src="/anim/algo/dp.html" loading="lazy" style="width:100%;height:520px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
-<h3 id="编辑距离"><a href="#编辑距离" class="headerlink" title="编辑距离"></a>编辑距离</h3><p>dp[i][j] = word1 前 i 个变成 word2 前 j 个的最少操作数：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> word1[i-<span class="hljs-number">1</span>] == word2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>]        <span class="hljs-comment"># 不用操作</span><br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-number">1</span> + <span class="hljs-built_in">min</span>(<br>        dp[i-<span class="hljs-number">1</span>][j],    <span class="hljs-comment"># 删除</span><br>        dp[i][j-<span class="hljs-number">1</span>],    <span class="hljs-comment"># 插入</span><br>        dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>]   <span class="hljs-comment"># 替换</span><br>    )<br></code></pre></td></tr></table></figure>
+<h2 id="三种范式"><a href="#三种范式" class="headerlink" title="三种范式"></a>三种范式</h2><p>记住三个原型题，90% 的 DP 都是它们的变种。</p>
+<h3 id="线性-DP-—-爬楼梯型"><a href="#线性-DP-—-爬楼梯型" class="headerlink" title="线性 DP — 爬楼梯型"></a>线性 DP — 爬楼梯型</h3><p>状态只依赖前面有限个位置。一维数组够用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 70. 爬楼梯</span><br>dp[i] = dp[i-<span class="hljs-number">1</span>] + dp[i-<span class="hljs-number">2</span>]<br><span class="hljs-comment"># dp[0] = dp[1] = 1</span><br></code></pre></td></tr></table></figure>
 
-<h2 id="4-背包问题"><a href="#4-背包问题" class="headerlink" title="4. 背包问题"></a>4. 背包问题</h2><h3 id="0-1-背包"><a href="#0-1-背包" class="headerlink" title="0/1 背包"></a>0/1 背包</h3><p>每个物品只能用一次。一维优化时<strong>容量倒序</strong>遍历：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):           <span class="hljs-comment"># 物品外层</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(W, w[i]-<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>):  <span class="hljs-comment"># 容量倒序!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j - w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+<p>同款套路：打家劫舍（<code>dp[i] = max(dp[i-1], dp[i-2]+nums[i])</code>）、最大子数组、最小路径和。</p>
+<h3 id="LIS-—-序列里挑子序列"><a href="#LIS-—-序列里挑子序列" class="headerlink" title="LIS — 序列里挑子序列"></a>LIS — 序列里挑子序列</h3><p><code>dp[i] = 以 nums[i] 结尾的最长递增子序列长度</code>。注意是”以 i 结尾”，不是”前 i 个”，否则转移写不出来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># O(n^2)</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    dp[i] = <span class="hljs-number">1</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(i):<br>        <span class="hljs-keyword">if</span> nums[j] &lt; nums[i]:<br>            dp[i] = <span class="hljs-built_in">max</span>(dp[i], dp[j] + <span class="hljs-number">1</span>)<br>ans = <span class="hljs-built_in">max</span>(dp)<br></code></pre></td></tr></table></figure>
 
-<h3 id="完全背包"><a href="#完全背包" class="headerlink" title="完全背包"></a>完全背包</h3><p>每个物品可以用无限次。一维优化时<strong>容量正序</strong>遍历：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):           <span class="hljs-comment"># 物品外层</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(w[i], W+<span class="hljs-number">1</span>):      <span class="hljs-comment"># 容量正序!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j - w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>还有 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.847ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4352.3 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(1918.7,0)"><path data-c="6C" d="M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z"></path><path data-c="6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z" transform="translate(278,0)"></path><path data-c="67" d="M329 409Q373 453 429 453Q459 453 472 434T485 396Q485 382 476 371T449 360Q416 360 412 390Q410 404 415 411Q415 412 416 414V415Q388 412 363 393Q355 388 355 386Q355 385 359 381T368 369T379 351T388 325T392 292Q392 230 343 187T222 143Q172 143 123 171Q112 153 112 133Q112 98 138 81Q147 75 155 75T227 73Q311 72 335 67Q396 58 431 26Q470 -13 470 -72Q470 -139 392 -175Q332 -206 250 -206Q167 -206 107 -175Q29 -140 29 -75Q29 -39 50 -15T92 18L103 24Q67 55 67 108Q67 155 96 193Q52 237 52 292Q52 355 102 398T223 442Q274 442 318 416L329 409ZM299 343Q294 371 273 387T221 404Q192 404 171 388T145 343Q142 326 142 292Q142 248 149 227T179 192Q196 182 222 182Q244 182 260 189T283 207T294 227T299 242Q302 258 302 292T299 343ZM403 -75Q403 -50 389 -34T348 -11T299 -2T245 0H218Q151 0 138 -6Q118 -15 107 -34T95 -74Q95 -84 101 -97T122 -127T170 -155T250 -167Q319 -167 361 -139T403 -75Z" transform="translate(778,0)"></path></g><g data-mml-node="mo" transform="translate(3196.7,0)"><path data-c="2061" d=""></path></g><g data-mml-node="mi" transform="translate(3363.3,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(3963.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> 的贪心+二分（维护 <code>tails</code> 单调数组，二分插入），面试两种都要会。</p>
+</blockquote>
+<h3 id="背包-—-多阶段决策"><a href="#背包-—-多阶段决策" class="headerlink" title="背包 — 多阶段决策"></a>背包 — 多阶段决策</h3><p>每个物品”选不选 / 选几次”，是 DP 里最高频的范式。</p>
+<p><strong>LCS / 编辑距离</strong>也属于这一类（”当前字符匹/不匹”是两阶段决策）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 1143. LCS</span><br><span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>] + <span class="hljs-number">1</span><br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-built_in">max</span>(dp[i-<span class="hljs-number">1</span>][j], dp[i][j-<span class="hljs-number">1</span>])<br><br><span class="hljs-comment"># 72. 编辑距离</span><br><span class="hljs-keyword">if</span> word1[i-<span class="hljs-number">1</span>] == word2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>]<br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-number">1</span> + <span class="hljs-built_in">min</span>(dp[i-<span class="hljs-number">1</span>][j],    <span class="hljs-comment"># 删除</span><br>                       dp[i][j-<span class="hljs-number">1</span>],    <span class="hljs-comment"># 插入</span><br>                       dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>])  <span class="hljs-comment"># 替换</span><br></code></pre></td></tr></table></figure>
 
-<p>上面的 LCS 动画下方还演示了 0/1 背包（倒序）与完全背包（正序）在同一组物品（重量 [2,3,4]、价值 [3,4,5]、容量 W=7）上的填表差异。</p>
-<h3 id="背包变形总结"><a href="#背包变形总结" class="headerlink" title="背包变形总结"></a>背包变形总结</h3><table>
+<p><strong>0/1 背包</strong>：每个物品至多用一次。一维优化 → <strong>容量倒序</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(W, w[i]-<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>):   <span class="hljs-comment"># 倒序!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j-w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+
+<p><strong>完全背包</strong>：每个物品用任意次。一维优化 → <strong>容量正序</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(w[i], W+<span class="hljs-number">1</span>):       <span class="hljs-comment"># 正序!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j-w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+
+<p>背包变形对照表（动画里能看到两种顺序的差别）：</p>
+<table>
 <thead>
 <tr>
-<th>问题类型</th>
+<th>问题</th>
 <th>初始化</th>
 <th>转移</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>最大价值</td>
-<td>dp = [0]*n</td>
-<td>dp[j] = max(dp[j], dp[j-w]+v)</td>
+<td><code>dp = [0]*(W+1)</code></td>
+<td><code>dp[j] = max(dp[j], dp[j-w]+v)</code></td>
 </tr>
 <tr>
 <td>方案数</td>
-<td>dp[0]=1, 其余0</td>
-<td>dp[j] += dp[j-w]</td>
+<td><code>dp[0]=1</code>, 其余 0</td>
+<td><code>dp[j] += dp[j-w]</code></td>
 </tr>
 <tr>
 <td>能否装满</td>
-<td>dp[0]=True</td>
-<td>dp[j] = dp[j] or dp[j-w]</td>
+<td><code>dp[0]=True</code></td>
+<td><code>dp[j] = dp[j] or dp[j-w]</code></td>
 </tr>
 <tr>
-<td>排列 vs 组合</td>
-<td>组合=物品外层, 排列=容量外层</td>
-<td></td>
+<td>组合 vs 排列</td>
+<td>—</td>
+<td>物品外层 = 组合；容量外层 = 排列</td>
 </tr>
 </tbody></table>
-<h2 id="5-记忆化递归"><a href="#5-记忆化递归" class="headerlink" title="5. 记忆化递归"></a>5. 记忆化递归</h2><p>本质上和迭代 DP 等价，但写起来更像递归思维：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> cache<br><br><span class="hljs-meta">@cache</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">i, j</span>):<br>    <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> j == <span class="hljs-number">0</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>    <span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>        <span class="hljs-keyword">return</span> dfs(i-<span class="hljs-number">1</span>, j-<span class="hljs-number">1</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(i-<span class="hljs-number">1</span>, j), dfs(i, j-<span class="hljs-number">1</span>))<br><br><span class="hljs-comment"># 调用后记得清缓存: dfs.cache_clear()</span><br></code></pre></td></tr></table></figure>
+<h2 id="模板-—-Python"><a href="#模板-—-Python" class="headerlink" title="模板 — Python"></a>模板 — Python</h2><p>记忆化递归（最不易错）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> cache<br><br><span class="hljs-meta">@cache</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">i, j</span>):<br>    <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> j == <span class="hljs-number">0</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>    <span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>        <span class="hljs-keyword">return</span> dfs(i-<span class="hljs-number">1</span>, j-<span class="hljs-number">1</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(i-<span class="hljs-number">1</span>, j), dfs(i, j-<span class="hljs-number">1</span>))<br><br>ans = dfs(m, n)<br>dfs.cache_clear()   <span class="hljs-comment"># 多组数据时记得清</span><br></code></pre></td></tr></table></figure>
 
-<blockquote>
-<p>记忆化递归的好处：不用纠结遍历顺序，递归自然保证依赖顺序。缺点：递归栈深度有限制（Python 默认 1000），常数大一些。</p>
-</blockquote>
+<p>迭代填表（无栈风险、易压空间）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">dp = [[<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m+<span class="hljs-number">1</span>)]<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, m+<span class="hljs-number">1</span>):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, n+<span class="hljs-number">1</span>):<br>        <span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>            dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>] + <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>:<br>            dp[i][j] = <span class="hljs-built_in">max</span>(dp[i-<span class="hljs-number">1</span>][j], dp[i][j-<span class="hljs-number">1</span>])<br>ans = dp[m][n]<br></code></pre></td></tr></table></figure>
+
+<h2 id="空间优化-—-滚动数组"><a href="#空间优化-—-滚动数组" class="headerlink" title="空间优化 — 滚动数组"></a>空间优化 — 滚动数组</h2><p>如果 <code>dp[i][...]</code> 只依赖 <code>dp[i-1][...]</code>，就只留两行甚至一行。</p>
+<p>二维 → 两行（依赖上一行）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">prev = [<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, m+<span class="hljs-number">1</span>):<br>    cur = [<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, n+<span class="hljs-number">1</span>):<br>        ...<br>    prev = cur<br></code></pre></td></tr></table></figure>
+
+<p>二维 → 一行（背包套路，靠遍历顺序保证语义）：</p>
+<ul>
+<li>0/1 背包：<code>j</code> <strong>倒序</strong>，引用的 <code>dp[j-w]</code> 还是上一轮的值（”i 没选过”）。</li>
+<li>完全背包：<code>j</code> <strong>正序</strong>，引用的 <code>dp[j-w]</code> 已经是本轮更新过的（”i 可以反复选”）。</li>
+</ul>
+<p>顺序错了，物品就被选了多次或一次都没选。这是背包最高频的 bug。</p>
+<h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><p><strong>三句口诀</strong>：</p>
+<ul>
+<li>状态先定义，转移再写式。</li>
+<li>边界要写全，顺序要对路。</li>
+<li>一维滚一滚，01 倒、完全正。</li>
+</ul>
+<p><strong>常踩的坑</strong>：</p>
+<ul>
+<li><strong>下标错位</strong>：状态 <code>dp[i]</code> 用”前 i 个” → 数组取 <code>s[i-1]</code>，别取 <code>s[i]</code>。</li>
+<li><strong>初始化漏边界</strong>：求方案数时 <code>dp[0]=1</code>（空集算一种）；求最值时初始化要和 max/min 方向一致。</li>
+<li><strong>LIS 状态写错</strong>：必须是”以 i 结尾”，不能是”前 i 个里的”，否则无法转移。</li>
+<li><strong>背包顺序</strong>：倒序 / 正序与”物品/容量谁在外层”，是两个独立维度，别混。</li>
+<li><strong>记忆化清缓存</strong>：<code>@cache</code> 在多组测试里会串数据，函数返回前 <code>cache_clear()</code>。</li>
+</ul>
 <h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
 <details>
-<summary><strong>Q1：为什么 0/1 背包容量要倒序？如果正序会怎样？</strong></summary>
+<summary><strong>Q1：为什么 0/1 背包容量要倒序？正序会怎样？</strong></summary>
 
-<p>正序的话，dp[j-w[i]] 可能已经被本轮更新过了，相当于物品 i 被用了多次。倒序保证引用的是”上一轮”的值，即物品 i 还没被选的状态。</p>
+<p>正序时，<code>dp[j-w[i]]</code> 可能已经在本轮被更新过，相当于物品 i 被用了多次 —— 那是完全背包。倒序保证 <code>dp[j-w[i]]</code> 还是”上一轮 i 没选时”的值。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>Q2：记忆化递归和迭代 DP 的优劣分别是什么？</strong></summary>
+<summary><strong>Q2：记忆化递归 vs 迭代 DP 怎么选？</strong></summary>
 
-<p>记忆化递归：不用想遍历顺序、只算需要的子问题（稀疏时快）、代码直观。迭代 DP：没有栈溢出风险、常数小、方便空间优化（滚动数组）。</p>
+<p>写起来怕错 → 记忆化递归（不用想顺序、只算需要的子问题）。要压空间 / 数据规模大 → 迭代填表（无栈风险，方便滚动数组）。Python 默认递归深度 1000，深状态记得 <code>sys.setrecursionlimit</code>。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>Q3："排列"和"组合"在背包中遍历顺序为什么不同？</strong></summary>
+<summary><strong>Q3：背包里"组合"和"排列"为什么遍历顺序不同？</strong></summary>
 
-<p>物品在外层：每个物品按顺序考虑，(1,2) 和 (2,1) 只会出现一种 = 组合。容量在外层：对每个容量都考虑所有物品，同样的物品可以以不同顺序被选 = 排列。</p>
+<p>物品外层：每个物品按固定顺序考虑，<code>(1,2)</code> 和 <code>(2,1)</code> 只算一种 = 组合。容量外层：每个容量都把所有物品扫一遍，同一组物品可以以不同顺序出现 = 排列。</p>
 </details>
 </div>
 

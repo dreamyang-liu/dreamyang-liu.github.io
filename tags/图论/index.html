@@ -734,7 +734,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>每次取入度为 0 的点输出，删掉它的出边。全部输出 → 无环。本文正文为 markdown，配有 BFS 拓扑排序的可交互动画。</p>...
+              <p>DAG 里给所有节点排个序,使得<strong>每条边都从靠前的指向靠后的</strong>。两种实现各背一份:Kahn 算法(BFS 入度法)和 DFS 后序逆序。顺手就把环检测做了。</p>...
             </div>
             
             <div class="post-footer">
@@ -767,7 +767,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>带优先队列的 BFS：每次取当前已知距离最小的未确定节点去松弛邻居。只适用于非负边权。本文正文为 markdown，配有逐步演示动画。</p>...
+              <p>Dijkstra = BFS + 贪心。把 FIFO 队列换成优先队列，每次从未确定的节点里挑距离最小的那个去松弛邻居。前提:边权非负——因为已确定节点的距离一旦敲定就不再回头。</p>...
             </div>
             
             <div class="post-footer">
@@ -800,7 +800,7 @@
             </div>
             
             <div class="post-excerpt">
-              <p>一层一层往外扩。第一次访问到某点的步数 &#x3D; 最短步数（边权为 1）。本文正文为 markdown，配有可交互动画演示 BFS 的逐层扩散。</p>...
+              <p><strong>一句话</strong>：BFS = 把图当池塘，从起点丢颗石头，看波纹一圈圈扩出去。<strong>第一次碰到目标的那一圈，就是最短步数</strong>（边权为 1）。</p>...
             </div>
             
             <div class="post-footer">

@@ -41,7 +41,119 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
   <body>
     <div class="wrapper">
@@ -154,7 +266,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E6%BC%94%E7%A4%BA"><span class="toc-text">动画演示</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94-%E6%AF%8F%E4%B8%AA%E9%9B%86%E5%90%88%E4%B8%80%E6%A3%B5%E6%A0%91"><span class="toc-text">直觉 — 每个集合一棵树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB-%E2%80%94-%E7%9C%8B%E6%A0%91%E9%95%BF%E5%87%BA%E6%9D%A5-%E7%9C%8B%E8%B7%AF%E5%BE%84%E8%A2%AB%E5%8E%8B%E6%89%81"><span class="toc-text">动画 — 看树长出来,看路径被压扁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-%E2%80%94-%E8%B7%AF%E5%BE%84%E5%8E%8B%E7%BC%A9%E7%89%88-90-%E9%A2%98%E5%A4%9F%E7%94%A8"><span class="toc-text">模板 — 路径压缩版 (90% 题够用)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6-%E2%80%94-%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6-%E5%B8%A6%E6%9D%83%E5%B9%B6%E6%9F%A5%E9%9B%86"><span class="toc-text">进阶 — 按秩合并 &#x2F; 带权并查集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6"><span class="toc-text">按秩合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%A6%E6%9D%83%E5%B9%B6%E6%9F%A5%E9%9B%86"><span class="toc-text">带权并查集</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E7%B1%BB%E5%9C%BA%E6%99%AF-%E2%80%94-%E5%88%A4%E8%BF%9E%E9%80%9A-%E6%95%B0%E5%88%86%E9%87%8F-%E7%A6%BB%E7%BA%BF%E6%97%B6%E5%85%89%E5%80%92%E6%B5%81"><span class="toc-text">三类场景 — 判连通 &#x2F; 数分量 &#x2F; 离线时光倒流</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E9%A2%98"><span class="toc-text">经典题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95"><span class="toc-text">记忆法</span></a></li></ol>
       </div>
     </div>
     
@@ -268,10 +380,23 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>每个集合用一棵树，根代表整个集合。<code>find</code> 找根，<code>union</code> 合并两个集合。下面是带路径压缩与按秩合并的模板实现。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">UnionFind</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, n</span>):<br>        <span class="hljs-variable language_">self</span>.parent = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(n))<br>        <span class="hljs-variable language_">self</span>.rank = [<span class="hljs-number">1</span>] * n<br>        <span class="hljs-variable language_">self</span>._count = n<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">find</span>(<span class="hljs-params">self, p</span>):<br>        <span class="hljs-keyword">while</span> p != <span class="hljs-variable language_">self</span>.parent[p]:<br>            <span class="hljs-variable language_">self</span>.parent[p] = <span class="hljs-variable language_">self</span>.parent[<span class="hljs-variable language_">self</span>.parent[p]]  <span class="hljs-comment"># path compression</span><br>            p = <span class="hljs-variable language_">self</span>.parent[p]<br>        <span class="hljs-keyword">return</span> p<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">union</span>(<span class="hljs-params">self, p, q</span>):<br>        root_p = <span class="hljs-variable language_">self</span>.find(p)<br>        root_q = <span class="hljs-variable language_">self</span>.find(q)<br>        <span class="hljs-keyword">if</span> root_p == root_q:<br>            <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.rank[root_p] &gt; <span class="hljs-variable language_">self</span>.rank[root_q]:<br>            <span class="hljs-variable language_">self</span>.parent[root_q] = root_p<br>        <span class="hljs-keyword">elif</span> <span class="hljs-variable language_">self</span>.rank[root_p] &lt; <span class="hljs-variable language_">self</span>.rank[root_q]:<br>            <span class="hljs-variable language_">self</span>.parent[root_p] = root_q<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-variable language_">self</span>.parent[root_q] = root_p<br>            <span class="hljs-variable language_">self</span>.rank[root_p] += <span class="hljs-number">1</span><br>        <span class="hljs-variable language_">self</span>._count -= <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connected</span>(<span class="hljs-params">self, p, q</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.find(p) == <span class="hljs-variable language_">self</span>.find(q)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">count</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>._count<br></code></pre></td></tr></table></figure>
+          <p>每个集合用一棵树,根是集合的代表。<code>find</code> 沿父指针往上爬到根,<code>union</code> 把一个根挂到另一个根下。加上路径压缩和按秩合并,单次操作均摊 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="8.704ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 3847 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g><g data-mml-node="mo" transform="translate(1792,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(2181,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(3069,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(3458,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> — 反阿克曼函数,实际 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.312ex;" xmlns="http://www.w3.org/2000/svg" width="3.52ex" height="1.844ex" role="img" focusable="false" viewBox="0 -677 1555.8 815"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="2264" d="M674 636Q682 636 688 630T694 615T687 601Q686 600 417 472L151 346L399 228Q687 92 691 87Q694 81 694 76Q694 58 676 56H670L382 192Q92 329 90 331Q83 336 83 348Q84 359 96 365Q104 369 382 500T665 634Q669 636 674 636ZM84 -118Q84 -108 99 -98H678Q694 -104 694 -118Q694 -130 679 -138H98Q84 -131 84 -118Z"></path></g><g data-mml-node="mn" transform="translate(1055.8,0)"><path data-c="34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path></g></g></g></svg></mjx-container>,基本就是 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.618ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2041 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mn" transform="translate(1152,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(1652,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
+<span id="more"></span>
 
-<h2 id="动画演示"><a href="#动画演示" class="headerlink" title="动画演示"></a>动画演示</h2><p>下面动画依次执行若干次 <code>union</code> 把节点连成树（绿色&#x3D;根），再点击 <strong>执行 Find</strong> 观察路径压缩如何把树”压扁”，让后续查询接近 O(1)：</p>
+<h2 id="直觉-—-每个集合一棵树"><a href="#直觉-—-每个集合一棵树" class="headerlink" title="直觉 — 每个集合一棵树"></a>直觉 — 每个集合一棵树</h2><p>想象一群人,每人指向自己的”老大”。问 “A 和 B 是不是一伙的?”,就各自沿着老大指针往上爬,爬到指向自己的人 (帮主/根) 为止。两人帮主相同 → 同一伙。要合并两个帮派,就让一个帮主认另一个当老大。整个数据结构只有一个数组 <code>parent[i] = i 的父亲</code>,根节点满足 <code>parent[i] == i</code>。</p>
+<p>两个原语:</p>
+<ul>
+<li><code>find(x)</code>: 沿父指针往上找,返回 x 所在集合的根。</li>
+<li><code>union(x, y)</code>: 找到两个根 <code>rx</code>、<code>ry</code>,如果不同就让 <code>parent[rx] = ry</code>。</li>
+</ul>
+<p>朴素版本最坏会退化成一条链,find 变 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.844ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2141 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1752,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。两个优化救场:</p>
+<ul>
+<li><strong>路径压缩</strong>: find 在回溯时把路径上每个节点直接挂到根上,树越用越扁。</li>
+<li><strong>按秩合并</strong>: 矮树挂高树下,防止链化。</li>
+</ul>
+<p>两者一起用,单次操作均摊 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="8.704ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 3847 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g><g data-mml-node="mo" transform="translate(1792,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(2181,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(3069,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(3458,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>。</p>
+<h2 id="动画-—-看树长出来-看路径被压扁"><a href="#动画-—-看树长出来-看路径被压扁" class="headerlink" title="动画 — 看树长出来,看路径被压扁"></a>动画 — 看树长出来,看路径被压扁</h2><p>下面动画依次执行 5 次 <code>union</code> 把 6 个节点连起来 (绿色 = 根),然后点击 <strong>执行 Find</strong> 观察路径压缩瞬间把所有节点拉到根下面 — 树从有层级直接拍扁成一层。</p>
+<p><strong>重点观察</strong>: union 之前每个节点都是自己的根;union 中根挂到根;Find 之后整棵树几乎只剩两层。</p>
 
 <script>
 (function () {
@@ -287,7 +412,73 @@
     }
   });
 })();
-</script><iframe class="tc-anim-frame" src="/anim/algo/union-find.html" loading="lazy" style="width:100%;height:480px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+</script><iframe class="tc-anim-frame" src="/anim/algo/union-find.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="模板-—-路径压缩版-90-题够用"><a href="#模板-—-路径压缩版-90-题够用" class="headerlink" title="模板 — 路径压缩版 (90% 题够用)"></a>模板 — 路径压缩版 (90% 题够用)</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">UnionFind</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, n</span>):<br>        <span class="hljs-variable language_">self</span>.p = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(n))     <span class="hljs-comment"># parent[i] 初始指向自己</span><br>        <span class="hljs-variable language_">self</span>.cnt = n                <span class="hljs-comment"># 连通分量个数</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">find</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.p[x] != x:<br>            <span class="hljs-variable language_">self</span>.p[x] = <span class="hljs-variable language_">self</span>.find(<span class="hljs-variable language_">self</span>.p[x])   <span class="hljs-comment"># 路径压缩</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.p[x]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">union</span>(<span class="hljs-params">self, x, y</span>):<br>        rx, ry = <span class="hljs-variable language_">self</span>.find(x), <span class="hljs-variable language_">self</span>.find(y)<br>        <span class="hljs-keyword">if</span> rx == ry:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>            <span class="hljs-comment"># 已经同集合</span><br>        <span class="hljs-variable language_">self</span>.p[rx] = ry<br>        <span class="hljs-variable language_">self</span>.cnt -= <span class="hljs-number">1</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connected</span>(<span class="hljs-params">self, x, y</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.find(x) == <span class="hljs-variable language_">self</span>.find(y)<br></code></pre></td></tr></table></figure>
+
+<p>三个易错点:</p>
+<ol>
+<li><code>union</code> 要先 find <strong>两个根</strong>再合并,不能直接 <code>p[x] = y</code> — 那是把节点挂上去,会把原集合的其他节点甩掉。只有根代表整个集合。</li>
+<li>路径压缩写在 find 里,不要忘。递归版最简洁,迭代版稍快、不爆栈。</li>
+<li><code>cnt</code> 只在真正合并 (rx != ry) 时才减 1。</li>
+</ol>
+<h2 id="进阶-—-按秩合并-带权并查集"><a href="#进阶-—-按秩合并-带权并查集" class="headerlink" title="进阶 — 按秩合并 / 带权并查集"></a>进阶 — 按秩合并 / 带权并查集</h2><h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>记每棵树的”秩” (粗略的高度),小树挂大树:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, n</span>):<br>    <span class="hljs-variable language_">self</span>.p = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(n))<br>    <span class="hljs-variable language_">self</span>.r = [<span class="hljs-number">0</span>] * n            <span class="hljs-comment"># rank</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">union</span>(<span class="hljs-params">self, x, y</span>):<br>    rx, ry = <span class="hljs-variable language_">self</span>.find(x), <span class="hljs-variable language_">self</span>.find(y)<br>    <span class="hljs-keyword">if</span> rx == ry: <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.r[rx] &lt; <span class="hljs-variable language_">self</span>.r[ry]:<br>        rx, ry = ry, rx         <span class="hljs-comment"># 保证 rx 是高的</span><br>    <span class="hljs-variable language_">self</span>.p[ry] = rx<br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.r[rx] == <span class="hljs-variable language_">self</span>.r[ry]:<br>        <span class="hljs-variable language_">self</span>.r[rx] += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br></code></pre></td></tr></table></figure>
+
+<p>实战里<strong>路径压缩一个就够</strong>。秩只有在严格证明复杂度、或题目卡常时才加。</p>
+<h3 id="带权并查集"><a href="#带权并查集" class="headerlink" title="带权并查集"></a>带权并查集</h3><p>边上带权,代表两点的关系 (差、比、距离…)。find 时把路径权值累加,union 时根据已知关系推出新边权。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 维护 w[x] = x 到 p[x] 的权值</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">find</span>(<span class="hljs-params">self, x</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.p[x] != x:<br>        root = <span class="hljs-variable language_">self</span>.find(<span class="hljs-variable language_">self</span>.p[x])<br>        <span class="hljs-variable language_">self</span>.w[x] += <span class="hljs-variable language_">self</span>.w[<span class="hljs-variable language_">self</span>.p[x]]      <span class="hljs-comment"># 累加到根的权值</span><br>        <span class="hljs-variable language_">self</span>.p[x] = root<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.p[x]<br></code></pre></td></tr></table></figure>
+
+<p>经典题: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">LC 399. 除法求值</a> — <code>a/b = 2, b/c = 3</code> 推 <code>a/c</code>。把”比值”当边权,find 时连乘。</p>
+<h2 id="三类场景-—-判连通-数分量-离线时光倒流"><a href="#三类场景-—-判连通-数分量-离线时光倒流" class="headerlink" title="三类场景 — 判连通 / 数分量 / 离线时光倒流"></a>三类场景 — 判连通 / 数分量 / 离线时光倒流</h2><p><strong>1. 判连通</strong>: 两点 find 同根 → 连通。冗余连接 (LC 684) 就是边一条条加,撞上同根的就是多余的。</p>
+<p><strong>2. 数连通分量</strong>: 最后 <code>uf.cnt</code> 就是答案。省份数量 (LC 547)、岛屿数量 (LC 200) 直接套。</p>
+<p><strong>3. 离线”时光倒流”</strong>: 并查集只支持合并,不支持拆分。题目要你<strong>删边/拆点</strong>?读完所有操作,从最终状态<strong>倒着加边</strong>就行 — 删变加。经典题 <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bricks-falling-when-hit/">LC 803. 打砖块</a>。</p>
+<p>第三类是面试出”难题”的钥匙,看到”按顺序删除”先想能不能离线倒着做。</p>
+<h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身 (会一个会一类)</strong>:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-provinces/">LC 547. 省份数量</a> — 数分量裸题</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-islands/">LC 200. 岛屿数量</a> — 二维网格转一维 id (<code>i*n+j</code>)</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection/">LC 684. 冗余连接</a> — 加边遇同根即是答案</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/satisfiability-of-equality-equations/">LC 990. 等式方程的可满足性</a> — 先 = 后 !=</li>
+</ul>
+<p><strong>进阶</strong>:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-consecutive-sequence/">LC 128. 最长连续序列</a> — 把 <code>x</code> 和 <code>x+1</code> union</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">LC 399. 除法求值</a> — 带权并查集模板</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/accounts-merge/">LC 721. 账户合并</a> — 邮箱当节点,同账户内两两 union</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bricks-falling-when-hit/">LC 803. 打砖块</a> — 时光倒流经典</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection-ii/">LC 685. 冗余连接 II</a> — 有向图变种,需分类讨论</li>
+</ul>
+<h2 id="记忆法"><a href="#记忆法" class="headerlink" title="记忆法"></a>记忆法</h2><p>一句话: <strong>集合即树,根即代表;find 找根,union 接根。</strong></p>
+<p>三件事必背:</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据</td>
+<td><code>parent[]</code> 一维数组,根满足 <code>p[i]==i</code></td>
+</tr>
+<tr>
+<td>find</td>
+<td>沿父指针上爬到根,<strong>回溯时挂根</strong> (路径压缩)</td>
+</tr>
+<tr>
+<td>union</td>
+<td>先 find 两个根,<strong>根挂根</strong>,<code>cnt -= 1</code></td>
+</tr>
+</tbody></table>
+<p>判题口诀:</p>
+<ul>
+<li>“几个连通块 / 是不是同一组” → 并查集</li>
+<li>“按顺序加边” → 在线并查集</li>
+<li>“按顺序删边 / 删点” → <strong>离线倒着加</strong> + 并查集</li>
+<li>边有权 (比值、差) → 带权并查集</li>
+</ul>
+<p>模板背到能 30 秒默写出来,90% 的连通性题就是套模板 + 想清楚”节点是什么、什么时候 union”。</p>
 
         </div>
         

@@ -154,7 +154,7 @@
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%BC%8F"><span class="toc-text">三大模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%EF%BC%88%E4%B8%80%E8%BE%B9%E9%81%8D%E5%8E%86%E4%B8%80%E8%BE%B9%E6%9F%A5%EF%BC%89"><span class="toc-text">1. 两数之和（一边遍历一边查）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%89%8D%E7%BC%80%E5%92%8C-%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%88%E5%92%8C%E4%B8%BA-K-%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84%EF%BC%89"><span class="toc-text">2. 前缀和 + 哈希表（和为 K 的子数组）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%86%E7%BB%84-%E8%AE%A1%E6%95%B0-%E5%BC%82%E4%BD%8D%E8%AF%8D"><span class="toc-text">3. 分组 &#x2F; 计数 &#x2F; 异位词</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python-%E9%80%9F%E6%9F%A5"><span class="toc-text">Python 速查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%BB%9A%E5%8A%A8%E5%93%88%E5%B8%8C%EF%BC%88Rabin-Karp%EF%BC%89"><span class="toc-text">进阶：滚动哈希（Rabin-Karp）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9A%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%E8%BF%87%E7%A8%8B"><span class="toc-text">动画：两数之和过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E9%A2%98%E7%9B%AE"><span class="toc-text">LeetCode 题目</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%89-%E2%80%94-O-1-%E6%9F%A5%E8%AF%A2%E6%8D%A2-O-N-%E9%81%8D%E5%8E%86"><span class="toc-text">直觉 — O(1) 查询换 O(N) 遍历</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9A%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%E7%9A%84%E2%80%9D%E5%85%88%E6%9F%A5%E5%90%8E%E5%AD%98%E2%80%9D"><span class="toc-text">动画：两数之和的”先查后存”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-%E2%80%94-%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%E3%80%81%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C%E7%AD%89%E4%BA%8E-k"><span class="toc-text">模板 — 两数之和、子数组和等于 k</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%97%E8%B7%AF%E4%B8%80%EF%BC%9A%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%EF%BC%88%E5%85%88%E6%9F%A5%E5%90%8E%E5%AD%98%EF%BC%89"><span class="toc-text">套路一：两数之和（先查后存）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%97%E8%B7%AF%E4%BA%8C%EF%BC%9A%E6%98%AF%E5%90%A6%E5%87%BA%E7%8E%B0%E8%BF%87-%E5%88%A4%E9%87%8D"><span class="toc-text">套路二：是否出现过 &#x2F; 判重</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%97%E8%B7%AF%E4%B8%89%EF%BC%9A%E5%88%86%E7%BB%84-%E8%AE%A1%E6%95%B0%EF%BC%88%E9%80%89%E5%A5%BD-key-%E6%98%AF%E5%85%B3%E9%94%AE%EF%BC%89"><span class="toc-text">套路三：分组 &#x2F; 计数（选好 key 是关键）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BC%80%E5%92%8C-hash-%E7%BB%84%E5%90%88"><span class="toc-text">前缀和 + hash 组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E9%A2%98"><span class="toc-text">经典题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python-%E9%80%9F%E6%9F%A5"><span class="toc-text">Python 速查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%BB%9A%E5%8A%A8%E5%93%88%E5%B8%8C-Rabin-Karp"><span class="toc-text">进阶：滚动哈希 Rabin-Karp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B0%E5%BF%86%E6%B3%95-%E6%98%93%E9%94%99%E7%82%B9"><span class="toc-text">记忆法 &#x2F; 易错点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li></ol>
       </div>
     </div>
     
@@ -274,24 +274,28 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <p>用空间换时间，把找过的东西存起来 O(1) 查。面试高频中的高频。</p>
+          <p>哈希表本质不是数据结构，是一种<strong>算法套路</strong>：用 O(1) 查询换 O(N) 遍历。看到”找两个元素满足某关系”就该条件反射。</p>
 <span id="more"></span>
 
-<h2 id="三大模式"><a href="#三大模式" class="headerlink" title="三大模式"></a>三大模式</h2><h3 id="1-两数之和（一边遍历一边查）"><a href="#1-两数之和（一边遍历一边查）" class="headerlink" title="1. 两数之和（一边遍历一边查）"></a>1. 两数之和（一边遍历一边查）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">twoSum</span>(<span class="hljs-params">nums, target</span>):<br>    seen = &#123;&#125;<br>    <span class="hljs-keyword">for</span> i, x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(nums):<br>        <span class="hljs-keyword">if</span> target - x <span class="hljs-keyword">in</span> seen:      <span class="hljs-comment"># 先查</span><br>            <span class="hljs-keyword">return</span> [seen[target - x], i]<br>        seen[x] = i                  <span class="hljs-comment"># 后存</span><br></code></pre></td></tr></table></figure>
-
-<p>关键：先查后存，防止自己配自己。</p>
-<h3 id="2-前缀和-哈希表（和为-K-的子数组）"><a href="#2-前缀和-哈希表（和为-K-的子数组）" class="headerlink" title="2. 前缀和 + 哈希表（和为 K 的子数组）"></a>2. 前缀和 + 哈希表（和为 K 的子数组）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">subarraySum</span>(<span class="hljs-params">nums, k</span>):<br>    prefix = &#123;<span class="hljs-number">0</span>: <span class="hljs-number">1</span>&#125;  <span class="hljs-comment"># 初始化！空前缀和为 0 出现 1 次</span><br>    curr_sum = count = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        curr_sum += x<br>        count += prefix.get(curr_sum - k, <span class="hljs-number">0</span>)<br>        prefix[curr_sum] = prefix.get(curr_sum, <span class="hljs-number">0</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> count<br></code></pre></td></tr></table></figure>
-
-<p>核心思想：<code>curr_sum - prev_sum = k</code>，即 <code>prev_sum = curr_sum - k</code>。</p>
-<h3 id="3-分组-计数-异位词"><a href="#3-分组-计数-异位词" class="headerlink" title="3. 分组 &#x2F; 计数 &#x2F; 异位词"></a>3. 分组 &#x2F; 计数 &#x2F; 异位词</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 异位词分组：选什么做 key？</span><br><span class="hljs-comment"># 方法 1: 排序后的字符串</span><br>key = <span class="hljs-built_in">tuple</span>(<span class="hljs-built_in">sorted</span>(word))<br><br><span class="hljs-comment"># 方法 2: 字母频率元组</span><br>key = <span class="hljs-built_in">tuple</span>(count[c] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;abcdefghijklmnopqrstuvwxyz&#x27;</span>)<br></code></pre></td></tr></table></figure>
-
-<p>选 key 的技巧：能唯一标识一组的、可哈希的东西。</p>
-<h2 id="Python-速查"><a href="#Python-速查" class="headerlink" title="Python 速查"></a>Python 速查</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># dict.get(key, default) — 不存在时返回默认值</span><br>d.get(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">0</span>)<br><br><span class="hljs-comment"># dict.setdefault(key, default) — 不存在时设置并返回</span><br>d.setdefault(<span class="hljs-string">&#x27;x&#x27;</span>, []).append(val)<br><br><span class="hljs-comment"># defaultdict — 自动初始化</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> defaultdict<br>d = defaultdict(<span class="hljs-built_in">list</span>)   <span class="hljs-comment"># d[&#x27;key&#x27;] 自动是 []</span><br>d = defaultdict(<span class="hljs-built_in">int</span>)    <span class="hljs-comment"># d[&#x27;key&#x27;] 自动是 0</span><br><br><span class="hljs-comment"># Counter — 计数神器</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>c = Counter(<span class="hljs-string">&quot;hello&quot;</span>)    <span class="hljs-comment"># Counter(&#123;&#x27;l&#x27;: 2, &#x27;h&#x27;: 1, &#x27;e&#x27;: 1, &#x27;o&#x27;: 1&#125;)</span><br>c.most_common(<span class="hljs-number">2</span>)        <span class="hljs-comment"># [(&#x27;l&#x27;, 2), (&#x27;h&#x27;, 1)]</span><br>c1 - c2                 <span class="hljs-comment"># 减法，只保留正数计数</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="进阶：滚动哈希（Rabin-Karp）"><a href="#进阶：滚动哈希（Rabin-Karp）" class="headerlink" title="进阶：滚动哈希（Rabin-Karp）"></a>进阶：滚动哈希（Rabin-Karp）</h2><p>用多项式哈希在 O(1) 时间内从一个窗口滑动到下一个窗口。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 字符串匹配：O(n+m) 平均</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rabinKarp</span>(<span class="hljs-params">text, pattern</span>):<br>    base, mod = <span class="hljs-number">31</span>, <span class="hljs-number">10</span>**<span class="hljs-number">9</span> + <span class="hljs-number">7</span><br>    m = <span class="hljs-built_in">len</span>(pattern)<br><br>    <span class="hljs-comment"># 计算 pattern 的哈希</span><br>    pat_hash = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> pattern:<br>        pat_hash = (pat_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br><br>    <span class="hljs-comment"># 滑动窗口</span><br>    win_hash = <span class="hljs-number">0</span><br>    power = <span class="hljs-built_in">pow</span>(base, m - <span class="hljs-number">1</span>, mod)<br>    <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(text):<br>        win_hash = (win_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m:<br>            win_hash = (win_hash - <span class="hljs-built_in">ord</span>(text[i - m]) * power * base) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m - <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> win_hash == pat_hash:<br>            <span class="hljs-keyword">if</span> text[i-m+<span class="hljs-number">1</span>:i+<span class="hljs-number">1</span>] == pattern:  <span class="hljs-comment"># 验证（防哈希碰撞）</span><br>                <span class="hljs-keyword">return</span> i - m + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="动画：两数之和过程"><a href="#动画：两数之和过程" class="headerlink" title="动画：两数之和过程"></a>动画：两数之和过程</h2><p>数组 <code>[2, 7, 11, 15]</code>，target &#x3D; <code>9</code>，逐步演示「先查后存」的查找过程。</p>
+<h2 id="直觉-—-O-1-查询换-O-N-遍历"><a href="#直觉-—-O-1-查询换-O-N-遍历" class="headerlink" title="直觉 — O(1) 查询换 O(N) 遍历"></a>直觉 — O(1) 查询换 O(N) 遍历</h2><p>暴力解法的题大多长这样：枚举所有 <code>(i, j)</code> 对，看是否满足某关系。O(N²)。</p>
+<p>哈希表做的事情非常单纯：<strong>边遍历边把”已见过的”丢进表，每来一个新元素，问表里有没有能跟我配对的</strong>。一次遍历 + 每步 O(1) 查询 &#x3D; O(N)。</p>
+<p>套路化成一句话：</p>
+<blockquote>
+<p>把 O(N²) 的”配对枚举”，改成 O(N) 的”边走边查”。</p>
+</blockquote>
+<p>什么时候用得上：</p>
+<ul>
+<li>题目要求两个元素满足 <code>f(a, b) = target</code>（两数之和、四数相加、HashMap 找差&#x2F;和&#x2F;积）</li>
+<li>题目问”前面是否出现过 X”（最长无重复子串、包含重复元素）</li>
+<li>题目要数”某种值出现了多少次”（计数、异位词分组）</li>
+<li>题目想把 O(N) 的范围查询压成 O(1)（前缀和 + hash，下面讲）</li>
+</ul>
+<p><strong>set vs dict 怎么选</strong>：只关心”见过没”用 <code>set</code>；要存附加信息（下标、计数、上次出现的位置）用 <code>dict</code>。两数之和要返回下标，所以是 dict；判重就是 set。别一上来就 dict 装样子。</p>
+<h2 id="动画：两数之和的”先查后存”"><a href="#动画：两数之和的”先查后存”" class="headerlink" title="动画：两数之和的”先查后存”"></a>动画：两数之和的”先查后存”</h2><p>数组 <code>[2, 7, 11, 15]</code>，target &#x3D; <code>9</code>。重点看两件事：</p>
+<ol>
+<li><strong>每来一个新元素 x，先查表里有没有 <code>target - x</code></strong>，没有再把 x 自己存进去。</li>
+<li>seen 字典从空慢慢长大，第 2 个元素 <code>7</code> 来的时候，表里已经有 <code>2</code>，立刻命中。</li>
+</ol>
 
 <script>
 (function () {
@@ -309,42 +313,143 @@
 })();
 </script><iframe class="tc-anim-frame" src="/anim/algo/hash-table.html" loading="lazy" style="width:100%;height:380px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
 
+<p>看完动画再回头读下面的模板，套路就刻进肌肉里了。</p>
+<h2 id="模板-—-两数之和、子数组和等于-k"><a href="#模板-—-两数之和、子数组和等于-k" class="headerlink" title="模板 — 两数之和、子数组和等于 k"></a>模板 — 两数之和、子数组和等于 k</h2><h3 id="套路一：两数之和（先查后存）"><a href="#套路一：两数之和（先查后存）" class="headerlink" title="套路一：两数之和（先查后存）"></a>套路一：两数之和（先查后存）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">twoSum</span>(<span class="hljs-params">nums, target</span>):<br>    seen = &#123;&#125;                              <span class="hljs-comment"># 值 -&gt; 下标</span><br>    <span class="hljs-keyword">for</span> i, x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(nums):<br>        <span class="hljs-keyword">if</span> target - x <span class="hljs-keyword">in</span> seen:             <span class="hljs-comment"># 1. 先查</span><br>            <span class="hljs-keyword">return</span> [seen[target - x], i]<br>        seen[x] = i                        <span class="hljs-comment"># 2. 后存</span><br></code></pre></td></tr></table></figure>
+
+<p>为什么必须<strong>先查后存</strong>？<code>nums = [3, 3], target = 6</code>：如果先存后查，第一个 3 存进去后立刻自己查到自己，返回 <code>[0, 0]</code>——同一个元素配自己。先查后存把”自己”挡在表外。</p>
+<h3 id="套路二：是否出现过-判重"><a href="#套路二：是否出现过-判重" class="headerlink" title="套路二：是否出现过 &#x2F; 判重"></a>套路二：是否出现过 &#x2F; 判重</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">containsDuplicate</span>(<span class="hljs-params">nums</span>):<br>    seen = <span class="hljs-built_in">set</span>()                           <span class="hljs-comment"># 只关心见没见过 → set</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        <span class="hljs-keyword">if</span> x <span class="hljs-keyword">in</span> seen:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        seen.add(x)<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure>
+
+<p>注意这里换成了 <code>set</code>，因为不需要附加信息。</p>
+<h3 id="套路三：分组-计数（选好-key-是关键）"><a href="#套路三：分组-计数（选好-key-是关键）" class="headerlink" title="套路三：分组 &#x2F; 计数（选好 key 是关键）"></a>套路三：分组 &#x2F; 计数（选好 key 是关键）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 异位词分组：key 必须能唯一标识&quot;同一组&quot;</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> defaultdict<br>groups = defaultdict(<span class="hljs-built_in">list</span>)<br><span class="hljs-keyword">for</span> word <span class="hljs-keyword">in</span> words:<br>    key = <span class="hljs-built_in">tuple</span>(<span class="hljs-built_in">sorted</span>(word))              <span class="hljs-comment"># 或字母频率元组</span><br>    groups[key].append(word)<br><span class="hljs-keyword">return</span> <span class="hljs-built_in">list</span>(groups.values())<br></code></pre></td></tr></table></figure>
+
+<p>选 key 的标准：<strong>可哈希 + 能唯一代表”同类”</strong>。</p>
+<h2 id="前缀和-hash-组合"><a href="#前缀和-hash-组合" class="headerlink" title="前缀和 + hash 组合"></a>前缀和 + hash 组合</h2><p>这是 hash 在算法题里最容易拉开差距的一招。子数组和 &#x3D; <code>prefix[j] - prefix[i]</code>，所以”子数组和等于 k”就等价于”找两个前缀和差等于 k”——又一次回到两数之和的形状。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">subarraySum</span>(<span class="hljs-params">nums, k</span>):<br>    prefix = &#123;<span class="hljs-number">0</span>: <span class="hljs-number">1</span>&#125;                        <span class="hljs-comment"># 空前缀，和为 0 出现 1 次</span><br>    curr_sum = count = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        curr_sum += x<br>        count += prefix.get(curr_sum - k, <span class="hljs-number">0</span>)   <span class="hljs-comment"># 找 prev_sum = curr - k</span><br>        prefix[curr_sum] = prefix.get(curr_sum, <span class="hljs-number">0</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> count<br></code></pre></td></tr></table></figure>
+
+<p>两个关键点：</p>
+<ul>
+<li><strong><code>&#123;0: 1&#125;</code> 不能漏</strong>：代表”什么都不取”的空前缀。少了它，从下标 0 开始的合法子数组会被漏数。</li>
+<li><strong>先查后存的顺序仍然成立</strong>：先用旧的 prefix 算 count，再把当前 curr_sum 写进表。否则会把当前位置自己算成”前一段”。</li>
+</ul>
+<p>这个组合一旦学会，下面这些题就都是同一道：</p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>key 存什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>和等于 k</td>
+<td><code>prefix_sum</code></td>
+</tr>
+<tr>
+<td>和能被 k 整除</td>
+<td><code>prefix_sum % k</code></td>
+</tr>
+<tr>
+<td>二叉树路径和（437）</td>
+<td>沿路径维护 prefix</td>
+</tr>
+<tr>
+<td>0&#x2F;1 子数组数量相等</td>
+<td>把 0 当 -1，再求和等于 0</td>
+</tr>
+</tbody></table>
+<h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身</strong>（一遍写出来）：</p>
+<ul>
+<li><ol>
+<li>Two Sum — 模板题</li>
+</ol>
+</li>
+<li><ol start="217">
+<li>Contains Duplicate — set 判重</li>
+</ol>
+</li>
+<li><ol start="49">
+<li>Group Anagrams — 选 key</li>
+</ol>
+</li>
+<li><ol start="128">
+<li>Longest Consecutive — set + 跳过非起点，O(N)</li>
+</ol>
+</li>
+<li><ol start="560">
+<li>Subarray Sum Equals K — 前缀和模板</li>
+</ol>
+</li>
+</ul>
+<p><strong>进阶</strong>：</p>
+<ul>
+<li><ol start="454">
+<li>4Sum II — 拆成 <code>a+b</code> 和 <code>-(c+d)</code> 两边，hash 把 O(N⁴) 砍成 O(N²)</li>
+</ol>
+</li>
+<li><ol start="974">
+<li>Subarray Sums Divisible by K — 前缀和模 K</li>
+</ol>
+</li>
+<li><ol start="437">
+<li>Path Sum III — 前缀和 + 回溯，下树前加、回溯前删</li>
+</ol>
+</li>
+<li><ol start="146">
+<li>LRU Cache — dict + 双链表</li>
+</ol>
+</li>
+<li><ol start="355">
+<li>Design Twitter — hash 套 heap</li>
+</ol>
+</li>
+</ul>
+<h2 id="Python-速查"><a href="#Python-速查" class="headerlink" title="Python 速查"></a>Python 速查</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">d.get(k, <span class="hljs-number">0</span>)                                <span class="hljs-comment"># 不存在返回默认值</span><br>d.setdefault(k, []).append(v)              <span class="hljs-comment"># 不存在先建空列表</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> defaultdict, Counter<br>d = defaultdict(<span class="hljs-built_in">int</span>)                       <span class="hljs-comment"># 自动初始化为 0</span><br>d = defaultdict(<span class="hljs-built_in">list</span>)                      <span class="hljs-comment"># 自动初始化为 []</span><br>c = Counter(<span class="hljs-string">&quot;hello&quot;</span>)                       <span class="hljs-comment"># Counter(&#123;&#x27;l&#x27;:2,&#x27;h&#x27;:1,&#x27;e&#x27;:1,&#x27;o&#x27;:1&#125;)</span><br>c.most_common(<span class="hljs-number">2</span>)                           <span class="hljs-comment"># 取频次前 2</span><br>c1 - c2                                    <span class="hljs-comment"># 多重集合差，负数自动截断为 0</span><br></code></pre></td></tr></table></figure>
+
+<p><code>Counter</code> 减法是滑动窗口比较字符频率、判断”能否拼成 X”的利器。</p>
+<h2 id="进阶：滚动哈希-Rabin-Karp"><a href="#进阶：滚动哈希-Rabin-Karp" class="headerlink" title="进阶：滚动哈希 Rabin-Karp"></a>进阶：滚动哈希 Rabin-Karp</h2><p>字符串匹配场景，把窗口看成 base 进制数，移动窗口时 O(1) 更新哈希：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">rabinKarp</span>(<span class="hljs-params">text, pattern</span>):<br>    base, mod = <span class="hljs-number">31</span>, <span class="hljs-number">10</span>**<span class="hljs-number">9</span> + <span class="hljs-number">7</span><br>    m = <span class="hljs-built_in">len</span>(pattern)<br>    pat_hash = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> pattern:<br>        pat_hash = (pat_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br>    win_hash, power = <span class="hljs-number">0</span>, <span class="hljs-built_in">pow</span>(base, m, mod)<br>    <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(text):<br>        win_hash = (win_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m:<br>            win_hash = (win_hash - <span class="hljs-built_in">ord</span>(text[i - m]) * power) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m - <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> win_hash == pat_hash:<br>            <span class="hljs-keyword">if</span> text[i-m+<span class="hljs-number">1</span>:i+<span class="hljs-number">1</span>] == pattern: <span class="hljs-comment"># 防碰撞验证</span><br>                <span class="hljs-keyword">return</span> i - m + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>哈希相等还得用字符串再比一次，工程上是基本操作。</p>
+<h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 &#x2F; 易错点"></a>记忆法 &#x2F; 易错点</h2><ul>
+<li><strong>看到”配对”想 hash</strong>：题面出现”两个数满足…”、”是否存在…”、”前面有没有…”——条件反射伸手摸 hash。</li>
+<li><strong>先查后存</strong>：永远别让当前元素配它自己。</li>
+<li><strong>set vs dict</strong>：只问见没见 → set；要存下标&#x2F;计数&#x2F;位置 → dict。</li>
+<li><strong>前缀和 hash 一定要 <code>&#123;0: 1&#125;</code> 初始化</strong>：覆盖”从头开始”的子数组。</li>
+<li><strong>遍历中改 dict 要小心</strong>：键变更可能影响后续逻辑，必要时拷贝或延后写。</li>
+<li><strong>大数据担心碰撞</strong>：自定义对象做 key 要实现 <code>__hash__</code> 和 <code>__eq__</code>，且两者必须一致。</li>
+<li><strong>不可变才能当 key</strong>：list 不行、tuple 可以；set 不行、frozenset 可以。</li>
+</ul>
 <h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
 <details>
-<summary><strong>为什么两数之和要"先查后存"？举一个如果"先存后查"会出错的例子。</strong></summary>
+<summary><strong>为什么两数之和必须"先查后存"？给一个"先存后查"会出错的例子。</strong></summary>
 
-<p>例子：<code>nums = [3, 3]</code>, <code>target = 6</code>。</p>
-<p>如果”先存后查”：遍历到第一个 3 时，先存 <code>seen[3]=0</code>。然后查 <code>target-3=3</code>，发现 seen 里有！返回 <code>[0, 0]</code>。但这是同一个元素，不是两个不同的数。</p>
-<p>“先查后存”：遍历到第一个 3 时，先查 seen 里有没有 <code>6-3=3</code>，没有。再存 <code>seen[3]=0</code>。遍历到第二个 3 时，先查 seen 里有没有 <code>6-3=3</code>，有！返回 <code>[0, 1]</code>。正确！</p>
+<p><code>nums = [3, 3], target = 6</code>。先存后查：第一个 3 先写入 <code>seen[3]=0</code>，立刻查 <code>6-3=3</code> 在表里，返回 <code>[0, 0]</code>——同一个元素自己配自己，错误。</p>
+<p>先查后存：第一个 3 来时表空，查不到，再写入；第二个 3 来时查到表里的 3，返回 <code>[0, 1]</code>，正确。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>前缀和+哈希表中，{0: 1} 初始化的含义是什么？不加会漏掉哪些情况？</strong></summary>
+<summary><strong>前缀和 + hash 中，<code>&#123;0: 1&#125;</code> 初始化代表什么？不加会漏什么？</strong></summary>
 
-<p><code>&#123;0: 1&#125;</code> 表示”前缀和为 0 出现过 1 次”，对应的是空前缀（一个元素都不取）。</p>
-<p>如果不加：当 <code>curr_sum</code> 恰好等于 <code>k</code> 时（即从数组开头到当前位置的子数组和就是 k），我们需要找 <code>curr_sum - k = 0</code> 在 prefix 中出现的次数。如果没有初始化 <code>&#123;0:1&#125;</code>，就找不到，漏掉了这种情况。</p>
-<p>例：<code>nums = [1, 2, 3]</code>, <code>k = 3</code>。前缀和到第 2 个元素时是 3，需要 <code>prefix[0] = 1</code> 才能数到子数组 <code>[1,2]</code>。</p>
+<p>代表”什么都不取的空前缀，和为 0，出现过 1 次”。</p>
+<p>当某个 <code>curr_sum</code> 恰好等于 <code>k</code> 时（即从下标 0 一路加到当前位置就是 k），代码会去查 <code>prefix[curr_sum - k] = prefix[0]</code>。没初始化就漏掉这种”从头开始”的子数组。</p>
+<p>例：<code>nums = [1, 2, 3], k = 3</code>，子数组 <code>[1, 2]</code> 就是靠 <code>prefix[0]=1</code> 数到的。</p>
 </details>
 </div>
 
 <div class="exercise">
 <details>
-<summary><strong>Counter 的减法 c1 - c2 为什么只保留正数？这在什么场景下有用？</strong></summary>
+<summary><strong>Counter 减法 <code>c1 - c2</code> 为什么只保留正数？什么时候有用？</strong></summary>
 
-<p>设计哲学：Counter 代表”多重集合”，元素个数不能为负。减法表示”从集合中移除”，移除比拥有的多就是 0。</p>
-<p>有用场景：</p>
+<p>Counter 是”多重集合”，元素数不能负。减法即”移除”，移除超过持有量就归零。</p>
+<p>用法：</p>
 <ul>
-<li>判断一个单词能否由另一个的字母组成：<code>Counter(word) - Counter(available)</code> 为空则可以。</li>
-<li>找缺少的字母：<code>Counter(required) - Counter(have)</code> 得到还差什么。</li>
-<li>滑动窗口中比较字符频率。</li>
+<li>判断 <code>word</code> 能否由 <code>available</code> 的字母拼成：<code>Counter(word) - Counter(available)</code> 为空则可以。</li>
+<li>找缺什么字母：<code>Counter(required) - Counter(have)</code>。</li>
+<li>滑动窗口比较字符频率。</li>
 </ul>
 </details>
 </div>
-
-<h2 id="LeetCode-题目"><a href="#LeetCode-题目" class="headerlink" title="LeetCode 题目"></a>LeetCode 题目</h2><p><strong>热身</strong>：1. Two Sum、49. Group Anagrams、560. Subarray Sum Equals K、128. Longest Consecutive、217. Contains Duplicate。</p>
-<p><strong>进阶</strong>：454. 4Sum II、974. Subarray Sums Divisible by K、437. Path Sum III、146. LRU Cache、355. Design Twitter。</p>
 
         </div>
         
