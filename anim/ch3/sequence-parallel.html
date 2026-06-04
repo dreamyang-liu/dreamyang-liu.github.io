@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequence Parallelism: TP ↔ SP 区域切换</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+</style>
+</head>
+<body>
+
+<div style="background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0; text-align:center;">
+  <div style="margin-bottom:10px;color:#f472b6;font-weight:bold;">Sequence Parallelism: TP ↔ SP 区域切换 (4 GPUs)</div>
+  <canvas id="spCanvas" width="860" height="420" style="width:100%;max-width:860px;border-radius:8px;background:#0a0a1a;"></canvas>
+  <div style="margin-top:10px;">
+    <button onclick="spAnim.reset();spAnim.play();" style="background:linear-gradient(135deg,#f472b6,#667eea);border:none;color:#fff;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;">▶ 播放</button>
+    <button onclick="spAnim.reset();" style="background:#333;border:1px solid #555;color:#ccc;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;margin-left:8px;">↺ 重置</button>
+  </div>
+</div>
+
+<script>
+const spAnim = (() => {
+  const canvas = document.getElementById('spCanvas');
+  if (!canvas) return { play(){}, reset(){} };
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const N = 4;
+  const gpuColors = ['#ff6b6b', '#4caf50', '#667eea', '#fbbf24'];
+  let progress = 0, animId = null, startTime = null;
+  const duration = 7000;
+
+  function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+  function lerp(a,b,t) { return a+(b-a)*t; }
+
+  const stageW = 160, stageH = 260, stageGap = 30;
+  const startX = 50;
+  const stageY = 100;
+
+  const stages = [
+    { label: 'LayerNorm', type: 'sp', x: startX },
+    { label: 'Attention', type: 'tp', x: startX + stageW + stageGap },
+    { label: 'LayerNorm', type: 'sp', x: startX + 2*(stageW + stageGap) },
+    { label: 'FFN', type: 'tp', x: startX + 3*(stageW + stageGap) },
+  ];
+
+  function drawStageBox(stage, active, phaseLabel) {
+    const { x, label, type } = stage;
+    const isSP = type === 'sp';
+    ctx.fillStyle = active ? (isSP ? '#1a2e1a' : '#1a1a3e') : '#111118';
+    ctx.beginPath();
+    ctx.roundRect(x, stageY, stageW, stageH, 8);
+    ctx.fill();
+    ctx.strokeStyle = active ? (isSP ? '#4caf50' : '#667eea') : '#333';
+    ctx.lineWidth = active ? 2.5 : 1;
+    ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = isSP ? '#4caf50' : '#667eea';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + stageW/2, stageY - 12);
+    ctx.font = '10px monospace';
+    ctx.fillStyle = isSP ? '#4caf50' : '#667eea';
+    const badge = isSP ? 'SP 区域' : 'TP 区域';
+    ctx.fillText(badge, x + stageW/2, stageY - 28);
+  }
+
+  function drawSeqBar(x, y, w, h, gpuIdx, alpha, label) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = gpuColors[gpuIdx];
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 3);
+    ctx.fill();
+    if (label) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '9px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, x + w/2, y + h/2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawArrow(fromX, toX, y, label, color) {
+    const midY = y;
+    ctx.strokeStyle = color || '#888';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(fromX, midY);
+    ctx.lineTo(toX, midY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1;
+    ctx.fillStyle = color || '#888';
+    ctx.beginPath();
+    ctx.moveTo(toX, midY);
+    ctx.lineTo(toX - 6, midY - 4);
+    ctx.lineTo(toX - 6, midY + 4);
+    ctx.fill();
+    if (label) {
+      ctx.fillStyle = color || '#888';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, (fromX + toX)/2, midY - 10);
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    const p = progress;
+
+    ctx.fillStyle = '#ddd';
+    ctx.font = 'bold 15px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('一个 Transformer Layer 内的数据流', W/2, 30);
+
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = '#aaa';
+    let subtitle = '';
+    if (p < 0.05) subtitle = '序列被切分到 4 个 GPU, 每 GPU 持有 1/4 序列';
+    else if (p < 0.25) subtitle = 'SP 区域: 每 GPU 独立计算自己的序列 chunk (无通信!)';
+    else if (p < 0.40) subtitle = 'AllGather: 收集完整序列, 准备进入 TP 区域';
+    else if (p < 0.60) subtitle = 'TP 区域: 完整序列, 按 hidden dim 切分计算';
+    else if (p < 0.75) subtitle = 'ReduceScatter: reduce 并切分回各 GPU 的序列 chunk';
+    else if (p < 0.90) subtitle = 'SP 区域: 再次独立计算 (LayerNorm 2)';
+    else subtitle = 'AllGather → 进入下一个 TP 区域 (FFN)';
+    ctx.fillText(subtitle, W/2, 52);
+
+    const activeIdx = p < 0.25 ? 0 : p < 0.60 ? 1 : p < 0.90 ? 2 : 3;
+    stages.forEach((s, i) => drawStageBox(s, i === activeIdx));
+
+    const barH = 14, barGap = 4;
+
+    if (p >= 0.05 && p < 0.40) {
+      const s = stages[0];
+      const fadeIn = p < 0.10 ? (p - 0.05)/0.05 : 1;
+      const fadeOut = p > 0.25 ? 1 - (p - 0.25)/0.15 : 1;
+      const alpha = Math.min(fadeIn, fadeOut);
+      for (let g = 0; g < N; g++) {
+        const y = stageY + 30 + g * (barH + barGap + 40);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = gpuColors[g];
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`GPU${g}`, s.x + 8, y + barH/2 + 3);
+        ctx.globalAlpha = 1;
+        drawSeqBar(s.x + 45, y, stageW - 55, barH, g, alpha * 0.9, `seq[${g}/4]`);
+      }
+    }
+
+    if (p >= 0.25 && p < 0.40) {
+      const t = (p - 0.25) / 0.15;
+      drawArrow(stages[0].x + stageW + 5, stages[1].x - 5, stageY + stageH/2, 'AllGather', `rgba(76,175,80,${t})`);
+    }
+
+    if (p >= 0.35 && p < 0.75) {
+      const s = stages[1];
+      const fadeIn = p < 0.40 ? (p - 0.35)/0.05 : 1;
+      const fadeOut = p > 0.60 ? 1 - (p - 0.60)/0.15 : 1;
+      const alpha = Math.min(fadeIn, fadeOut);
+      for (let g = 0; g < N; g++) {
+        const y = stageY + 30 + g * (barH + barGap + 40);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = gpuColors[g];
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`GPU${g}`, s.x + 8, y + barH/2 + 3);
+        ctx.globalAlpha = 1;
+        for (let c = 0; c < N; c++) {
+          const cw = (stageW - 55) / N;
+          drawSeqBar(s.x + 45 + c * cw, y, cw - 1, barH, c, alpha * 0.7);
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#667eea';
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`h[${g}/4]`, s.x + stageW/2, y + barH + 10);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    if (p >= 0.60 && p < 0.75) {
+      const t = (p - 0.60) / 0.15;
+      drawArrow(stages[1].x + stageW + 5, stages[2].x - 5, stageY + stageH/2, 'ReduceScatter', `rgba(102,126,234,${t})`);
+    }
+
+    if (p >= 0.70 && p < 1.0) {
+      const s = stages[2];
+      const fadeIn = p < 0.75 ? (p - 0.70)/0.05 : 1;
+      const fadeOut = p > 0.90 ? 1 - (p - 0.90)/0.10 : 1;
+      const alpha = Math.min(fadeIn, fadeOut);
+      for (let g = 0; g < N; g++) {
+        const y = stageY + 30 + g * (barH + barGap + 40);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = gpuColors[g];
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`GPU${g}`, s.x + 8, y + barH/2 + 3);
+        ctx.globalAlpha = 1;
+        drawSeqBar(s.x + 45, y, stageW - 55, barH, g, alpha * 0.9, `seq[${g}/4]`);
+      }
+    }
+
+    if (p >= 0.90) {
+      const t = (p - 0.90) / 0.10;
+      drawArrow(stages[2].x + stageW + 5, stages[3].x - 5, stageY + stageH/2, 'AllGather', `rgba(76,175,80,${t})`);
+    }
+
+    const memY = stageY + stageH + 30;
+    ctx.fillStyle = '#888';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('Activation 内存 / GPU:', startX, memY);
+
+    const barStartX = startX + 170;
+    const maxBarW = 300;
+
+    ctx.fillStyle = '#ff6b6b30';
+    ctx.fillRect(barStartX, memY - 12, maxBarW, 16);
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.strokeRect(barStartX, memY - 12, maxBarW, 16);
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Without SP: 完整 seq × hidden (100%)', barStartX + maxBarW/2, memY);
+
+    const spBarW = maxBarW / N;
+    ctx.fillStyle = '#4caf5050';
+    ctx.fillRect(barStartX, memY + 12, spBarW, 16);
+    ctx.strokeStyle = '#4caf50';
+    ctx.strokeRect(barStartX, memY + 12, spBarW, 16);
+    ctx.fillStyle = '#4caf50';
+    ctx.fillText(`With SP: seq/${N} × hidden (${Math.round(100/N)}%)`, barStartX + maxBarW/2, memY + 24);
+  }
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    progress = Math.min((ts - startTime) / duration, 1);
+    render();
+    if (progress < 1) animId = requestAnimationFrame(animate);
+  }
+
+  function play() { startTime = null; if (animId) cancelAnimationFrame(animId); animId = requestAnimationFrame(animate); }
+  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; progress = 0; render(); }
+
+  progress = 0; render();
+  return { play, reset };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

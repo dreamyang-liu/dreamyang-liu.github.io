@@ -122,6 +122,15 @@
   border-right: 1px solid var(--vscode-border);
   font-size: 13px;
   color: var(--vscode-text);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tab span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab.active {
@@ -162,6 +171,20 @@
 
 .post-header i {
   color: #519aba;
+}
+
+/* 文章页头部：标题独占一行，元信息在下方 */
+.post-content > .post-header {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.post-content > .post-header h1 {
+  font-size: 1.7rem;
+  line-height: 1.35;
+  margin-bottom: 0.9rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .post-title a {

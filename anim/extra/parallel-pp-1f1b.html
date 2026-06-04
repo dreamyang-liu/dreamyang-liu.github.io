@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PP 1F1B Schedule</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.diagram { background: #12121f; border-radius: 12px; padding: 20px; margin: 10px 0; overflow-x: auto; border: 1px solid #2a2a4a; }
+.anim-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.anim-btn { background: #667eea; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; transition: background 0.2s; }
+.anim-btn:hover { background: #764ba2; }
+.anim-btn.danger { background: #e85d75; }
+.anim-btn.danger:hover { background: #c94060; }
+.anim-status { text-align: center; margin-top: 12px; font-size: 0.9em; color: #f4a460; min-height: 1.5em; }
+
+.pp-anim-grid { display: grid; grid-template-columns: 70px repeat(12, 1fr); gap: 3px; min-width: 600px; }
+.pp-anim-cell { height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.72em; font-weight: bold; background: #1e1e2e; color: #555; transition: all 0.4s ease; }
+.pp-anim-cell.active { color: #fff; }
+.pp-anim-cell.fwd-0 { background: #4a90d9; }
+.pp-anim-cell.fwd-1 { background: #50c878; }
+.pp-anim-cell.fwd-2 { background: #f4a460; }
+.pp-anim-cell.fwd-3 { background: #e85d75; }
+.pp-anim-cell.bwd-0 { background: rgba(74,144,217,0.55); }
+.pp-anim-cell.bwd-1 { background: rgba(80,200,120,0.55); }
+.pp-anim-cell.bwd-2 { background: rgba(244,164,96,0.55); }
+.pp-anim-cell.bwd-3 { background: rgba(232,93,117,0.55); }
+.pp-anim-cell.current { box-shadow: 0 0 12px rgba(255,255,255,0.6); transform: scale(1.1); z-index: 2; }
+.pp-anim-header { font-size: 0.7em; color: #666; display: flex; align-items: center; justify-content: center; }
+.pp-anim-label { font-size: 0.8em; color: #aaa; display: flex; align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+    <h3 style="text-align:center; margin-bottom:20px; color:#50c878;">交互动画：1F1B Pipeline Schedule（Forward/Backward 流转）</h3>
+    <div class="pp-anim-grid" id="pp-anim-grid"></div>
+    <div class="anim-controls">
+        <button class="anim-btn" onclick="ppPlay()">▶ 播放</button>
+        <button class="anim-btn" onclick="ppStepFn()">⏭ 单步</button>
+        <button class="anim-btn danger" onclick="ppReset()">↺ 重置</button>
+    </div>
+    <div class="anim-status" id="pp-status"></div>
+    <div style="margin-top:10px; text-align:center; font-size:0.8em; color:#888;">
+        深色 = Forward, 浅色 = Backward | 注意空格 = Pipeline Bubble
+    </div>
+</div>
+
+<script>
+(function() {
+    const schedule = [
+        [['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null,null,null],
+        [null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null,null],
+        [null,null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null],
+        [null,null,null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null],
+    ];
+    const totalCols = 12;
+    let ppStep = -1;
+    let ppRunning = false;
+    let ppTimer = null;
+
+    function buildGrid() {
+        const el = document.getElementById('pp-anim-grid');
+        if (!el) return;
+        let html = '<div class="pp-anim-header"></div>';
+        for (let t = 0; t < totalCols; t++) html += `<div class="pp-anim-header">t${t}</div>`;
+        for (let g = 0; g < 4; g++) {
+            html += `<div class="pp-anim-label">GPU ${g}</div>`;
+            for (let t = 0; t < totalCols; t++) {
+                const s = schedule[g][t];
+                const label = s ? `${s[0]}${s[1]}` : '';
+                html += `<div class="pp-anim-cell" data-g="${g}" data-t="${t}">${label}</div>`;
+            }
+        }
+        el.innerHTML = html;
+    }
+    buildGrid();
+
+    function ppDoStep() {
+        ppStep++;
+        if (ppStep >= totalCols) {
+            ppRunning = false;
+            document.getElementById('pp-status').textContent = '1F1B 完成！注意：只有首尾有少量 Bubble，中间 GPU 利用率很高';
+            return;
+        }
+
+        document.querySelectorAll('.pp-anim-cell.current').forEach(c => c.classList.remove('current'));
+
+        let actions = [];
+        for (let g = 0; g < 4; g++) {
+            for (let t = 0; t <= ppStep; t++) {
+                const cell = document.querySelector(`.pp-anim-cell[data-g="${g}"][data-t="${t}"]`);
+                const s = schedule[g][t];
+                if (s) {
+                    const cls = s[0] === 'F' ? `fwd-${g}` : `bwd-${g}`;
+                    cell.classList.add('active', cls);
+                    if (t === ppStep) {
+                        cell.classList.add('current');
+                        actions.push(`GPU${g}: ${s[0]==='F'?'Forward':'Backward'} μ-batch ${s[1]}`);
+                    }
+                }
+            }
+        }
+
+        document.getElementById('pp-status').textContent =
+            `t=${ppStep}: ${actions.length > 0 ? actions.join(' | ') : '(idle - pipeline bubble)'}`;
+
+        if (ppRunning) ppTimer = setTimeout(ppDoStep, 800);
+    }
+
+    window.ppPlay = function() {
+        if (ppRunning) return;
+        if (ppStep >= totalCols - 1) ppReset();
+        ppRunning = true;
+        ppDoStep();
+    };
+    window.ppStepFn = function() {
+        ppRunning = false;
+        clearTimeout(ppTimer);
+        if (ppStep >= totalCols - 1) { ppReset(); return; }
+        ppDoStep();
+    };
+    window.ppReset = function() {
+        ppRunning = false;
+        clearTimeout(ppTimer);
+        ppStep = -1;
+        buildGrid();
+        document.getElementById('pp-status').textContent = '';
+    };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

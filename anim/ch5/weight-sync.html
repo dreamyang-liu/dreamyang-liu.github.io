@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weight Sync 策略</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; margin: 8px 0; }
+h3 { font-size: 1.4em; color: #ff9800; margin: 0 0 15px; }
+p { margin: 12px 0; color: #ccc; }
+.sync-container { position: relative; width: 100%; height: 300px; background: #12122a; border-radius: 12px; border: 1px solid #333; margin: 20px 0; overflow: hidden; }
+.gpu-node { position: absolute; width: 80px; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: bold; }
+.gpu-train { background: linear-gradient(135deg, #ff4444, #ff6666); }
+.gpu-infer { background: linear-gradient(135deg, #4488ff, #66aaff); }
+.sync-packet { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #50fa7b; box-shadow: 0 0 8px #50fa7b; }
+.btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; }
+.btn:hover { opacity: 0.85; }
+.tabs { display: flex; gap: 2px; margin-bottom: 0; }
+.tab-btn { padding: 10px 20px; background: #2a2a4e; border: 1px solid #333; border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; color: #aaa; font-weight: bold; }
+.tab-btn.active { background: #1a1a2e; color: #ff9800; border-color: #ff9800; border-bottom: 1px solid #1a1a2e; }
+.tab-content { display: none; background: #1a1a2e; border: 1px solid #333; border-radius: 0 12px 12px 12px; padding: 20px; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="card">
+<h3>交互式：Weight Sync 策略</h3>
+<div class="tabs">
+<div class="tab-btn active" data-tab="nccl-tab">NCCL Broadcast</div>
+<div class="tab-btn" data-tab="disk-tab">Disk-based</div>
+<div class="tab-btn" data-tab="hybrid-tab">Hybrid Engine</div>
+</div>
+<div class="tab-content active" id="nccl-tab">
+<p>通过 NCCL 直接将更新后的权重从 training GPU broadcast 到 inference GPU：</p>
+<div class="sync-container" id="sync-nccl-container">
+<div class="gpu-node gpu-train" style="left:10%; top:20%;">Train 0</div>
+<div class="gpu-node gpu-train" style="left:10%; top:50%;">Train 1</div>
+<div class="gpu-node gpu-train" style="left:10%; top:80%;">Train 2</div>
+<div class="gpu-node gpu-infer" style="right:10%; top:20%;">Infer 0</div>
+<div class="gpu-node gpu-infer" style="right:10%; top:50%;">Infer 1</div>
+<div class="gpu-node gpu-infer" style="right:10%; top:80%;">Infer 2</div>
+</div>
+<button class="btn" id="btn-sync-nccl">▶ 播放 NCCL Sync</button>
+<p style="font-size:0.85em; color:#888;">延迟低 (~秒级)，需要 training 和 inference GPU 在同一 NCCL group 内</p>
+</div>
+<div class="tab-content" id="disk-tab">
+<p>Training 完成后将 checkpoint 保存到共享存储，inference worker 从 disk 加载：</p>
+<div style="text-align:center; padding:30px; color:#aaa;">
+<p>Train GPU → 保存 checkpoint → 共享文件系统 → Inference GPU 加载</p>
+<p style="margin-top:15px;">延迟高 (~分钟级)，但架构简单，training 和 inference 完全解耦</p>
+</div>
+</div>
+<div class="tab-content" id="hybrid-tab">
+<p>同一组 GPU 在 training 和 inference 模式间动态切换（如 DeepSpeed Hybrid Engine）：</p>
+<div style="text-align:center; padding:30px; color:#aaa;">
+<p>Training Mode (FSDP/ZeRO) ↔ 动态切换 ↔ Inference Mode (TP + KV Cache)</p>
+<p style="margin-top:15px;">零 sync 开销，但模式切换有 overhead，且无法 overlap</p>
+</div>
+</div>
+</div>
+
+<script>
+// === Tab functionality ===
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        const parent = btn.closest('.card');
+        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    });
+});
+
+// === Weight Sync NCCL Animation ===
+(function() {
+    const btn = document.getElementById('btn-sync-nccl');
+    const container = document.getElementById('sync-nccl-container');
+    let packets = [];
+
+    btn.addEventListener('click', () => {
+        // Clear old packets
+        packets.forEach(p => p.remove());
+        packets = [];
+
+        // Animate packets from train to infer GPUs
+        const trainPositions = [{x: 14, y: 20}, {x: 14, y: 50}, {x: 14, y: 80}];
+        const inferPositions = [{x: 78, y: 20}, {x: 78, y: 50}, {x: 78, y: 80}];
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const delay = i * 200 + j * 100;
+                setTimeout(() => {
+                    const pkt = document.createElement('div');
+                    pkt.className = 'sync-packet';
+                    pkt.style.left = trainPositions[i].x + '%';
+                    pkt.style.top = trainPositions[i].y + '%';
+                    pkt.style.transition = 'left 1s ease-in-out, top 0.8s ease-in-out';
+                    container.appendChild(pkt);
+                    packets.push(pkt);
+
+                    setTimeout(() => {
+                        pkt.style.left = inferPositions[j].x + '%';
+                        pkt.style.top = inferPositions[j].y + '%';
+                    }, 50);
+
+                    setTimeout(() => { pkt.style.opacity = '0'; }, 1200);
+                }, delay);
+            }
+        }
+    });
+})();
+
+// === 自动把高度汇报给父页面（让 iframe 自适应高度）===
+(function () {
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'tc-anim-height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    setInterval(reportHeight, 500);
+  }
+})();
+</script>
+</body>
+</html>

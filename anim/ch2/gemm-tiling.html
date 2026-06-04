@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEMM Tiling 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.gemm-container { position: relative; width: 100%; background: #12122a; border-radius: 12px; border: 1px solid #333; padding: 20px; min-height: 400px; }
+.matrix-grid { display: inline-block; vertical-align: top; margin: 10px; }
+.matrix-label { text-align: center; font-size: 0.9rem; color: #00d2ff; margin-bottom: 6px; font-weight: bold; }
+.matrix-cells { display: grid; gap: 1px; }
+.matrix-cell { width: 22px; height: 22px; border-radius: 2px; background: #2a2a4a; border: 1px solid #444; transition: all 0.3s ease; }
+.matrix-cell.highlight-a { background: #ff6b6b; border-color: #ff6b6b; }
+.matrix-cell.highlight-b { background: #00d2ff; border-color: #00d2ff; }
+.matrix-cell.highlight-c { background: #7b2ff7; border-color: #7b2ff7; }
+.gemm-controls { text-align: center; margin-top: 16px; }
+.gemm-controls button { background: linear-gradient(135deg, #00d2ff, #7b2ff7); border: none; color: #fff; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin: 0 8px; transition: transform 0.2s; }
+.gemm-controls button:hover { transform: scale(1.05); }
+.gemm-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+.gemm-info { text-align: center; margin-top: 12px; color: #aaa; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="gemm-container" id="gemmContainer">
+  <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:20px;">
+    <div class="matrix-grid">
+      <div class="matrix-label">A [8×8]</div>
+      <div class="matrix-cells" id="matrixA" style="grid-template-columns:repeat(8,22px);"></div>
+    </div>
+    <div style="font-size:1.5rem;color:#7b2ff7;font-weight:bold;align-self:center;">×</div>
+    <div class="matrix-grid">
+      <div class="matrix-label">B [8×8]</div>
+      <div class="matrix-cells" id="matrixB" style="grid-template-columns:repeat(8,22px);"></div>
+    </div>
+    <div style="font-size:1.5rem;color:#7b2ff7;font-weight:bold;align-self:center;">=</div>
+    <div class="matrix-grid">
+      <div class="matrix-label">C [8×8]</div>
+      <div class="matrix-cells" id="matrixC" style="grid-template-columns:repeat(8,22px);"></div>
+    </div>
+  </div>
+  <div class="gemm-controls">
+    <button id="gemmStartBtn" onclick="startGemmAnimation()">开始 Tiling 动画</button>
+    <button id="gemmResetBtn" onclick="resetGemmAnimation()">重置</button>
+  </div>
+  <div class="gemm-info" id="gemmInfo">点击 "开始" 观察 4×4 tile 如何逐步计算 8×8 矩阵乘法</div>
+</div>
+
+<script>
+// ========================
+// GEMM Tiling Animation
+// ========================
+const MATRIX_SIZE = 8;
+const TILE_SIZE = 4;
+let gemmAnimationRunning = false;
+let gemmTimeouts = [];
+
+function initMatrices() {
+  ['matrixA', 'matrixB', 'matrixC'].forEach(id => {
+    const container = document.getElementById(id);
+    container.innerHTML = '';
+    for (let i = 0; i < MATRIX_SIZE * MATRIX_SIZE; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'matrix-cell';
+      container.appendChild(cell);
+    }
+  });
+}
+initMatrices();
+
+function highlightTile(matrixId, startRow, startCol, tileRows, tileCols, className) {
+  const container = document.getElementById(matrixId);
+  const cells = container.querySelectorAll('.matrix-cell');
+  for (let r = startRow; r < startRow + tileRows; r++) {
+    for (let c = startCol; c < startCol + tileCols; c++) {
+      if (r < MATRIX_SIZE && c < MATRIX_SIZE) {
+        cells[r * MATRIX_SIZE + c].classList.add(className);
+      }
+    }
+  }
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.matrix-cell').forEach(cell => {
+    cell.classList.remove('highlight-a', 'highlight-b', 'highlight-c');
+  });
+}
+
+function startGemmAnimation() {
+  if (gemmAnimationRunning) return;
+  gemmAnimationRunning = true;
+  document.getElementById('gemmStartBtn').disabled = true;
+  clearHighlights();
+
+  const steps = [];
+  // For each output tile (TILE_SIZE x TILE_SIZE block of C)
+  for (let bm = 0; bm < MATRIX_SIZE; bm += TILE_SIZE) {
+    for (let bn = 0; bn < MATRIX_SIZE; bn += TILE_SIZE) {
+      // For each K tile
+      for (let bk = 0; bk < MATRIX_SIZE; bk += TILE_SIZE) {
+        steps.push({ bm, bn, bk });
+      }
+    }
+  }
+
+  let stepIdx = 0;
+  function doStep() {
+    if (stepIdx >= steps.length) {
+      document.getElementById('gemmInfo').textContent = '动画完成！共 ' + steps.length + ' 个 tile 计算步骤';
+      gemmAnimationRunning = false;
+      document.getElementById('gemmStartBtn').disabled = false;
+      return;
+    }
+
+    clearHighlights();
+    const { bm, bn, bk } = steps[stepIdx];
+
+    // Highlight A tile: rows [bm, bm+TILE), cols [bk, bk+TILE)
+    highlightTile('matrixA', bm, bk, TILE_SIZE, TILE_SIZE, 'highlight-a');
+    // Highlight B tile: rows [bk, bk+TILE), cols [bn, bn+TILE)
+    highlightTile('matrixB', bk, bn, TILE_SIZE, TILE_SIZE, 'highlight-b');
+    // Highlight C tile: rows [bm, bm+TILE), cols [bn, bn+TILE)
+    highlightTile('matrixC', bm, bn, TILE_SIZE, TILE_SIZE, 'highlight-c');
+
+    document.getElementById('gemmInfo').textContent =
+      `Step ${stepIdx + 1}/${steps.length}: C[${bm}:${bm+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}] += A[${bm}:${bm+TILE_SIZE}, ${bk}:${bk+TILE_SIZE}] × B[${bk}:${bk+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}]`;
+
+    stepIdx++;
+    const t = setTimeout(doStep, 600);
+    gemmTimeouts.push(t);
+  }
+
+  doStep();
+}
+
+function resetGemmAnimation() {
+  gemmTimeouts.forEach(t => clearTimeout(t));
+  gemmTimeouts = [];
+  gemmAnimationRunning = false;
+  document.getElementById('gemmStartBtn').disabled = false;
+  clearHighlights();
+  document.getElementById('gemmInfo').textContent = '点击 "开始" 观察 4×4 tile 如何逐步计算 8×8 矩阵乘法';
+}
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

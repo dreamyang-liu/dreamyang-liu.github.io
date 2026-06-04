@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Data Flow</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: transparent;
+  color: #e0e0e0;
+  padding: 4px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+.section-subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.95em; }
+
+.flow-gpu-wrapper { max-width: 1100px; margin: 0 auto; position: relative; }
+.flow-gpu-simplified { display: grid; grid-template-columns: 100px 1fr 100px; gap: 10px; min-height: 450px; background: #0c0c18; border: 2px solid #1a1a3a; border-radius: 16px; padding: 20px; position: relative; }
+.flow-hbm-side { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.flow-hbm-block { background: rgba(255,107,107,0.08); border: 1px solid #ff6b6b; border-radius: 6px; padding: 8px 4px; font-size: 0.6em; text-align: center; color: #ff6b6b; transition: all 0.5s; }
+.flow-hbm-block.active { background: rgba(255,107,107,0.25); box-shadow: 0 0 12px rgba(255,107,107,0.5); }
+.flow-center { display: flex; flex-direction: column; gap: 8px; }
+.flow-l2 { background: rgba(255,165,0,0.06); border: 1px solid rgba(255,165,0,0.4); border-radius: 6px; padding: 6px; text-align: center; font-size: 0.7em; color: #ffa500; transition: all 0.5s; }
+.flow-l2.active { background: rgba(255,165,0,0.2); box-shadow: 0 0 10px rgba(255,165,0,0.4); }
+.flow-sm-area { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; flex: 1; }
+.flow-sm { background: #0f0f20; border: 1px solid #2a2a4a; border-radius: 5px; padding: 5px; font-size: 0.55em; text-align: center; transition: all 0.5s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.flow-sm.active { border-color: #6bff6b; background: rgba(107,255,107,0.1); box-shadow: 0 0 8px rgba(107,255,107,0.3); }
+.flow-sm .fsm-tc { width: 16px; height: 6px; background: #2a2a4a; border-radius: 2px; transition: all 0.5s; }
+.flow-sm.active .fsm-tc { background: #c77dff; box-shadow: 0 0 5px #c77dff; }
+.flow-sm .fsm-sram { width: 16px; height: 4px; background: #1a1a2a; border-radius: 2px; transition: all 0.5s; }
+.flow-sm.active .fsm-sram { background: #6bff6b; box-shadow: 0 0 4px #6bff6b; }
+
+.flow-info-panel { margin-top: 20px; background: #111122; border-radius: 12px; padding: 20px 24px; border: 1px solid #2a2a4a; min-height: 120px; }
+.flow-info-title { font-size: 1.1em; font-weight: bold; color: #fff; margin-bottom: 8px; }
+.flow-info-desc { font-size: 0.88em; color: #bbb; line-height: 1.6; }
+.flow-info-tags { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.flow-info-tag { padding: 3px 10px; border-radius: 4px; font-size: 0.75em; font-weight: bold; }
+.fit-hbm { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+.fit-tc { background: rgba(199,125,255,0.2); color: #c77dff; }
+.fit-cuda { background: rgba(255,159,67,0.2); color: #ff9f43; }
+.fit-sram { background: rgba(107,255,107,0.2); color: #6bff6b; }
+.fit-l2 { background: rgba(255,165,0,0.2); color: #ffa500; }
+.fit-mem { background: rgba(255,107,107,0.15); color: #ff8888; border: 1px solid rgba(255,107,107,0.3); }
+.fit-comp { background: rgba(107,255,107,0.15); color: #88ff88; border: 1px solid rgba(107,255,107,0.3); }
+
+.controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.ctrl-btn { background: #00d2ff; color: #000; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: all 0.2s; }
+.ctrl-btn:hover { background: #33ddff; transform: translateY(-1px); }
+.ctrl-btn.danger { background: #ff6b6b; }
+.ctrl-btn.danger:hover { background: #ff8888; }
+.ctrl-progress { font-size: 0.85em; color: #888; min-width: 80px; text-align: center; }
+</style>
+</head>
+<body>
+
+<p class="section-subtitle">点击按钮，观察一个 token 从输入到输出在 GPU 硬件中的完整旅程 (LLaMA-70B Decode)</p>
+
+<div class="flow-gpu-wrapper">
+    <div class="flow-gpu-simplified" id="flow-gpu">
+        <div class="flow-hbm-side">
+            <div class="flow-hbm-block" id="fhbm-emb">Embedding<br>250MB</div>
+            <div class="flow-hbm-block" id="fhbm-wqkv">W_qkv<br>384MB</div>
+            <div class="flow-hbm-block" id="fhbm-wo">W_o<br>128MB</div>
+            <div class="flow-hbm-block" id="fhbm-kv">KV Cache<br>~1.3GB</div>
+        </div>
+
+        <div class="flow-center">
+            <div class="flow-l2" id="flow-l2">L2 Cache (50MB) — RoPE cos/sin 表 + 热数据</div>
+            <div class="flow-sm-area" id="flow-sm-area"></div>
+            <div class="flow-l2" id="flow-l2-2">L2 Cache ↔ HBM 数据通路</div>
+        </div>
+
+        <div class="flow-hbm-side">
+            <div class="flow-hbm-block" id="fhbm-wg">W_gate<br>448MB</div>
+            <div class="flow-hbm-block" id="fhbm-wu">W_up<br>448MB</div>
+            <div class="flow-hbm-block" id="fhbm-wd">W_down<br>448MB</div>
+            <div class="flow-hbm-block" id="fhbm-lm">LM Head<br>500MB</div>
+        </div>
+    </div>
+
+    <div class="flow-info-panel" id="flow-info">
+        <div class="flow-info-title" id="flow-title">准备就绪</div>
+        <div class="flow-info-desc" id="flow-desc">
+            点击「下一步」观察 token 在 GPU 内部的数据流动。每一步会高亮活跃的 HBM 区域、SM 和缓存，
+            并说明数据从哪里来、到哪里去、经过什么计算单元。
+        </div>
+        <div class="flow-info-tags" id="flow-tags"></div>
+    </div>
+
+    <div class="controls">
+        <button class="ctrl-btn" id="fl-play" onclick="flPlay()">▶ 播放</button>
+        <button class="ctrl-btn" onclick="flStep()">⏭ 下一步</button>
+        <button class="ctrl-btn" onclick="flBack()">⏮ 上一步</button>
+        <button class="ctrl-btn danger" onclick="flReset()">↺ 重置</button>
+        <div class="ctrl-progress" id="fl-progress">0 / 11</div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const smArea = document.getElementById('flow-sm-area');
+    let html = '';
+    for (let i = 0; i < 24; i++) {
+        html += `<div class="flow-sm" id="fsm-${i}">
+            <span style="color:#6bff6b;font-size:1.1em;">SM</span>
+            <div class="fsm-tc"></div>
+            <div class="fsm-sram"></div>
+        </div>`;
+    }
+    smArea.innerHTML = html;
+
+    const steps = [
+        {
+            title: 'Step 0: Embedding Lookup',
+            desc: 'token_id (一个整数) → 从 HBM 的 Embedding 表中查找对应的向量 [1, 8192]。<br><br><strong>数据路径:</strong> HBM (Embedding 权重) → Memory Controller → L2 → SM 的 Register<br><strong>操作:</strong> 纯内存读取（gather），无计算。1 个 SM 的少量线程即可完成。',
+            hbm: ['fhbm-emb'], l2: true, sms: [0,1],
+            tags: ['fit-hbm:HBM → Register', 'fit-mem:Memory Bound', 'fit-cuda:无计算(gather)'],
+        },
+        {
+            title: 'Step 1: RMSNorm',
+            desc: '对 embedding 向量归一化: x / RMS(x) × γ<br><br><strong>数据路径:</strong> 向量已在 SM Register 中 → CUDA Cores 做 reduction（求平方和）→ 算 1/√mean → 逐元素缩放<br><strong>硬件:</strong> Warp 内 shuffle reduction（线程间交换数据不走内存），然后 CUDA Cores 逐元素乘。<br><strong>γ 参数</strong>从 L2 Cache 读取（很小，会被缓存）。',
+            hbm: [], l2: true, sms: [0,1,2,3],
+            tags: ['fit-sram:SRAM/Register 就地', 'fit-cuda:CUDA Cores', 'fit-mem:Memory Bound(轻量)'],
+        },
+        {
+            title: 'Step 2: QKV Projection (GEMV)',
+            desc: 'x[1, 8192] × W_qkv[8192, 24576] → qkv[1, 24576]<br><br><strong>数据路径:</strong> W_qkv (384MB!) 从 HBM <strong>流式加载</strong>: HBM → Mem Ctrl → L2 → SM 的 SRAM → Register → <strong>Tensor Cores</strong> 计算<br><br><strong>关键:</strong> 权重只用一次就丢弃（batch=1 时）。384MB 的权重每 token 都要完整读一遍。<br>HBM 带宽 3.35TB/s → 光读权重就要 0.11ms。Tensor Cores 算力远远过剩。<br><strong>这就是 decode 阶段 memory-bound 的根源。</strong>',
+            hbm: ['fhbm-wqkv'], l2: true, sms: 'all',
+            tags: ['fit-hbm:HBM 384MB 流式读取', 'fit-tc:Tensor Cores GEMV', 'fit-mem:严重 Memory Bound'],
+        },
+        {
+            title: 'Step 3: RoPE + KV Cache 写入',
+            desc: 'Q 和 K 向量应用旋转位置编码 (逐元素 cos/sin 旋转)，然后把 K、V 追加到 HBM 中的 KV Cache。<br><br><strong>RoPE:</strong> cos/sin 表从 L2 Cache 读取 → CUDA Cores 逐元素计算 → 结果留在 Register<br><strong>KV Cache 写入:</strong> 新的 K[1,8,128]、V[1,8,128] 从 SM → L2 → HBM 写入 KV Cache 表尾<br>写入量很小 (4KB)，但后面<strong>读取历史 KV</strong>时就大了。',
+            hbm: ['fhbm-kv'], l2: true, sms: [0,1,2,3,4,5],
+            tags: ['fit-l2:L2 Cache (RoPE表)', 'fit-cuda:CUDA Cores (RoPE)', 'fit-hbm:HBM Write (KV)'],
+        },
+        {
+            title: 'Step 4: Attention (Flash Decoding)',
+            desc: 'Q[1,64heads,128] 与所有历史 K、V 计算注意力。<br><br><strong>数据路径 (Flash Decoding):</strong><br>1. 从 HBM <strong>分块</strong>加载 K_cache 和 V_cache 到 SM 的 <strong>SRAM</strong> (每次一个 block)<br>2. 在 SRAM 中: Tensor Cores 算 Q×K<sup>T</sup> → CUDA Cores 做 online softmax (维护 running max)<br>3. Tensor Cores 算 softmax_score × V_block → 累加到 Register 中的 partial output<br>4. 加载下一个 block，重复直到处理完所有历史 token<br><br><strong>精髓:</strong> 全程 score 矩阵不写回 HBM！只读一次 KV，输出一个向量。<br>seq=4096 时，KV 读取 ~16MB/层 → 这也是 memory-bound 的。',
+            hbm: ['fhbm-kv'], l2: true, sms: 'all',
+            tags: ['fit-hbm:HBM 读 KV Cache', 'fit-sram:SRAM 驻留计算!', 'fit-tc:Tensor Cores (QK,×V)', 'fit-cuda:CUDA (softmax)'],
+        },
+        {
+            title: 'Step 5: Output Projection (O_proj)',
+            desc: 'attn_output[1, 8192] × W_o[8192, 8192] → [1, 8192]<br><br><strong>数据路径:</strong> 又一次 GEMV。W_o (128MB) 从 HBM 流式读入 → Tensor Cores 计算。<br>模式和 Step 2 完全相同：权重远大于激活值 → memory-bound。',
+            hbm: ['fhbm-wo'], l2: false, sms: 'all',
+            tags: ['fit-hbm:HBM 128MB Read', 'fit-tc:Tensor Cores GEMV', 'fit-mem:Memory Bound'],
+        },
+        {
+            title: 'Step 6: Residual + RMSNorm (Fused Kernel)',
+            desc: 'output = x + attn_out，然后 RMSNorm 归一化进入 FFN。<br><br><strong>数据路径:</strong> residual 从 HBM 读回 → 在 SM 中与 attn_out 相加 → 就地做 RMSNorm → 写回 HBM<br><strong>优化:</strong> 融合为 1 个 kernel (fused add+norm)，避免多次 HBM 读写。只需读 2 × 16KB，写 16KB。<br>计算量极小但仍是 memory-bound（受 kernel launch overhead 和带宽限制）。',
+            hbm: [], l2: false, sms: [0,1,2,3],
+            tags: ['fit-cuda:CUDA Cores (add+norm)', 'fit-hbm:HBM 读写 48KB', 'fit-mem:Memory Bound (轻量)'],
+        },
+        {
+            title: 'Step 7: FFN — Gate + Up Projection (SwiGLU)',
+            desc: 'gate = x × W_gate, up = x × W_up, hidden = SiLU(gate) ⊙ up<br><br><strong>数据路径:</strong> W_gate (448MB) + W_up (448MB) = <strong>896MB 从 HBM 流式读取</strong>!<br>→ Tensor Cores 并行算两个 GEMV<br>→ CUDA Cores 做 SiLU 激活 + 逐元素乘<br><br>这是<strong>整个推理过程中最大的一次权重读取</strong>。<br>中间结果 [1, 28672] 留在 Register/SRAM 中，不写回 HBM。',
+            hbm: ['fhbm-wg', 'fhbm-wu'], l2: false, sms: 'all',
+            tags: ['fit-hbm:HBM 896MB!! 流式读取', 'fit-tc:Tensor Cores ×2 GEMV', 'fit-cuda:CUDA (SiLU+mul)', 'fit-mem:极端 Memory Bound'],
+        },
+        {
+            title: 'Step 8: FFN — Down Projection',
+            desc: 'output = hidden[1, 28672] × W_down[28672, 8192] → [1, 8192]<br><br><strong>数据路径:</strong> W_down (448MB) 从 HBM 流式读取 → Tensor Cores GEMV。<br>一层 FFN 的总权重读取: 896 + 448 = 1.34 GB!<br><br>加上 Attention 的权重 (384 + 128 = 512MB)，<strong>单层总计 ~1.86GB 权重读取</strong>。<br>70B 模型 80 层 → 每 token 需读 ~148GB 权重。',
+            hbm: ['fhbm-wd'], l2: false, sms: 'all',
+            tags: ['fit-hbm:HBM 448MB Read', 'fit-tc:Tensor Cores GEMV', 'fit-mem:Memory Bound'],
+        },
+        {
+            title: 'Step 9: Residual + 重复 × 80 层',
+            desc: 'FFN 输出加回残差 → 进入下一层的 RMSNorm (回到 Step 1)。<br><br><strong>80 层循环:</strong> Step 1-9 重复 80 次。每次都要从 HBM 读取该层的权重和 KV Cache。<br><br><strong>总数据移动:</strong><br>• 权重: 1.86GB × 80 = <strong>148GB</strong><br>• KV Cache (seq=4096): ~16MB × 80 = 1.28GB<br>• 总计: ~150GB / token<br>• H100 理论耗时: 150GB ÷ 3.35TB/s ≈ <strong>45ms</strong><br>• 实际: ~55-70ms (有各种 overhead)',
+            hbm: [], l2: false, sms: [0,1,2,3],
+            tags: ['fit-cuda:CUDA (add)', 'fit-hbm:× 80 层循环!'],
+        },
+        {
+            title: 'Step 10: LM Head + Sampling → 输出 Token',
+            desc: '最后一层输出过 RMSNorm → LM Head (W_lm[8192, 32000], 500MB) → logits[32000]<br>→ temperature scaling → top-p/top-k → softmax → <strong>采样出 1 个 token ID</strong><br><br><strong>数据路径:</strong> W_lm 从 HBM 读取 → Tensor Cores GEMV → CUDA Cores softmax + sample<br>最终输出: <strong>1 个整数 (next_token_id)</strong> — 这就是你看到的"一个字一个字冒出来"。<br><br>然后这个 token 重新进入 Step 0 → 开始下一轮 decode。',
+            hbm: ['fhbm-lm'], l2: false, sms: 'all',
+            tags: ['fit-hbm:HBM 500MB Read', 'fit-tc:Tensor Cores', 'fit-cuda:CUDA (sample)', 'fit-comp:输出 1 个 int!'],
+        },
+    ];
+
+    let current = -1;
+    let running = false;
+    let timer = null;
+
+    function clearFlow() {
+        document.querySelectorAll('.flow-hbm-block').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.flow-sm').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.flow-l2').forEach(e => e.classList.remove('active'));
+    }
+
+    function showStep(idx) {
+        clearFlow();
+        if (idx < 0 || idx >= steps.length) return;
+        const s = steps[idx];
+        s.hbm.forEach(id => document.getElementById(id)?.classList.add('active'));
+        if (s.l2) {
+            document.getElementById('flow-l2')?.classList.add('active');
+            document.getElementById('flow-l2-2')?.classList.add('active');
+        }
+        if (s.sms === 'all') {
+            document.querySelectorAll('.flow-sm').forEach(e => e.classList.add('active'));
+        } else {
+            s.sms.forEach(i => document.getElementById(`fsm-${i}`)?.classList.add('active'));
+        }
+        document.getElementById('flow-title').innerHTML = s.title;
+        document.getElementById('flow-desc').innerHTML = s.desc;
+        let tagsHtml = '';
+        s.tags.forEach(t => {
+            const [cls, label] = t.split(':');
+            tagsHtml += `<span class="flow-info-tag ${cls}">${label}</span>`;
+        });
+        document.getElementById('flow-tags').innerHTML = tagsHtml;
+        document.getElementById('fl-progress').textContent = `${idx + 1} / ${steps.length}`;
+    }
+
+    window.flStep = function() {
+        running = false; clearTimeout(timer);
+        if (current >= steps.length - 1) return;
+        current++;
+        showStep(current);
+    };
+    window.flBack = function() {
+        running = false; clearTimeout(timer);
+        if (current <= 0) return;
+        current--;
+        showStep(current);
+    };
+    window.flPlay = function() {
+        if (running) { running = false; clearTimeout(timer); document.getElementById('fl-play').textContent = '▶ 播放'; return; }
+        if (current >= steps.length - 1) { current = -1; }
+        running = true;
+        document.getElementById('fl-play').textContent = '⏸ 暂停';
+        function tick() {
+            if (!running) return;
+            current++;
+            if (current >= steps.length) { running = false; document.getElementById('fl-play').textContent = '▶ 播放'; return; }
+            showStep(current);
+            timer = setTimeout(tick, 3500);
+        }
+        tick();
+    };
+    window.flReset = function() {
+        running = false; clearTimeout(timer); current = -1;
+        clearFlow();
+        document.getElementById('fl-play').textContent = '▶ 播放';
+        document.getElementById('flow-title').innerHTML = '准备就绪';
+        document.getElementById('flow-desc').innerHTML = '点击「下一步」观察 token 在 GPU 内部的数据流动。';
+        document.getElementById('flow-tags').innerHTML = '';
+        document.getElementById('fl-progress').textContent = '0 / 11';
+    };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diffusion LLM Token Denoising</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.interactive-container { background: #1a1a2e; border-radius: 12px; border: 1px solid #444; padding: 24px; margin: 0; position: relative; overflow: hidden; }
+.interactive-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #00d4aa, #0088ff); }
+.interactive-title { font-size: 1.1rem; color: #00d4aa; margin-bottom: 15px; font-weight: 600; }
+.diffusion-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin: 15px 0; }
+.diffusion-token { background: #16213e; border: 1px solid #333; border-radius: 6px; padding: 8px 4px; text-align: center; font-size: 0.75rem; min-height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.5s; }
+.diffusion-token.noisy { color: #666; border-color: #444; }
+.diffusion-token.partial { color: #0088ff; border-color: #0066cc; background: #1a2a4e; }
+.diffusion-token.clean { color: #00d4aa; border-color: #00d4aa; background: #1a2e2a; }
+.diffusion-controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+.diffusion-controls button { background: linear-gradient(135deg, #00d4aa, #0088ff); border: none; border-radius: 6px; padding: 8px 16px; color: #fff; cursor: pointer; font-weight: 600; }
+.step-indicator { color: #aaa; font-size: 0.9rem; }
+@media (max-width: 768px) { .diffusion-grid { grid-template-columns: repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="interactive-container">
+<div class="interactive-title">Interactive: Diffusion LLM Token Denoising</div>
+<p style="font-size:0.85rem; color:#888; margin-bottom:10px;">观察 tokens 如何从随机 mask 逐步被 "去噪" 为连贯文本 (Block-Parallel Decoding)</p>
+<div class="diffusion-grid" id="diffusionGrid"></div>
+<div class="diffusion-controls">
+  <button onclick="startDiffusion()">Start Denoising</button>
+  <button onclick="resetDiffusion()" style="background:#16213e; border:1px solid #444;">Reset</button>
+  <span class="step-indicator">Step: <span id="diffusionStep">0</span> / <span id="diffusionTotal">8</span></span>
+</div>
+<p style="font-size:0.8rem; color:#666; margin-top:8px; text-align:center;">每步可并行恢复多个 token，不同于 AR 的逐个生成</p>
+</div>
+
+<script>
+// ==================== Diffusion LLM Animation ====================
+const targetSentence = ['机器', '学习', '系统', '需要', '高效', '的', '推理', '优化',
+                        '通过', '并行', '计算', '来', '加速', '模型', '训练', '过程'];
+const noiseChars = ['▓', '░', '▒', '█', '◆', '◇', '●', '○', '△', '□', '■', '◎', '※', '⊕', '⊗', '⊙'];
+let diffusionStep = 0;
+let diffusionInterval = null;
+const totalSteps = 8;
+
+function initDiffusionGrid() {
+    const grid = document.getElementById('diffusionGrid');
+    grid.innerHTML = '';
+    for (let i = 0; i < 16; i++) {
+        const token = document.createElement('div');
+        token.className = 'diffusion-token noisy';
+        token.textContent = noiseChars[Math.floor(Math.random() * noiseChars.length)];
+        token.id = `dtoken-${i}`;
+        grid.appendChild(token);
+    }
+    diffusionStep = 0;
+    document.getElementById('diffusionStep').textContent = '0';
+}
+
+function startDiffusion() {
+    if (diffusionInterval) return;
+    if (diffusionStep >= totalSteps) resetDiffusion();
+
+    diffusionInterval = setInterval(() => {
+        diffusionStep++;
+        document.getElementById('diffusionStep').textContent = diffusionStep;
+
+        // Each step reveals ~2 tokens (block-parallel)
+        const revealCount = 2;
+        const unrevealed = [];
+        for (let i = 0; i < 16; i++) {
+            const el = document.getElementById(`dtoken-${i}`);
+            if (el.className.includes('noisy') || el.className.includes('partial')) {
+                unrevealed.push(i);
+            }
+        }
+
+        // Shuffle and pick tokens to reveal/partially reveal
+        const shuffled = unrevealed.sort(() => Math.random() - 0.5);
+
+        for (let j = 0; j < Math.min(revealCount, shuffled.length); j++) {
+            const idx = shuffled[j];
+            const el = document.getElementById(`dtoken-${idx}`);
+            if (el.className.includes('noisy')) {
+                el.className = 'diffusion-token partial';
+                el.textContent = targetSentence[idx].charAt(0) + '?';
+            } else if (el.className.includes('partial')) {
+                el.className = 'diffusion-token clean';
+                el.textContent = targetSentence[idx];
+            }
+        }
+
+        // Also advance some partial to clean
+        for (let j = revealCount; j < Math.min(revealCount + 1, shuffled.length); j++) {
+            const idx = shuffled[j];
+            const el = document.getElementById(`dtoken-${idx}`);
+            if (el.className.includes('partial')) {
+                el.className = 'diffusion-token clean';
+                el.textContent = targetSentence[idx];
+            }
+        }
+
+        if (diffusionStep >= totalSteps) {
+            // Reveal all remaining
+            for (let i = 0; i < 16; i++) {
+                const el = document.getElementById(`dtoken-${i}`);
+                el.className = 'diffusion-token clean';
+                el.textContent = targetSentence[i];
+            }
+            clearInterval(diffusionInterval);
+            diffusionInterval = null;
+        }
+    }, 600);
+}
+
+function resetDiffusion() {
+    if (diffusionInterval) {
+        clearInterval(diffusionInterval);
+        diffusionInterval = null;
+    }
+    initDiffusionGrid();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    initDiffusionGrid();
+});
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

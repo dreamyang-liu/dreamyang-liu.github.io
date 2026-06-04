@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSDP 内存计算器</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.calculator {
+  background: #12121f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 20px 0;
+}
+.slider-group {
+  margin: 20px 0;
+}
+.slider-group label {
+  display: block;
+  color: #a78bfa;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.slider-group input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 3px;
+  outline: none;
+}
+.slider-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  cursor: pointer;
+}
+.slider-value {
+  color: #667eea;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-left: 10px;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+.result-card {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+}
+.result-card .stage-label {
+  color: #888;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+.result-card .mem-value {
+  font-size: 1.5em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.result-card .mem-detail {
+  color: #888;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+</style>
+</head>
+<body>
+
+<div class="calculator" id="fsdpCalc">
+  <div class="slider-group">
+    <label>模型参数量 (Billions): <span class="slider-value" id="paramDisplay">7</span>B</label>
+    <input type="range" id="paramSlider" min="1" max="175" value="7" oninput="updateFSDP()">
+  </div>
+  <div class="slider-group">
+    <label>GPU 数量: <span class="slider-value" id="gpuDisplay">8</span></label>
+    <input type="range" id="gpuSlider" min="1" max="128" value="8" oninput="updateFSDP()">
+  </div>
+  <div class="slider-group">
+    <label>单卡显存 (GB): <span class="slider-value" id="memDisplay">80</span> GB</label>
+    <input type="range" id="memSlider" min="16" max="80" value="80" step="8" oninput="updateFSDP()">
+  </div>
+
+  <div class="result-grid" id="fsdpResults">
+    <div class="result-card">
+      <div class="stage-label">无优化 (DDP)</div>
+      <div class="mem-value" id="memDDP">112.0 GB</div>
+      <div class="mem-detail" id="detailDDP">超出显存</div>
+    </div>
+    <div class="result-card">
+      <div class="stage-label">ZeRO Stage 1</div>
+      <div class="mem-value" id="memS1">40.5 GB</div>
+      <div class="mem-detail" id="detailS1">可放入</div>
+    </div>
+    <div class="result-card">
+      <div class="stage-label">ZeRO Stage 2</div>
+      <div class="mem-value" id="memS2">26.3 GB</div>
+      <div class="mem-detail" id="detailS2">可放入</div>
+    </div>
+    <div class="result-card">
+      <div class="stage-label">ZeRO Stage 3</div>
+      <div class="mem-value" id="memS3">14.0 GB</div>
+      <div class="mem-detail" id="detailS3">可放入</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateFSDP() {
+  const params = parseFloat(document.getElementById('paramSlider').value);
+  const gpus = parseInt(document.getElementById('gpuSlider').value);
+  const memLimit = parseInt(document.getElementById('memSlider').value);
+
+  document.getElementById('paramDisplay').textContent = params;
+  document.getElementById('gpuDisplay').textContent = gpus;
+  document.getElementById('memDisplay').textContent = memLimit;
+
+  // Memory in GB (params in billions, 16 bytes per param for mixed precision + Adam)
+  const phi = params; // billions
+  const bytesPerParam = 16; // total for mixed precision training
+  const totalMemGB = phi * bytesPerParam; // GB (since 1B params * 16 bytes = 16 GB)
+
+  // DDP: full replication
+  const memDDP = totalMemGB;
+
+  // Stage 1: shard optimizer states (12 bytes/param sharded, 4 bytes/param replicated)
+  const memS1 = phi * 4 + (phi * 12) / gpus;
+
+  // Stage 2: shard optimizer + gradients
+  const memS2 = phi * 2 + (phi * 14) / gpus;
+
+  // Stage 3: shard everything
+  const memS3 = totalMemGB / gpus;
+
+  document.getElementById('memDDP').textContent = memDDP.toFixed(1) + ' GB';
+  document.getElementById('memS1').textContent = memS1.toFixed(1) + ' GB';
+  document.getElementById('memS2').textContent = memS2.toFixed(1) + ' GB';
+  document.getElementById('memS3').textContent = memS3.toFixed(1) + ' GB';
+
+  // Status indicators
+  function setStatus(id, mem) {
+    const el = document.getElementById(id);
+    if (mem > memLimit) {
+      el.textContent = '超出显存 (' + ((mem/memLimit)*100).toFixed(0) + '%)';
+      el.style.color = '#f44336';
+    } else {
+      el.textContent = '可放入 (' + ((mem/memLimit)*100).toFixed(0) + '%)';
+      el.style.color = '#4caf50';
+    }
+  }
+
+  setStatus('detailDDP', memDDP);
+  setStatus('detailS1', memS1);
+  setStatus('detailS2', memS2);
+  setStatus('detailS3', memS3);
+}
+
+// Initialize calculator
+updateFSDP();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

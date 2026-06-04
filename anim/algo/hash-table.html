@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>两数之和过程</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; margin: 0; border: 1px solid #333; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #00d4aa; }
+
+.array-cell { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: #1a1a2e; border: 2px solid #444; border-radius: 8px; font-family: monospace; font-size: 1.1rem; font-weight: bold; margin: 4px; transition: all 0.4s ease; }
+.array-cell.current { border-color: #76b900; background: #2a3a1e; box-shadow: 0 0 12px rgba(118,185,0,0.4); }
+.array-cell.found { border-color: #00d4aa; background: #1a3a3e; box-shadow: 0 0 12px rgba(0,212,170,0.4); }
+.array-cell.paired { background: #00d4aa; color: #000; border-color: #00d4aa; animation: pairPulse 0.6s ease; }
+
+.dict-container { margin: 16px 0; padding: 12px; background: #1a1a2e; border-radius: 8px; border: 1px solid #333; min-height: 50px; }
+.dict-entry { display: inline-block; background: #0a0a1a; border: 1px solid #76b900; border-radius: 6px; padding: 4px 10px; margin: 4px; font-family: monospace; font-size: 0.85rem; transition: all 0.3s ease; }
+.dict-entry.highlight { background: #76b900; color: #000; font-weight: bold; }
+.dict-entry.match { background: #00d4aa; color: #000; font-weight: bold; animation: pairPulse 0.6s ease; }
+
+@keyframes pairPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+@media (max-width: 600px) {
+  .array-cell { width: 38px; height: 38px; font-size: 0.9rem; }
+  .controls { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<div class="animation-container">
+<p style="margin-bottom:8px; color:#888;">数组 <code>[2, 7, 11, 15]</code>，target = <code>9</code></p>
+<div class="controls">
+  <button class="btn" onclick="startTwoSum()">开始演示</button>
+  <button class="btn btn-secondary" onclick="nextStep()">下一步</button>
+  <button class="btn btn-secondary" onclick="resetTwoSum()">重置</button>
+</div>
+
+<div style="margin: 16px 0;">
+  <p style="font-size:0.85rem; color:#888; margin-bottom:8px;">数组：</p>
+  <div id="array-display"></div>
+</div>
+
+<div>
+  <p style="font-size:0.85rem; color:#888; margin-bottom:8px;">seen 字典：</p>
+  <div class="dict-container" id="dict-display">
+    <span style="color:#555; font-style:italic;">空</span>
+  </div>
+</div>
+
+<div class="step-info" id="twosum-step-info">点击"开始演示"查看两数之和的查找过程</div>
+</div>
+
+<script>
+// Two Sum Animation
+const nums = [2, 7, 11, 15];
+const target = 9;
+let currentStep = -1;
+let autoMode = false;
+
+const steps = [
+  { idx: 0, action: 'check', desc: '遍历 i=0, x=2。查找 target-x = 9-2 = 7，seen 中没有 7' },
+  { idx: 0, action: 'store', desc: '存入 seen[2] = 0' },
+  { idx: 1, action: 'check', desc: '遍历 i=1, x=7。查找 target-x = 9-7 = 2，seen 中有 2！' },
+  { idx: 1, action: 'found', desc: '找到配对！seen[2]=0, 当前i=1。返回 [0, 1]' },
+];
+
+function renderArray(highlightIdx = -1, pairedIndices = []) {
+  const container = document.getElementById('array-display');
+  container.innerHTML = '';
+  nums.forEach((n, i) => {
+    const cell = document.createElement('span');
+    cell.className = 'array-cell';
+    if (pairedIndices.includes(i)) cell.className += ' paired';
+    else if (i === highlightIdx) cell.className += ' current';
+    cell.textContent = n;
+    container.appendChild(cell);
+  });
+}
+
+function renderDict(entries, highlightKey = null, matchKey = null) {
+  const container = document.getElementById('dict-display');
+  if (entries.length === 0) {
+    container.innerHTML = '<span style="color:#555; font-style:italic;">空</span>';
+    return;
+  }
+  container.innerHTML = '';
+  entries.forEach(([k, v]) => {
+    const el = document.createElement('span');
+    el.className = 'dict-entry';
+    if (k === matchKey) el.className += ' match';
+    else if (k === highlightKey) el.className += ' highlight';
+    el.textContent = `${k}: ${v}`;
+    container.appendChild(el);
+  });
+}
+
+function resetTwoSum() {
+  currentStep = -1;
+  autoMode = false;
+  renderArray();
+  renderDict([]);
+  document.getElementById('twosum-step-info').textContent = '点击"开始演示"查看两数之和的查找过程';
+}
+
+function startTwoSum() {
+  resetTwoSum();
+  autoMode = true;
+  currentStep = -1;
+  autoNext();
+}
+
+function autoNext() {
+  if (!autoMode) return;
+  if (currentStep >= steps.length - 1) { autoMode = false; return; }
+  nextStep();
+  if (currentStep < steps.length - 1) {
+    setTimeout(autoNext, 1800);
+  } else {
+    autoMode = false;
+  }
+}
+
+function nextStep() {
+  currentStep++;
+  if (currentStep >= steps.length) { currentStep = steps.length - 1; return; }
+
+  const step = steps[currentStep];
+  const info = document.getElementById('twosum-step-info');
+  info.textContent = step.desc;
+
+  // Build current seen state
+  const seen = [];
+  for (let i = 0; i <= currentStep; i++) {
+    if (steps[i].action === 'store') {
+      seen.push([nums[steps[i].idx], steps[i].idx]);
+    }
+  }
+
+  if (step.action === 'check') {
+    renderArray(step.idx);
+    renderDict(seen);
+  } else if (step.action === 'store') {
+    renderArray(step.idx);
+    renderDict(seen, nums[step.idx]);
+  } else if (step.action === 'found') {
+    renderArray(-1, [0, 1]);
+    renderDict(seen, null, 2);
+  }
+}
+
+// Initialize
+renderArray();
+renderDict([]);
+
+// 自动把高度汇报给父页面
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

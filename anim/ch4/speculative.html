@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speculative Decoding 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-container { background: #12122a; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 4px 0; position: relative; overflow: hidden; min-height: 200px; }
+.anim-label { position: absolute; top: 10px; right: 15px; font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+.spec-container { padding: 20px 10px; }
+.spec-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+.spec-token { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 0.85em; transition: all 0.3s; opacity: 0; transform: translateY(10px); }
+.spec-token.draft { background: #2a4a6a; border: 1px solid #4a8abf; color: #7dd3fc; }
+.spec-token.accepted { background: #2a4a2a; border: 1px solid #4a9f4a; color: #7dfc7d; }
+.spec-token.rejected { background: #4a2a2a; border: 1px solid #9f4a4a; color: #fc7d7d; text-decoration: line-through; }
+.spec-token.verified { background: #4a4a2a; border: 1px solid #9f9f4a; color: #fcfc7d; }
+.spec-token.visible { opacity: 1; transform: translateY(0); }
+.spec-label { font-size: 0.75em; color: #888; min-width: 80px; }
+.btn { background: linear-gradient(135deg, #ff9800, #e68900); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; margin: 5px; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
+.btn:active { transform: translateY(0); }
+.btn.secondary { background: linear-gradient(135deg, #555, #444); }
+</style>
+</head>
+<body>
+
+<div class="anim-container" id="spec-anim">
+<span class="anim-label">Speculative Decoding Animation</span>
+<div class="spec-container">
+<div class="spec-row">
+<span class="spec-label">Draft Model:</span>
+<span class="spec-token draft" id="spec-d0">The</span>
+<span class="spec-token draft" id="spec-d1">cat</span>
+<span class="spec-token draft" id="spec-d2">sat</span>
+<span class="spec-token draft" id="spec-d3">on</span>
+<span class="spec-token draft" id="spec-d4">the</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">Verification:</span>
+<span class="spec-token" id="spec-v0">The</span>
+<span class="spec-token" id="spec-v1">cat</span>
+<span class="spec-token" id="spec-v2">sat</span>
+<span class="spec-token" id="spec-v3">upon</span>
+<span class="spec-token" id="spec-v4">-</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">结果:</span>
+<span class="spec-token" id="spec-r0">-</span>
+<span class="spec-token" id="spec-r1">-</span>
+<span class="spec-token" id="spec-r2">-</span>
+<span class="spec-token" id="spec-r3">-</span>
+<span class="spec-token" id="spec-r4">-</span>
+</div>
+<div id="spec-summary" style="margin-top:15px; font-size:0.9em; color:#aaa;"></div>
+</div>
+<div style="text-align:center;">
+<button class="btn" onclick="startSpecAnim()">播放动画</button>
+<button class="btn secondary" onclick="resetSpecAnim()">重置</button>
+</div>
+</div>
+
+<script>
+// ==================== Speculative Decoding Animation ====================
+let specTimeout = null;
+function startSpecAnim() {
+    resetSpecAnim();
+    const draftTokens = ['The', 'cat', 'sat', 'on', 'the'];
+    const verifyResults = ['accepted', 'accepted', 'accepted', 'rejected', ''];
+    const verifyTokens = ['The', 'cat', 'sat', 'upon', ''];
+    const finalResults = ['accepted', 'accepted', 'accepted', 'rejected', 'skipped'];
+    const finalTokens = ['The', 'cat', 'sat', 'upon', ''];
+
+    let step = 0;
+    function animStep() {
+        if (step < 5) {
+            // Show draft tokens appearing
+            const dEl = document.getElementById(`spec-d${step}`);
+            dEl.classList.add('visible');
+            step++;
+            specTimeout = setTimeout(animStep, 400);
+        } else if (step < 10) {
+            // Show verification
+            const i = step - 5;
+            const vEl = document.getElementById(`spec-v${i}`);
+            vEl.textContent = verifyTokens[i] || '-';
+            if (verifyResults[i] === 'accepted') {
+                vEl.className = 'spec-token accepted visible';
+            } else if (verifyResults[i] === 'rejected') {
+                vEl.className = 'spec-token rejected visible';
+            } else {
+                vEl.className = 'spec-token visible';
+                vEl.style.opacity = '0.3';
+            }
+            step++;
+            specTimeout = setTimeout(animStep, 500);
+        } else if (step < 15) {
+            // Show final result
+            const i = step - 10;
+            const rEl = document.getElementById(`spec-r${i}`);
+            if (finalResults[i] === 'accepted') {
+                rEl.textContent = '✓ Accept';
+                rEl.className = 'spec-token accepted visible';
+            } else if (finalResults[i] === 'rejected') {
+                rEl.textContent = '✗ Reject → "upon"';
+                rEl.className = 'spec-token rejected visible';
+            } else {
+                rEl.textContent = '- Skip';
+                rEl.className = 'spec-token visible';
+                rEl.style.opacity = '0.4';
+            }
+            step++;
+            specTimeout = setTimeout(animStep, 400);
+        } else {
+            document.getElementById('spec-summary').innerHTML =
+                'Result: 接受了 3/5 个 draft tokens + 1 个修正 token = <strong style="color:#ffd700;">4 tokens in 1 verification pass</strong><br>' +
+                'Acceptance rate: 60% | 加速效果: 从 4 次 target forward 降到 1 次';
+        }
+    }
+    animStep();
+}
+
+function resetSpecAnim() {
+    if (specTimeout) clearTimeout(specTimeout);
+    specTimeout = null;
+    for (let i = 0; i < 5; i++) {
+        const dEl = document.getElementById(`spec-d${i}`);
+        dEl.className = 'spec-token draft';
+        const vEl = document.getElementById(`spec-v${i}`);
+        vEl.className = 'spec-token';
+        vEl.textContent = '-';
+        vEl.style.opacity = '';
+        const rEl = document.getElementById(`spec-r${i}`);
+        rEl.className = 'spec-token';
+        rEl.textContent = '-';
+        rEl.style.opacity = '';
+    }
+    document.getElementById('spec-summary').innerHTML = '';
+}
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

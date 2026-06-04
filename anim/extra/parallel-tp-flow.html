@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TP MLP Flow</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.diagram { background: #12121f; border-radius: 12px; padding: 20px; margin: 10px 0; overflow-x: auto; border: 1px solid #2a2a4a; }
+.anim-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.anim-btn { background: #667eea; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; transition: background 0.2s; }
+.anim-btn:hover { background: #764ba2; }
+.anim-btn.danger { background: #e85d75; }
+.anim-btn.danger:hover { background: #c94060; }
+.anim-status { text-align: center; margin-top: 12px; font-size: 0.9em; color: #f4a460; min-height: 1.5em; }
+
+.tp-flow { display: flex; flex-direction: column; gap: 0; align-items: center; padding: 10px 0; }
+.tp-flow-row { display: flex; gap: 30px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 10px 0; }
+.tp-flow-block { padding: 14px 20px; border-radius: 10px; text-align: center; font-size: 0.85em; font-weight: bold; min-width: 160px; transition: all 0.6s ease; opacity: 0.3; border: 2px solid transparent; }
+.tp-flow-block.active { opacity: 1; transform: scale(1.05); }
+.tp-flow-block.gpu0 { background: rgba(74,144,217,0.15); border-color: #4a90d9; color: #7bb8eb; }
+.tp-flow-block.gpu0.active { background: rgba(74,144,217,0.35); box-shadow: 0 0 15px rgba(74,144,217,0.4); }
+.tp-flow-block.gpu1 { background: rgba(232,93,117,0.15); border-color: #e85d75; color: #f0a0b0; }
+.tp-flow-block.gpu1.active { background: rgba(232,93,117,0.35); box-shadow: 0 0 15px rgba(232,93,117,0.4); }
+.tp-flow-block.shared { background: rgba(102,126,234,0.15); border-color: #667eea; color: #a0b0f0; }
+.tp-flow-block.shared.active { background: rgba(102,126,234,0.35); box-shadow: 0 0 15px rgba(102,126,234,0.4); }
+.tp-flow-block.comm { background: rgba(80,200,120,0.15); border-color: #50c878; color: #7ddf9b; }
+.tp-flow-block.comm.active { background: rgba(80,200,120,0.35); box-shadow: 0 0 15px rgba(80,200,120,0.4); }
+.tp-flow-block.nocomm { background: rgba(244,164,96,0.15); border-color: #f4a460; color: #f4c89a; }
+.tp-flow-block.nocomm.active { background: rgba(244,164,96,0.35); box-shadow: 0 0 15px rgba(244,164,96,0.4); }
+.tp-flow-arrow { color: #667eea; font-size: 1.2em; padding: 4px 0; opacity: 0.4; transition: opacity 0.4s; }
+.tp-flow-arrow.active { opacity: 1; }
+.tp-flow-explain { text-align: center; margin-top: 14px; padding: 14px; background: #1e1e3a; border-radius: 6px; font-size: 0.9em; color: #e0e0e0; min-height: 52px; line-height: 1.5; }
+.tp-flow-data { font-size: 0.75em; color: #888; margin-top: 4px; }
+.tp-flow-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7em; margin-top: 4px; }
+.tp-flow-badge.no-comm { background: rgba(80,200,120,0.3); color: #50c878; }
+.tp-flow-badge.has-comm { background: rgba(244,164,96,0.3); color: #f4a460; }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+    <h3 style="text-align:center; margin-bottom:10px; color:#4a90d9;">交互动画：完整 MLP 层的 TP 计算流程（Megatron-LM 风格）</h3>
+    <p style="text-align:center; color:#888; font-size:0.85em; margin-bottom:20px;">
+        Column Parallel → GeLU（无通信）→ Row Parallel → AllReduce（唯一通信点）
+    </p>
+    <div class="tp-flow" id="tp-flow-diagram">
+        <div class="tp-flow-row">
+            <div class="tp-flow-block shared" id="tpf-input">
+                X (输入)<br>
+                <span class="tp-flow-data">[batch, seq, d]</span>
+            </div>
+        </div>
+        <div class="tp-flow-arrow" id="tpf-arr0">↓ 广播到每张卡（f 算子: identity forward, AllReduce backward）</div>
+
+        <div class="tp-flow-row">
+            <div class="tp-flow-block gpu0" id="tpf-col0">
+                X × W₁<sup>col</sup><br>
+                <span class="tp-flow-data">[d, d/2] → Y₁ [batch, seq, d/2]</span><br>
+                <span class="tp-flow-badge no-comm">GPU 0 独立计算</span>
+            </div>
+            <div class="tp-flow-block gpu1" id="tpf-col1">
+                X × W₂<sup>col</sup><br>
+                <span class="tp-flow-data">[d, d/2] → Y₂ [batch, seq, d/2]</span><br>
+                <span class="tp-flow-badge no-comm">GPU 1 独立计算</span>
+            </div>
+        </div>
+        <div class="tp-flow-arrow" id="tpf-arr1">↓ 无需通信！GeLU 是逐元素操作</div>
+
+        <div class="tp-flow-row">
+            <div class="tp-flow-block gpu0 nocomm" id="tpf-gelu0">
+                GeLU(Y₁)<br>
+                <span class="tp-flow-data">shape 不变 [batch, seq, d/2]</span><br>
+                <span class="tp-flow-badge no-comm">无通信！</span>
+            </div>
+            <div class="tp-flow-block gpu1 nocomm" id="tpf-gelu1">
+                GeLU(Y₂)<br>
+                <span class="tp-flow-data">shape 不变 [batch, seq, d/2]</span><br>
+                <span class="tp-flow-badge no-comm">无通信！</span>
+            </div>
+        </div>
+        <div class="tp-flow-arrow" id="tpf-arr2">↓ 关键：Row Parallel 按行切分第二个权重矩阵</div>
+
+        <div class="tp-flow-row">
+            <div class="tp-flow-block gpu0" id="tpf-row0">
+                GeLU(Y₁) × W₁<sup>row</sup><br>
+                <span class="tp-flow-data">[d/2, d] → Z₁ [batch, seq, d]</span><br>
+                <span class="tp-flow-badge no-comm">GPU 0 部分结果</span>
+            </div>
+            <div class="tp-flow-block gpu1" id="tpf-row1">
+                GeLU(Y₂) × W₂<sup>row</sup><br>
+                <span class="tp-flow-data">[d/2, d] → Z₂ [batch, seq, d]</span><br>
+                <span class="tp-flow-badge no-comm">GPU 1 部分结果</span>
+            </div>
+        </div>
+        <div class="tp-flow-arrow" id="tpf-arr3">↓ AllReduce（g 算子: AllReduce forward, identity backward）</div>
+
+        <div class="tp-flow-row">
+            <div class="tp-flow-block comm" id="tpf-allreduce">
+                Z = Z₁ + Z₂ (AllReduce)<br>
+                <span class="tp-flow-data">[batch, seq, d] — 完整输出</span><br>
+                <span class="tp-flow-badge has-comm">唯一通信点！</span>
+            </div>
+        </div>
+        <div class="tp-flow-arrow" id="tpf-arr4">↓</div>
+
+        <div class="tp-flow-row">
+            <div class="tp-flow-block shared" id="tpf-output">
+                输出 → 下一层<br>
+                <span class="tp-flow-data">[batch, seq, d]</span>
+            </div>
+        </div>
+    </div>
+    <div class="tp-flow-explain" id="tp-flow-explain">
+        点击「播放」逐步展示 MLP 在两张 GPU 上的完整计算流程
+    </div>
+    <div class="anim-controls">
+        <button class="anim-btn" onclick="tpFlowPlay()">▶ 播放</button>
+        <button class="anim-btn" onclick="tpFlowStep()">⏭ 单步</button>
+        <button class="anim-btn danger" onclick="tpFlowReset()">↺ 重置</button>
+    </div>
+    <div class="anim-status" id="tp-flow-status"></div>
+</div>
+
+<script>
+(function() {
+    const steps = [
+        {
+            activate: ['tpf-input'],
+            arrows: [],
+            explain: '<strong>输入 X [batch, seq, d]</strong> — 完整输入，每张卡都持有同一份副本<br><span style="color:#888">这就是 f 算子的 forward（identity），backward 时才做 AllReduce</span>'
+        },
+        {
+            activate: ['tpf-input','tpf-col0','tpf-col1'],
+            arrows: ['tpf-arr0'],
+            explain: '<strong>第一个 Linear: Column Parallel</strong><br>W<sup>col</sup> 按列切成两半: GPU0 拿左半 W₁[d, d/2]，GPU1 拿右半 W₂[d, d/2]<br>各自独立做矩阵乘法: Y₁ = X × W₁, Y₂ = X × W₂<br><span style="color:#50c878">两张卡并行计算，无需通信！</span>'
+        },
+        {
+            activate: ['tpf-col0','tpf-col1','tpf-gelu0','tpf-gelu1'],
+            arrows: ['tpf-arr0','tpf-arr1'],
+            explain: '<strong>GeLU 激活函数（逐元素操作）</strong><br>GeLU(Y₁) 只需要 Y₁ 本身，GeLU(Y₂) 只需要 Y₂ 本身<br><span style="color:#50c878">关键洞察：因为 Column Parallel 的输出是完整结果的不同列，GeLU 可以直接在局部结果上操作！</span><br><span style="color:#f4a460">如果用 Row Parallel 做第一层，输出是部分和，就必须先 AllReduce 再过 GeLU — 多一次通信</span>'
+        },
+        {
+            activate: ['tpf-gelu0','tpf-gelu1','tpf-row0','tpf-row1'],
+            arrows: ['tpf-arr0','tpf-arr1','tpf-arr2'],
+            explain: '<strong>第二个 Linear: Row Parallel</strong><br>W<sup>row</sup> 按行切: GPU0 拿上半 W₁[d/2, d]，GPU1 拿下半 W₂[d/2, d]<br>Z₁ = GeLU(Y₁) × W₁<sup>row</sup> → shape [batch, seq, d]<br>Z₂ = GeLU(Y₂) × W₂<sup>row</sup> → shape [batch, seq, d]<br><span style="color:#888">两个部分结果 shape 相同但值不同，需要求和</span>'
+        },
+        {
+            activate: ['tpf-row0','tpf-row1','tpf-allreduce'],
+            arrows: ['tpf-arr0','tpf-arr1','tpf-arr2','tpf-arr3'],
+            explain: '<strong style="color:#50c878">AllReduce — 整个 MLP forward 唯一的通信！</strong><br>Z = Z₁ + Z₂ (跨 GPU 求和)<br><span style="color:#888">这就是 g 算子的 forward（AllReduce），backward 时只做 identity</span><br><br><span style="color:#f4a460">为什么只需 1 次？因为 Column→Row 配对后，中间的 GeLU 天然可以在局部做，不需要额外同步！</span>'
+        },
+        {
+            activate: ['tpf-allreduce','tpf-output'],
+            arrows: ['tpf-arr0','tpf-arr1','tpf-arr2','tpf-arr3','tpf-arr4'],
+            explain: '<strong>输出完整结果 → 送入下一层</strong><br><br>总结通信开销: forward <strong>1 次 AllReduce</strong>，backward <strong>1 次 AllReduce</strong><br><span style="color:#50c878">对比朴素方案（两个 Column Parallel）: 中间需要 AllGather 拼接，多一次通信！</span><br><span style="color:#9b59b6">Megatron 的精髓: 用 Column+Row 配对消除了中间通信</span>'
+        }
+    ];
+
+    let tpStep = -1;
+    let tpRunning = false;
+    let tpTimer = null;
+
+    function clearAll() {
+        document.querySelectorAll('#tp-flow-diagram .tp-flow-block').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#tp-flow-diagram .tp-flow-arrow').forEach(a => a.classList.remove('active'));
+    }
+
+    function doStep() {
+        tpStep++;
+        if (tpStep >= steps.length) {
+            tpRunning = false;
+            document.getElementById('tp-flow-status').textContent = '完成！点击重置可重新播放';
+            return;
+        }
+
+        clearAll();
+        const s = steps[tpStep];
+        s.activate.forEach(id => document.getElementById(id)?.classList.add('active'));
+        s.arrows.forEach(id => document.getElementById(id)?.classList.add('active'));
+        document.getElementById('tp-flow-explain').innerHTML = s.explain;
+        document.getElementById('tp-flow-status').textContent = `步骤 ${tpStep+1}/${steps.length}`;
+
+        if (tpRunning) tpTimer = setTimeout(doStep, 3000);
+    }
+
+    window.tpFlowPlay = function() {
+        if (tpRunning) return;
+        if (tpStep >= steps.length - 1) tpFlowReset();
+        tpRunning = true;
+        doStep();
+    };
+    window.tpFlowStep = function() {
+        tpRunning = false;
+        clearTimeout(tpTimer);
+        if (tpStep >= steps.length - 1) { tpFlowReset(); return; }
+        doStep();
+    };
+    window.tpFlowReset = function() {
+        tpRunning = false;
+        clearTimeout(tpTimer);
+        tpStep = -1;
+        clearAll();
+        document.getElementById('tp-flow-explain').innerHTML = '点击「播放」逐步展示 MLP 在两张 GPU 上的完整计算流程';
+        document.getElementById('tp-flow-status').textContent = '';
+    };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

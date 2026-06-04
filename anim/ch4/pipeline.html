@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>请求生命周期 Pipeline</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-container { background: #12122a; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 4px 0; position: relative; overflow: hidden; min-height: 200px; }
+.anim-label { position: absolute; top: 10px; right: 15px; font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+.pipeline-stages { display: flex; align-items: center; justify-content: space-around; padding: 30px 10px; flex-wrap: wrap; gap: 10px; }
+.pipeline-stage { background: #2a2a4a; border: 2px solid #444; border-radius: 10px; padding: 15px 20px; text-align: center; min-width: 120px; transition: all 0.5s; position: relative; }
+.pipeline-stage.active { border-color: #ff9800; background: #2a2a3a; box-shadow: 0 0 20px rgba(255, 152, 0, 0.3); }
+.pipeline-arrow { color: #ff9800; font-size: 1.5em; }
+.request-token { position: absolute; width: 12px; height: 12px; background: #ffd700; border-radius: 50%; top: -6px; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s; }
+.pipeline-stage.active .request-token { opacity: 1; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.5); } }
+.btn { background: linear-gradient(135deg, #ff9800, #e68900); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; margin: 5px; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
+.btn:active { transform: translateY(0); }
+.btn.secondary { background: linear-gradient(135deg, #555, #444); }
+</style>
+</head>
+<body>
+
+<div class="anim-container" id="pipeline-anim">
+<span class="anim-label">Pipeline Animation</span>
+<div class="pipeline-stages">
+<div class="pipeline-stage" id="stage-tokenize">
+<div class="request-token"></div>
+<strong>Tokenize</strong>
+<div style="font-size:0.75em; color:#aaa; margin-top:5px;">文本 → Token IDs</div>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-stage" id="stage-schedule">
+<div class="request-token"></div>
+<strong>Schedule</strong>
+<div style="font-size:0.75em; color:#aaa; margin-top:5px;">Batch 组装</div>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-stage" id="stage-prefill">
+<div class="request-token"></div>
+<strong>Prefill</strong>
+<div style="font-size:0.75em; color:#aaa; margin-top:5px;">并行处理 prompt</div>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-stage" id="stage-decode">
+<div class="request-token"></div>
+<strong>Decode</strong>
+<div style="font-size:0.75em; color:#aaa; margin-top:5px;">逐 token 生成</div>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-stage" id="stage-detokenize">
+<div class="request-token"></div>
+<strong>Detokenize</strong>
+<div style="font-size:0.75em; color:#aaa; margin-top:5px;">Token IDs → 文本</div>
+</div>
+</div>
+<div style="text-align:center; margin-top:15px;">
+<button class="btn" onclick="startPipelineAnim()">播放动画</button>
+<button class="btn secondary" onclick="resetPipelineAnim()">重置</button>
+</div>
+</div>
+
+<script>
+// ==================== Pipeline Animation ====================
+let pipelineInterval = null;
+function startPipelineAnim() {
+    resetPipelineAnim();
+    const stages = ['stage-tokenize', 'stage-schedule', 'stage-prefill', 'stage-decode', 'stage-detokenize'];
+    let current = 0;
+    pipelineInterval = setInterval(() => {
+        stages.forEach(id => document.getElementById(id).classList.remove('active'));
+        if (current < stages.length) {
+            document.getElementById(stages[current]).classList.add('active');
+            current++;
+        } else {
+            current = 0;
+        }
+    }, 800);
+}
+
+function resetPipelineAnim() {
+    if (pipelineInterval) clearInterval(pipelineInterval);
+    pipelineInterval = null;
+    document.querySelectorAll('.pipeline-stage').forEach(s => s.classList.remove('active'));
+}
+
+// ==================== Auto-start pipeline on scroll ====================
+const pipelineObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !pipelineInterval) {
+            startPipelineAnim();
+        }
+    });
+}, { threshold: 0.5 });
+
+const pipelineEl = document.getElementById('pipeline-anim');
+if (pipelineEl) pipelineObserver.observe(pipelineEl);
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

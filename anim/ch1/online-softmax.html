@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线 Softmax 累积过程</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; padding: 4px; }
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+</style>
+</head>
+<body>
+
+<div class="animation-container" id="online-softmax-animation" style="min-height: 380px;">
+  <div class="controls">
+    <button class="btn" onclick="onlineSoftmaxDemo.next()">处理下一个块 →</button>
+    <button class="btn btn-secondary" onclick="onlineSoftmaxDemo.reset()">重置</button>
+  </div>
+  <div class="step-info" id="osm-step-info" style="font-weight: bold;">初始状态: m=-∞, l=0, O=0。4 个 KV 块待处理</div>
+
+  <div style="margin: 15px 0;">
+    <div style="font-size: 0.8rem; color: #888; margin-bottom: 6px;">Score 向量 s = [q_i × K^T] — 共 8 个值，分 4 块:</div>
+    <div id="osm-scores" style="display: flex; gap: 2px; flex-wrap: wrap;"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 15px 0;">
+    <div style="background: #0a0a1a; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 0.75rem; color: #ff9800; margin-bottom: 4px;">m (running max)</div>
+      <div id="osm-m" style="font-size: 1.4rem; font-weight: bold; color: #ff9800;">-∞</div>
+    </div>
+    <div style="background: #0a0a1a; border: 1px solid #4caf50; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 0.75rem; color: #4caf50; margin-bottom: 4px;">l (rescaled Σexp)</div>
+      <div id="osm-l" style="font-size: 1.4rem; font-weight: bold; color: #4caf50;">0</div>
+    </div>
+    <div style="background: #0a0a1a; border: 1px solid #9c27b0; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 0.75rem; color: #9c27b0; margin-bottom: 4px;">O (rescaled Σexp×v)</div>
+      <div id="osm-o" style="font-size: 1.4rem; font-weight: bold; color: #9c27b0;">[0, 0]</div>
+      <div style="font-size: 0.65rem; color: #888;">简化为 2-d</div>
+    </div>
+  </div>
+
+  <div id="osm-correction" style="background: #0a0a1a; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin: 10px 0; min-height: 60px; font-size: 0.85rem; color: #ccc;"></div>
+
+  <div id="osm-result" style="background: #1a1a2e; border: 1px solid #333; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 0.85rem; color: #888;"></div>
+</div>
+
+<script>
+// ========== Online Softmax Animation（从 ch1 原文件抽取）==========
+const onlineSoftmaxDemo = (() => {
+  const scores = [1.2, 0.5,  3.1, 0.8,  2.0, 1.5,  0.3, 0.9];
+  const values = [[1,0],[0,1],[1,1],[0.5,0.5],[0,1],[1,0],[0.5,1],[1,0.5]];
+  const blockSize = 2;
+  const numBlocks = scores.length / blockSize;
+
+  let step = 0;
+  let m = -Infinity, l = 0, O = [0, 0];
+
+  function renderScores() {
+    const container = document.getElementById('osm-scores');
+    let html = '';
+    for (let b = 0; b < numBlocks; b++) {
+      const processed = b < step;
+      const current = b === step - 1;
+      const borderColor = current ? '#76b900' : processed ? '#00d4aa' : '#444';
+      const bg = current ? '#76b90022' : processed ? '#00d4aa11' : '#1a1a2e';
+      html += `<div style="display:flex; gap:2px; padding:4px 6px; border:2px solid ${borderColor}; border-radius:6px; background:${bg};">`;
+      for (let i = 0; i < blockSize; i++) {
+        const idx = b * blockSize + i;
+        const isMax = scores[idx] === Math.max(...scores.slice(0, step * blockSize));
+        html += `<div style="width:36px; height:50px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#0a0a1a; border-radius:4px; border:1px solid ${isMax && processed ? '#ff9800' : '#333'};">
+          <div style="font-size:0.7rem; color:${processed ? '#e0e0e0' : '#555'}; font-weight:bold;">${scores[idx]}</div>
+          <div style="font-size:0.55rem; color:#888;">v=[${values[idx]}]</div>
+        </div>`;
+      }
+      html += `<div style="font-size:0.6rem; color:${borderColor}; align-self:flex-end; margin-left:2px;">块${b}</div>`;
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function render() {
+    renderScores();
+    document.getElementById('osm-m').textContent = m === -Infinity ? '-∞' : m.toFixed(2);
+    document.getElementById('osm-l').textContent = l.toFixed(4);
+    document.getElementById('osm-o').textContent = `[${O[0].toFixed(3)}, ${O[1].toFixed(3)}]`;
+
+    const info = document.getElementById('osm-step-info');
+    const corrDiv = document.getElementById('osm-correction');
+    const resultDiv = document.getElementById('osm-result');
+
+    if (step === 0) {
+      info.textContent = '初始状态: m=-∞, l=0, O=[0,0]。点击 "处理下一个块" 开始';
+      corrDiv.innerHTML = '<span style="color:#888;">等待处理第一个块...</span>';
+      resultDiv.innerHTML = '';
+    } else if (step <= numBlocks) {
+      const b = step - 1;
+      const s0 = scores[b * blockSize], s1 = scores[b * blockSize + 1];
+      const blockMax = Math.max(s0, s1);
+      info.textContent = `处理块 ${b}: scores = [${s0}, ${s1}], 块内 max = ${blockMax.toFixed(2)}`;
+
+      if (step === 1) {
+        corrDiv.innerHTML = `
+          <div style="color:#2196f3; font-weight:bold; margin-bottom:5px;">第一个块 — 无需修正 (α=1)</div>
+          <code>m_new = max(-∞, ${blockMax}) = <span style="color:#ff9800;">${m.toFixed(2)}</span></code><br>
+          <code>l = exp(${s0}-${m.toFixed(2)}) + exp(${s1}-${m.toFixed(2)}) = <span style="color:#4caf50;">${l.toFixed(4)}</span></code><br>
+          <code>O = exp(${s0}-${m.toFixed(2)})×v₀ + exp(${s1}-${m.toFixed(2)})×v₁ = <span style="color:#9c27b0;">[${O[0].toFixed(3)}, ${O[1].toFixed(3)}]</span></code>
+        `;
+      } else {
+        const mOld = step >= 2 ? (() => {
+          let mTemp = -Infinity;
+          for (let k = 0; k < (step - 1) * blockSize; k++) mTemp = Math.max(mTemp, scores[k]);
+          return mTemp;
+        })() : -Infinity;
+        const alpha = Math.exp(mOld - m);
+        const needsCorrection = m > mOld;
+
+        if (needsCorrection) {
+          corrDiv.innerHTML = `
+            <div style="color:#ff4444; font-weight:bold; margin-bottom:5px;">⚠️ 新 max 出现! 需要修正旧值</div>
+            <code>m_old = ${mOld.toFixed(2)} → m_new = <span style="color:#ff9800;">${m.toFixed(2)}</span> (块中有更大的 score!)</code><br>
+            <code><span style="color:#2196f3;">α</span> = exp(m_old - m_new) = exp(${mOld.toFixed(2)} - ${m.toFixed(2)}) = <span style="color:#2196f3;">${alpha.toFixed(4)}</span></code><br>
+            <code>l_new = <span style="color:#2196f3;">${alpha.toFixed(4)}</span> × l_old + new_exps = <span style="color:#4caf50;">${l.toFixed(4)}</span></code><br>
+            <code>O_new = <span style="color:#2196f3;">${alpha.toFixed(4)}</span> × O_old + new_exp×v = <span style="color:#9c27b0;">[${O[0].toFixed(3)}, ${O[1].toFixed(3)}]</span></code><br>
+            <div style="margin-top:5px; color:#ff9800; font-size:0.8rem;">↑ 旧的 l 和 O 都乘了 α &lt; 1，相当于把之前的 exp 都 "缩小" 了</div>
+          `;
+        } else {
+          corrDiv.innerHTML = `
+            <div style="color:#76b900; font-weight:bold; margin-bottom:5px;">✓ max 没变 → α = 1，旧值不动，只加新项</div>
+            <code>m_new = max(${mOld.toFixed(2)}, ${blockMax.toFixed(2)}) = <span style="color:#ff9800;">${m.toFixed(2)}</span> (没变)</code><br>
+            <code><span style="color:#2196f3;">α</span> = exp(0) = <span style="color:#2196f3;">1.0</span></code><br>
+            <code>l_new = 1.0 × l_old + exp(${s0}-${m.toFixed(2)}) + exp(${s1}-${m.toFixed(2)}) = <span style="color:#4caf50;">${l.toFixed(4)}</span></code><br>
+            <code>O_new = 1.0 × O_old + new contributions = <span style="color:#9c27b0;">[${O[0].toFixed(3)}, ${O[1].toFixed(3)}]</span></code>
+          `;
+        }
+      }
+
+      if (l > 0) {
+        const normO = [O[0] / l, O[1] / l];
+        resultDiv.innerHTML = `<span style="color:#76b900;">当前归一化输出 O/l = [${normO[0].toFixed(4)}, ${normO[1].toFixed(4)}]</span>` +
+          (step === numBlocks ? `<br><span style="color:#ffd700; font-weight:bold;">✓ 所有块处理完毕! 这就是最终 attention 输出 (= softmax(scores) × V)</span>` : `<br><span style="color:#888;">还有 ${numBlocks - step} 个块待处理，O/l 会继续变化...</span>`);
+      }
+    }
+  }
+
+  return {
+    next() {
+      if (step >= numBlocks) return;
+      step++;
+      const b = step - 1;
+      const idx0 = b * blockSize, idx1 = b * blockSize + 1;
+      const s0 = scores[idx0], s1 = scores[idx1];
+      const blockMax = Math.max(s0, s1);
+
+      const mNew = Math.max(m, blockMax);
+      const alpha = m === -Infinity ? 0 : Math.exp(m - mNew);
+
+      const e0 = Math.exp(s0 - mNew), e1 = Math.exp(s1 - mNew);
+      l = (m === -Infinity ? 0 : alpha * l) + e0 + e1;
+      O[0] = (m === -Infinity ? 0 : alpha * O[0]) + e0 * values[idx0][0] + e1 * values[idx1][0];
+      O[1] = (m === -Infinity ? 0 : alpha * O[1]) + e0 * values[idx0][1] + e1 * values[idx1][1];
+      m = mNew;
+
+      render();
+    },
+    reset() {
+      step = 0;
+      m = -Infinity; l = 0; O = [0, 0];
+      render();
+    }
+  };
+})();
+onlineSoftmaxDemo.reset();
+
+// ========== 自动把高度汇报给父页面 ==========
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

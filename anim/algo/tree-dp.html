@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>树形 DP 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.8;
+  padding: 4px;
+}
+.animation-box {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 8px 0;
+}
+.controls {
+  text-align: center;
+  margin: 16px 0;
+}
+button {
+  background: linear-gradient(135deg, #76b900, #00d4aa);
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0 6px;
+  font-weight: bold;
+}
+button:hover { opacity: 0.85; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  border-radius: 8px;
+}
+.step-info {
+  text-align: center;
+  margin: 12px 0;
+  color: #aaa;
+  font-size: 0.9rem;
+  min-height: 50px;
+}
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 12px 0;
+  font-size: 0.85rem;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+@media (max-width: 600px) {
+  .legend { flex-direction: column; align-items: center; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="animation-box">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4a9eff;"></div><span>返回给父亲的深度</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00d4aa;"></div><span>经过我的路径长度</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff6b6b;"></div><span>全局 ans 更新</span></div>
+  </div>
+  <canvas id="treeCanvas" width="600" height="380"></canvas>
+  <div class="step-info" id="stepInfo">点击"下一步"开始后序遍历</div>
+  <div class="controls">
+    <button id="btnPrev" disabled>上一步</button>
+    <button id="btnNext">下一步</button>
+    <button id="btnReset">重置</button>
+    <button id="btnAuto">自动播放</button>
+  </div>
+</div>
+
+<script>
+// === Tree diameter animation ===
+// Tree structure:
+//        1
+//       / \
+//      2   3
+//     / \
+//    4   5
+//         \
+//          6
+const nodes = [
+  { id: 1, val: 1, left: 1, right: 2, x: 300, y: 50 },
+  { id: 2, val: 2, left: 3, right: 4, x: 180, y: 130 },
+  { id: 3, val: 3, left: -1, right: -1, x: 420, y: 130 },
+  { id: 4, val: 4, left: -1, right: -1, x: 110, y: 220 },
+  { id: 5, val: 5, left: -1, right: 5, x: 250, y: 220 },
+  { id: 6, val: 6, left: -1, right: -1, x: 310, y: 310 },
+];
+
+// Post-order traversal steps: 4, 6, 5, 2, 3, 1
+const animSteps = [
+  { node: 3, desc: '访问节点 4（叶子）：左=0, 右=0', returnVal: 1, pathLen: 0, leftD: 0, rightD: 0, ans: 0 },
+  { node: 5, desc: '访问节点 6（叶子）：左=0, 右=0', returnVal: 1, pathLen: 0, leftD: 0, rightD: 0, ans: 0 },
+  { node: 4, desc: '访问节点 5：左=0, 右=1 → 经过我=1, 返回=2', returnVal: 2, pathLen: 1, leftD: 0, rightD: 1, ans: 1 },
+  { node: 1, desc: '访问节点 2：左=1, 右=2 → 经过我=3, 返回=3', returnVal: 3, pathLen: 3, leftD: 1, rightD: 2, ans: 3 },
+  { node: 2, desc: '访问节点 3（叶子）：左=0, 右=0', returnVal: 1, pathLen: 0, leftD: 0, rightD: 0, ans: 3 },
+  { node: 0, desc: '访问节点 1：左=3, 右=1 → 经过我=4, 返回=4', returnVal: 4, pathLen: 4, leftD: 3, rightD: 1, ans: 4 },
+];
+
+let currentStep = -1;
+let autoInterval = null;
+const visited = new Set();
+const returnVals = {};
+let globalAns = 0;
+
+const canvas = document.getElementById('treeCanvas');
+const ctx = canvas.getContext('2d');
+
+function drawTree() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw edges
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 2;
+  for (const node of nodes) {
+    if (node.left >= 0) {
+      const child = nodes[node.left];
+      ctx.beginPath();
+      ctx.moveTo(node.x, node.y + 20);
+      ctx.lineTo(child.x, child.y - 20);
+      ctx.stroke();
+    }
+    if (node.right >= 0) {
+      const child = nodes[node.right];
+      ctx.beginPath();
+      ctx.moveTo(node.x, node.y + 20);
+      ctx.lineTo(child.x, child.y - 20);
+      ctx.stroke();
+    }
+  }
+
+  // Draw nodes
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    const isActive = (currentStep >= 0 && animSteps[currentStep].node === i);
+    const isVisited = visited.has(i);
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
+    if (isActive) {
+      ctx.fillStyle = '#2a4a0a';
+      ctx.strokeStyle = '#76b900';
+      ctx.lineWidth = 3;
+    } else if (isVisited) {
+      ctx.fillStyle = '#1a2a3a';
+      ctx.strokeStyle = '#4a9eff';
+      ctx.lineWidth = 2;
+    } else {
+      ctx.fillStyle = '#222';
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 2;
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Node value
+    ctx.fillStyle = isActive ? '#76b900' : (isVisited ? '#4a9eff' : '#888');
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(node.val, node.x, node.y);
+
+    // Return value annotation
+    if (returnVals[i] !== undefined) {
+      // Blue: return value
+      ctx.fillStyle = '#4a9eff';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(`↑${returnVals[i]}`, node.x + 32, node.y - 10);
+    }
+  }
+
+  // Draw current step path info
+  if (currentStep >= 0) {
+    const step = animSteps[currentStep];
+    const node = nodes[step.node];
+
+    // Green: path through me
+    if (step.pathLen > 0) {
+      ctx.fillStyle = '#00d4aa';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(`路径=${step.pathLen}`, node.x + 35, node.y + 12);
+    }
+
+    // Global ans
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`全局 ans = ${globalAns}`, canvas.width - 20, 30);
+  }
+}
+
+function showStep(idx) {
+  if (idx < 0 || idx >= animSteps.length) return;
+  currentStep = idx;
+
+  // Rebuild state
+  visited.clear();
+  Object.keys(returnVals).forEach(k => delete returnVals[k]);
+  globalAns = 0;
+  for (let s = 0; s <= idx; s++) {
+    const step = animSteps[s];
+    visited.add(step.node);
+    returnVals[step.node] = step.returnVal;
+    globalAns = step.ans;
+  }
+
+  const step = animSteps[idx];
+  document.getElementById('stepInfo').innerHTML =
+    `<strong>${step.desc}</strong><br>` +
+    `<span style="color:#4a9eff">返回值=${step.returnVal}</span> | ` +
+    `<span style="color:#00d4aa">经过路径=${step.pathLen}</span> | ` +
+    `<span style="color:#ff6b6b">ans=${globalAns}</span>`;
+
+  drawTree();
+  document.getElementById('btnPrev').disabled = (idx <= 0);
+  document.getElementById('btnNext').disabled = (idx >= animSteps.length - 1);
+}
+
+function reset() {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+  currentStep = -1;
+  visited.clear();
+  Object.keys(returnVals).forEach(k => delete returnVals[k]);
+  globalAns = 0;
+  drawTree();
+  document.getElementById('stepInfo').textContent = '点击"下一步"开始后序遍历';
+  document.getElementById('btnPrev').disabled = true;
+  document.getElementById('btnNext').disabled = false;
+}
+
+document.getElementById('btnNext').onclick = () => showStep(currentStep + 1);
+document.getElementById('btnPrev').onclick = () => showStep(currentStep - 1);
+document.getElementById('btnReset').onclick = reset;
+document.getElementById('btnAuto').onclick = () => {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; return; }
+  autoInterval = setInterval(() => {
+    if (currentStep >= animSteps.length - 1) { clearInterval(autoInterval); autoInterval = null; return; }
+    showStep(currentStep + 1);
+  }, 1500);
+};
+
+drawTree();
+
+// ========== 自动把高度汇报给父页面 ==========
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

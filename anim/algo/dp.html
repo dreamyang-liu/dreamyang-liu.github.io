@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态规划动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.7;
+  padding: 4px;
+}
+code {
+  background: #1a1a2e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  color: #76b900;
+}
+h3 { color: #76b900; margin: 20px 0 8px; font-size: 1.1em; }
+.anim-container {
+  background: #0a0a1a;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  overflow-x: auto;
+  border: 1px solid #333;
+}
+.anim-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.anim-controls button {
+  background: #76b900;
+  color: #0f0f23;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85em;
+}
+.anim-controls button:hover { opacity: 0.85; }
+.anim-controls button.secondary { background: #00d4aa; }
+/* DP Table */
+.dp-table { border-collapse: collapse; margin: 8px auto; }
+.dp-table td, .dp-table th {
+  width: 40px; height: 40px;
+  text-align: center;
+  border: 1px solid #444;
+  font-size: 0.85em;
+  transition: all 0.3s;
+}
+.dp-table th { background: #252540; color: #00d4aa; }
+.dp-table .current { background: #76b900; color: #0f0f23; font-weight: bold; }
+.dp-table .dep { background: #00d4aa33; }
+.dp-table .filled { background: #1a2a3a; }
+/* Knapsack */
+.knapsack-row {
+  display: flex;
+  gap: 4px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+.knapsack-cell {
+  width: 44px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: #252540;
+  border-radius: 4px;
+  font-size: 0.8em;
+  transition: all 0.3s;
+}
+.knapsack-cell.current { background: #76b900; color: #0f0f23; font-weight: bold; }
+.knapsack-cell.ref { background: #00d4aa44; border: 1px solid #00d4aa; }
+.knapsack-cell.updated { background: #3a3a1a; }
+.dual-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .dual-panel { grid-template-columns: 1fr; }
+}
+.status-msg { color: #888; font-size: 0.85em; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<h3>LCS 填表动画</h3>
+<div class="anim-container">
+  <div class="anim-controls">
+    <button onclick="lcsStep()">下一步</button>
+    <button class="secondary" onclick="lcsAutoPlay()">自动播放</button>
+    <button onclick="lcsReset()">重置</button>
+    <span class="status-msg" id="lcs-status"></span>
+  </div>
+  <p style="margin-bottom:8px;font-size:0.9em;">字符串: <code>"ABCDE"</code> vs <code>"ACE"</code></p>
+  <table class="dp-table" id="lcs-table"></table>
+</div>
+
+<h3>0/1 背包 vs 完全背包 动画</h3>
+<div class="anim-container">
+  <div class="anim-controls">
+    <button onclick="knapsackStep()">下一步</button>
+    <button class="secondary" onclick="knapsackAutoPlay()">自动播放</button>
+    <button onclick="knapsackReset()">重置</button>
+    <span class="status-msg" id="knapsack-status"></span>
+  </div>
+  <p style="margin-bottom:8px;font-size:0.9em;">物品: 重量=[2,3,4], 价值=[3,4,5], 容量W=7</p>
+  <div class="dual-panel">
+    <div>
+      <h3 style="text-align:center;margin-bottom:8px;">0/1 背包 (倒序)</h3>
+      <div id="knapsack01"></div>
+    </div>
+    <div>
+      <h3 style="text-align:center;margin-bottom:8px;">完全背包 (正序)</h3>
+      <div id="knapsack-full"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== LCS Animation ==========
+const lcsStr1 = "ABCDE";
+const lcsStr2 = "ACE";
+const m = lcsStr1.length, n = lcsStr2.length;
+let lcsDP = Array.from({length: m+1}, () => Array(n+1).fill(0));
+let lcsI = 1, lcsJ = 1;
+let lcsRunning = false;
+let lcsTimer = null;
+
+function buildLCSTable() {
+  const table = document.getElementById('lcs-table');
+  let html = '<tr><th></th><th></th>';
+  for (let j = 0; j < n; j++) html += `<th>${lcsStr2[j]}</th>`;
+  html += '</tr>';
+  for (let i = 0; i <= m; i++) {
+    html += '<tr>';
+    html += `<th>${i === 0 ? '' : lcsStr1[i-1]}</th>`;
+    for (let j = 0; j <= n; j++) {
+      let cls = '';
+      if (i === lcsI && j === lcsJ) cls = 'current';
+      else if (lcsI > 0 && lcsJ > 0 && ((i === lcsI-1 && j === lcsJ-1) || (i === lcsI-1 && j === lcsJ) || (i === lcsI && j === lcsJ-1))) cls = 'dep';
+      else if (i < lcsI || (i === lcsI && j < lcsJ)) cls = 'filled';
+      html += `<td class="${cls}">${lcsDP[i][j]}</td>`;
+    }
+    html += '</tr>';
+  }
+  table.innerHTML = html;
+}
+
+function lcsStep() {
+  if (lcsI > m) { document.getElementById('lcs-status').textContent = '完成!'; return; }
+  if (lcsStr1[lcsI-1] === lcsStr2[lcsJ-1]) {
+    lcsDP[lcsI][lcsJ] = lcsDP[lcsI-1][lcsJ-1] + 1;
+  } else {
+    lcsDP[lcsI][lcsJ] = Math.max(lcsDP[lcsI-1][lcsJ], lcsDP[lcsI][lcsJ-1]);
+  }
+  buildLCSTable();
+  lcsJ++;
+  if (lcsJ > n) { lcsJ = 1; lcsI++; }
+  if (lcsI > m) document.getElementById('lcs-status').textContent = `LCS 长度 = ${lcsDP[m][n]}`;
+}
+
+function lcsAutoPlay() {
+  if (lcsRunning) { clearInterval(lcsTimer); lcsRunning = false; return; }
+  lcsRunning = true;
+  lcsTimer = setInterval(() => {
+    if (lcsI > m) { clearInterval(lcsTimer); lcsRunning = false; return; }
+    lcsStep();
+  }, 400);
+}
+
+function lcsReset() {
+  clearInterval(lcsTimer); lcsRunning = false;
+  lcsDP = Array.from({length: m+1}, () => Array(n+1).fill(0));
+  lcsI = 1; lcsJ = 1;
+  document.getElementById('lcs-status').textContent = '';
+  buildLCSTable();
+}
+
+buildLCSTable();
+
+// ========== Knapsack Animation ==========
+const weights = [2, 3, 4];
+const values = [3, 4, 5];
+const W = 7;
+let dp01 = Array(W+1).fill(0);
+let dpFull = Array(W+1).fill(0);
+let kItem = 0;
+let kJ01 = W;      // 0/1: starts from W, goes down
+let kJFull = weights[0]; // full: starts from w[i], goes up
+let kRunning = false;
+let kTimer = null;
+let kHighlight01 = {current: -1, ref: -1};
+let kHighlightFull = {current: -1, ref: -1};
+let kDone = false;
+
+function renderKnapsack() {
+  // 0/1
+  let html01 = '<div style="font-size:0.8em;color:#888;margin-bottom:4px;">idx: ';
+  for (let j = 0; j <= W; j++) html01 += `<span style="display:inline-block;width:44px;text-align:center;">${j}</span>`;
+  html01 += '</div><div class="knapsack-row">';
+  for (let j = 0; j <= W; j++) {
+    let cls = '';
+    if (j === kHighlight01.current) cls = 'current';
+    else if (j === kHighlight01.ref) cls = 'ref';
+    html01 += `<div class="knapsack-cell ${cls}">${dp01[j]}</div>`;
+  }
+  html01 += '</div>';
+  document.getElementById('knapsack01').innerHTML = html01;
+
+  // Full
+  let htmlF = '<div style="font-size:0.8em;color:#888;margin-bottom:4px;">idx: ';
+  for (let j = 0; j <= W; j++) htmlF += `<span style="display:inline-block;width:44px;text-align:center;">${j}</span>`;
+  htmlF += '</div><div class="knapsack-row">';
+  for (let j = 0; j <= W; j++) {
+    let cls = '';
+    if (j === kHighlightFull.current) cls = 'current';
+    else if (j === kHighlightFull.ref) cls = 'ref';
+    htmlF += `<div class="knapsack-cell ${cls}">${dpFull[j]}</div>`;
+  }
+  htmlF += '</div>';
+  document.getElementById('knapsack-full').innerHTML = htmlF;
+}
+
+function knapsackStep() {
+  if (kDone) { document.getElementById('knapsack-status').textContent = '完成!'; return; }
+  const wi = weights[kItem], vi = values[kItem];
+
+  // 0/1: reverse
+  if (kJ01 >= wi) {
+    kHighlight01 = {current: kJ01, ref: kJ01 - wi};
+    dp01[kJ01] = Math.max(dp01[kJ01], dp01[kJ01 - wi] + vi);
+    kJ01--;
+  }
+
+  // Full: forward
+  if (kJFull <= W) {
+    kHighlightFull = {current: kJFull, ref: kJFull - wi};
+    dpFull[kJFull] = Math.max(dpFull[kJFull], dpFull[kJFull - wi] + vi);
+    kJFull++;
+  }
+
+  renderKnapsack();
+
+  // Check if both are done for this item
+  let o1Done = kJ01 < wi;
+  let fDone = kJFull > W;
+
+  if (o1Done && fDone) {
+    kItem++;
+    if (kItem >= weights.length) {
+      kDone = true;
+      kHighlight01 = {current: -1, ref: -1};
+      kHighlightFull = {current: -1, ref: -1};
+      renderKnapsack();
+      document.getElementById('knapsack-status').textContent = `完成! 0/1=${dp01[W]}, 完全=${dpFull[W]}`;
+      return;
+    }
+    kJ01 = W;
+    kJFull = weights[kItem];
+    document.getElementById('knapsack-status').textContent = `物品 ${kItem+1}: w=${weights[kItem]}, v=${values[kItem]}`;
+  }
+}
+
+function knapsackAutoPlay() {
+  if (kRunning) { clearInterval(kTimer); kRunning = false; return; }
+  kRunning = true;
+  kTimer = setInterval(() => {
+    if (kDone) { clearInterval(kTimer); kRunning = false; return; }
+    knapsackStep();
+  }, 350);
+}
+
+function knapsackReset() {
+  clearInterval(kTimer); kRunning = false;
+  dp01 = Array(W+1).fill(0);
+  dpFull = Array(W+1).fill(0);
+  kItem = 0; kJ01 = W; kJFull = weights[0]; kDone = false;
+  kHighlight01 = {current: -1, ref: -1};
+  kHighlightFull = {current: -1, ref: -1};
+  document.getElementById('knapsack-status').textContent = `物品 1: w=${weights[0]}, v=${values[0]}`;
+  renderKnapsack();
+}
+
+document.getElementById('knapsack-status').textContent = `物品 1: w=${weights[0]}, v=${values[0]}`;
+renderKnapsack();
+
+// ========== 自动把高度汇报给父页面 ==========
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

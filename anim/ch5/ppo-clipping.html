@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPO Clipping 可视化</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; margin: 8px 0; }
+h3 { font-size: 1.4em; color: #ff9800; margin: 0 0 15px; }
+p { margin: 12px 0; color: #ccc; }
+.graph-container { position: relative; width: 100%; height: 350px; background: #12122a; border-radius: 12px; border: 1px solid #333; margin: 20px 0; }
+.graph-canvas { width: 100%; height: 100%; }
+.slider-group { margin: 15px 0; }
+.slider-group label { display: block; margin-bottom: 5px; color: #aaa; }
+.slider-group input[type="range"] { width: 100%; accent-color: #ff9800; }
+.slider-value { color: #ff9800; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="card">
+<h3>交互式：PPO Clipping 可视化</h3>
+<p>拖动滑块改变参数，观察 clipped objective 如何限制策略更新：</p>
+<div class="slider-group">
+<label>ε (clip range): <span class="slider-value" id="eps-val">0.2</span></label>
+<input type="range" min="0.05" max="0.5" step="0.01" value="0.2" id="eps-slider">
+</div>
+<div class="slider-group">
+<label>Advantage: <span class="slider-value" id="adv-val">1.0</span></label>
+<input type="range" min="-2" max="2" step="0.1" value="1.0" id="adv-slider">
+</div>
+<div class="graph-container">
+<canvas class="graph-canvas" id="ppo-canvas"></canvas>
+</div>
+<p style="font-size:0.85em; color:#888;">橙色线 = unclipped objective (r·A)，红色线 = clipped objective，绿色区域 = 实际使用的 min 值</p>
+</div>
+
+<script>
+// === PPO Clipping Visualization ===
+(function() {
+    const canvas = document.getElementById('ppo-canvas');
+    const ctx = canvas.getContext('2d');
+    const epsSlider = document.getElementById('eps-slider');
+    const advSlider = document.getElementById('adv-slider');
+    const epsVal = document.getElementById('eps-val');
+    const advVal = document.getElementById('adv-val');
+
+    function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+    }
+
+    function drawPPOGraph() {
+        resizeCanvas();
+        const W = canvas.width;
+        const H = canvas.height;
+        const eps = parseFloat(epsSlider.value);
+        const adv = parseFloat(advSlider.value);
+
+        ctx.clearRect(0, 0, W, H);
+
+        const padL = 60, padR = 30, padT = 30, padB = 40;
+        const gW = W - padL - padR;
+        const gH = H - padT - padB;
+
+        // Axes
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padL, padT);
+        ctx.lineTo(padL, padT + gH);
+        ctx.lineTo(padL + gW, padT + gH);
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = '#888';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ratio r(θ)', padL + gW/2, H - 5);
+        ctx.save();
+        ctx.translate(15, padT + gH/2);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText('Objective', 0, 0);
+        ctx.restore();
+
+        // Range: ratio from 0 to 3, objective centered on 0
+        const rMin = 0, rMax = 3;
+        const maxObj = Math.max(Math.abs(adv) * 3, 1);
+        const oMin = -maxObj, oMax = maxObj;
+
+        function toX(r) { return padL + (r - rMin) / (rMax - rMin) * gW; }
+        function toY(o) { return padT + gH - (o - oMin) / (oMax - oMin) * gH; }
+
+        // Zero line
+        ctx.strokeStyle = '#333';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(padL, toY(0));
+        ctx.lineTo(padL + gW, toY(0));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Clip boundaries
+        ctx.strokeStyle = '#555';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(toX(1 - eps), padT);
+        ctx.lineTo(toX(1 - eps), padT + gH);
+        ctx.moveTo(toX(1 + eps), padT);
+        ctx.lineTo(toX(1 + eps), padT + gH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#666';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('1-ε', toX(1 - eps), padT + gH + 15);
+        ctx.fillText('1+ε', toX(1 + eps), padT + gH + 15);
+
+        // Draw unclipped: r * A (orange)
+        ctx.strokeStyle = '#ff9800';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i <= 200; i++) {
+            const r = rMin + (rMax - rMin) * i / 200;
+            const obj = r * adv;
+            const x = toX(r);
+            const y = toY(obj);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Draw clipped (red)
+        ctx.strokeStyle = '#ff4444';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i <= 200; i++) {
+            const r = rMin + (rMax - rMin) * i / 200;
+            const clipped_r = Math.max(1 - eps, Math.min(1 + eps, r));
+            const obj = clipped_r * adv;
+            const x = toX(r);
+            const y = toY(obj);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Draw actual PPO objective = min (green filled area approximation)
+        ctx.strokeStyle = '#50fa7b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let i = 0; i <= 200; i++) {
+            const r = rMin + (rMax - rMin) * i / 200;
+            const unclipped = r * adv;
+            const clipped_r = Math.max(1 - eps, Math.min(1 + eps, r));
+            const clipped = clipped_r * adv;
+            const obj = Math.min(unclipped, clipped);
+            const x = toX(r);
+            const y = toY(obj);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Current ratio marker at r=1
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(toX(1), toY(adv), 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tick marks
+        ctx.fillStyle = '#888';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        for (let r = 0; r <= 3; r += 0.5) {
+            ctx.fillText(r.toFixed(1), toX(r), padT + gH + 15);
+        }
+    }
+
+    epsSlider.addEventListener('input', () => { epsVal.textContent = epsSlider.value; drawPPOGraph(); });
+    advSlider.addEventListener('input', () => { advVal.textContent = advSlider.value; drawPPOGraph(); });
+    window.addEventListener('resize', drawPPOGraph);
+    setTimeout(drawPPOGraph, 100);
+})();
+
+// === 自动把高度汇报给父页面（让 iframe 自适应高度）===
+(function () {
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'tc-anim-height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    setInterval(reportHeight, 500);
+  }
+})();
+</script>
+</body>
+</html>

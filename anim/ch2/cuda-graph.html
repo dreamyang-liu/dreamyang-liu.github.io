@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUDA Graph 时间线对比</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; }
+.card h3 { color: #00d2ff; margin-bottom: 12px; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h3>CUDA Graph 时间线对比（动画）</h3>
+  <div style="position:relative;">
+    <canvas id="cudaGraphCanvas" width="900" height="420" style="width:100%;max-width:900px;display:block;margin:0 auto;border-radius:8px;background:#0a0a1a;"></canvas>
+    <div style="text-align:center;margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="cgAnim.reset(); cgAnim.play();" style="background:linear-gradient(135deg,#00d2ff,#7b2ff7);border:none;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;">▶ 播放动画</button>
+      <button onclick="cgAnim.reset();" style="background:#333;border:1px solid #555;color:#ccc;padding:8px 20px;border-radius:6px;cursor:pointer;">↺ 重置</button>
+    </div>
+    <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:0.75rem;color:#888;flex-wrap:wrap;">
+      <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b6b;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>CPU Launch</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#00d2ff;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>GPU Kernel</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#333;border:1px dashed #666;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>GPU Idle</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#7b2ff7;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Graph Launch</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================
+// CUDA Graph Timeline Animation (Canvas-based Gantt chart)
+// ========================
+const cgAnim = (() => {
+  const canvas = document.getElementById('cudaGraphCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Layout
+  const marginLeft = 90, marginRight = 30;
+  const trackW = W - marginLeft - marginRight;
+  const topY = 50, laneH = 36, laneGap = 10;
+
+  // Timing (in microseconds) — Without CUDA Graph
+  const kernels = [
+    { name: 'K1', compute: 15 },
+    { name: 'K2', compute: 12 },
+    { name: 'K3', compute: 18 },
+    { name: 'K4', compute: 14 },
+    { name: 'K5', compute: 10 },
+  ];
+  const launchTime = 8;  // CPU launch overhead per kernel
+  const gapTime = 4;     // GPU idle between kernels (waiting for next launch)
+
+  // Build event lists
+  // Without Graph: CPU launches sequentially, GPU has gaps
+  const normalCPU = [];
+  const normalGPU = [];
+  let t = 0;
+  kernels.forEach((k, i) => {
+    normalCPU.push({ start: t, dur: launchTime, label: `L${i+1}`, color: '#ff6b6b' });
+    const gpuStart = t + launchTime;
+    normalGPU.push({ start: gpuStart, dur: k.compute, label: k.name, color: '#00d2ff' });
+    t = gpuStart + k.compute + gapTime;
+  });
+  const normalTotal = t - gapTime;
+
+  // With Graph: single graph launch, then all kernels back-to-back
+  const graphCPU = [{ start: 0, dur: 8, label: 'Graph', color: '#7b2ff7' }];
+  const graphGPU = [];
+  let gt = 8; // GPU starts right after graph launch
+  kernels.forEach((k) => {
+    graphGPU.push({ start: gt, dur: k.compute, label: k.name, color: '#00d2ff' });
+    gt += k.compute;
+  });
+  const graphTotal = gt;
+
+  const maxTime = normalTotal;
+  const pxPerUs = trackW / maxTime;
+
+  let progress = 0; // 0 to 1
+  let animId = null;
+  let startTime = null;
+  const duration = 3000; // ms
+
+  function drawLane(y, label) {
+    ctx.fillStyle = '#aaa';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, marginLeft - 12, y + laneH / 2);
+    // lane background
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(marginLeft, y, trackW, laneH);
+    ctx.strokeStyle = '#333';
+    ctx.strokeRect(marginLeft, y, trackW, laneH);
+  }
+
+  function drawBlock(block, y, reveal) {
+    const x = marginLeft + block.start * pxPerUs;
+    const w = block.dur * pxPerUs;
+    const revealX = marginLeft + reveal * maxTime * pxPerUs;
+
+    if (x >= revealX) return; // not yet visible
+
+    const visibleW = Math.min(w, revealX - x);
+    ctx.fillStyle = block.color;
+    ctx.beginPath();
+    ctx.roundRect(x, y + 4, visibleW, laneH - 8, 4);
+    ctx.fill();
+
+    // label (only show if block is fully revealed and wide enough)
+    if (visibleW >= w - 1 && w > 20) {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(block.label, x + w / 2, y + laneH / 2);
+    }
+  }
+
+  function drawIdleGaps(gpuBlocks, y, reveal) {
+    for (let i = 0; i < gpuBlocks.length - 1; i++) {
+      const end = gpuBlocks[i].start + gpuBlocks[i].dur;
+      const nextStart = gpuBlocks[i + 1].start;
+      if (nextStart > end) {
+        const x = marginLeft + end * pxPerUs;
+        const w = (nextStart - end) * pxPerUs;
+        const revealX = marginLeft + reveal * maxTime * pxPerUs;
+        if (x >= revealX) continue;
+        const visibleW = Math.min(w, revealX - x);
+        ctx.fillStyle = '#2a2a2a';
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = '#555';
+        ctx.strokeRect(x, y + 3, visibleW, laneH - 6);
+        ctx.setLineDash([]);
+      }
+    }
+  }
+
+  function drawTimeAxis(y) {
+    ctx.strokeStyle = '#444';
+    ctx.beginPath();
+    ctx.moveTo(marginLeft, y);
+    ctx.lineTo(marginLeft + trackW, y);
+    ctx.stroke();
+    ctx.fillStyle = '#777';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    for (let t = 0; t <= maxTime; t += 20) {
+      const x = marginLeft + t * pxPerUs;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 6); ctx.stroke();
+      ctx.fillText(`${t}μs`, x, y + 18);
+    }
+  }
+
+  function drawTotalTime(label, total, y, color) {
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${label}: ${total}μs`, marginLeft, y);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Title
+    ctx.fillStyle = '#ddd';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Without CUDA Graph', marginLeft, topY - 12);
+
+    // Normal: CPU lane + GPU lane
+    const n_cpuY = topY;
+    const n_gpuY = topY + laneH + laneGap;
+    drawLane(n_cpuY, 'CPU');
+    drawLane(n_gpuY, 'GPU');
+    normalCPU.forEach(b => drawBlock(b, n_cpuY, progress));
+    normalGPU.forEach(b => drawBlock(b, n_gpuY, progress));
+    drawIdleGaps(normalGPU, n_gpuY, progress);
+
+    // Separator
+    const sepY = n_gpuY + laneH + 30;
+    ctx.strokeStyle = '#333';
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(marginLeft, sepY); ctx.lineTo(W - marginRight, sepY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Title 2
+    ctx.fillStyle = '#ddd';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('With CUDA Graph', marginLeft, sepY + 30);
+
+    // Graph: CPU lane + GPU lane
+    const g_cpuY = sepY + 40;
+    const g_gpuY = g_cpuY + laneH + laneGap;
+    drawLane(g_cpuY, 'CPU');
+    drawLane(g_gpuY, 'GPU');
+    graphCPU.forEach(b => drawBlock(b, g_cpuY, progress));
+    graphGPU.forEach(b => drawBlock(b, g_gpuY, progress));
+
+    // Time axis
+    drawTimeAxis(g_gpuY + laneH + 20);
+
+    // Total time comparison (show when done)
+    if (progress >= 1) {
+      const summaryY = g_gpuY + laneH + 55;
+      drawTotalTime(`Without Graph`, normalTotal, summaryY, '#ff6b6b');
+      drawTotalTime(`With Graph`, graphTotal, summaryY + 20, '#7b2ff7');
+
+      const speedup = (normalTotal / graphTotal).toFixed(1);
+      ctx.fillStyle = '#76b900';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText(`Speedup: ${speedup}×  (saved ${normalTotal - graphTotal}μs launch + idle overhead)`, marginLeft, summaryY + 45);
+
+      // draw end markers
+      ctx.strokeStyle = '#ff6b6b';
+      ctx.setLineDash([4, 4]);
+      const normalEndX = marginLeft + normalTotal * pxPerUs;
+      ctx.beginPath(); ctx.moveTo(normalEndX, topY); ctx.lineTo(normalEndX, n_gpuY + laneH); ctx.stroke();
+
+      ctx.strokeStyle = '#7b2ff7';
+      const graphEndX = marginLeft + graphTotal * pxPerUs;
+      ctx.beginPath(); ctx.moveTo(graphEndX, g_cpuY); ctx.lineTo(graphEndX, g_gpuY + laneH); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    progress = Math.min((ts - startTime) / duration, 1);
+    render();
+    if (progress < 1) {
+      animId = requestAnimationFrame(animate);
+    }
+  }
+
+  function play() {
+    startTime = null;
+    if (animId) cancelAnimationFrame(animId);
+    animId = requestAnimationFrame(animate);
+  }
+
+  function reset() {
+    if (animId) cancelAnimationFrame(animId);
+    animId = null;
+    progress = 0;
+    render();
+  }
+
+  // Initial render
+  progress = 1;
+  render();
+
+  return { play, reset };
+})();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

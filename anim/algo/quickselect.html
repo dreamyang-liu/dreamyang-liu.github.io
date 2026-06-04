@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partition 动画演示</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.8;
+  padding: 4px;
+}
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; margin: 0; border: 1px solid #333; min-height: 250px; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #00d4aa; }
+
+/* Partition visualization */
+.arr-container { display: flex; gap: 4px; margin: 15px 0; justify-content: center; flex-wrap: wrap; align-items: flex-end; }
+.arr-cell { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: #1a1a2e; border: 2px solid #444; border-radius: 8px; font-weight: bold; font-size: 1rem; transition: all 0.4s ease; position: relative; }
+.arr-cell.pivot { border-color: #ff6b6b; background: #2a1a1a; color: #ff6b6b; }
+.arr-cell.pointer-i { border-color: #76b900; box-shadow: 0 0 8px #76b90066; }
+.arr-cell.pointer-j { border-color: #00d4aa; box-shadow: 0 0 8px #00d4aa66; }
+.arr-cell.swapping { background: #76b900; color: #000; transform: scale(1.1); }
+.arr-cell.done { background: #76b900; color: #000; border-color: #76b900; }
+.arr-cell.left-region { background: #1a2e1a; border-color: #76b90088; }
+.arr-cell.right-region { background: #1a1a2e; border-color: #44444488; }
+.pointer-label { position: absolute; top: -20px; font-size: 0.7rem; font-weight: bold; }
+.pointer-i-label { color: #76b900; }
+.pointer-j-label { color: #00d4aa; }
+
+@media (max-width: 600px) {
+  .arr-cell { width: 38px; height: 38px; font-size: 0.85rem; }
+  .controls { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<p style="color:#888;">数组 <code>[3, 6, 2, 8, 1, 5, 4]</code>，pivot=4（选最后一个元素）。观察 i/j 指针如何将小于 pivot 的元素交换到左边。</p>
+
+<div class="animation-container">
+  <div class="step-info" id="qs-step-info">点击「下一步」开始演示 partition 过程</div>
+  <div class="arr-container" id="qs-array"></div>
+  <div style="text-align:center; margin:10px 0;">
+    <span style="color:#76b900; font-size:0.8rem;">&#9632; i 指针（下一个放小元素的位置）</span>&nbsp;&nbsp;
+    <span style="color:#00d4aa; font-size:0.8rem;">&#9632; j 指针（扫描位置）</span>&nbsp;&nbsp;
+    <span style="color:#ff6b6b; font-size:0.8rem;">&#9632; pivot</span>
+  </div>
+  <div class="controls">
+    <button class="btn" id="qs-next-btn">下一步</button>
+    <button class="btn btn-secondary" id="qs-auto-btn">自动播放</button>
+    <button class="btn btn-secondary" id="qs-reset-btn">重置</button>
+  </div>
+</div>
+
+<script>
+// === Partition Animation ===
+const ORIG = [3, 6, 2, 8, 1, 5, 4];
+let arr = [...ORIG];
+let qsSteps = [];
+let qsStepIndex = 0;
+let qsAutoInterval = null;
+
+function computePartitionSteps() {
+  qsSteps = [];
+  let a = [...ORIG];
+  const hi = a.length - 1;
+  const pivot = a[hi]; // 4
+  let i = 0;
+
+  qsSteps.push({ arr: [...a], i: 0, j: 0, pivot_idx: hi, action: `Pivot = ${pivot}（最后一个元素），i=0, j=0`, swapping: [] });
+
+  for (let j = 0; j < hi; j++) {
+    if (a[j] < pivot) {
+      if (i !== j) {
+        qsSteps.push({ arr: [...a], i, j, pivot_idx: hi, action: `a[j]=${a[j]} < pivot=${pivot}，交换 a[${i}] 和 a[${j}]`, swapping: [i, j] });
+        [a[i], a[j]] = [a[j], a[i]];
+        qsSteps.push({ arr: [...a], i: i + 1, j: j + 1, pivot_idx: hi, action: `交换完成，i++`, swapping: [] });
+      } else {
+        qsSteps.push({ arr: [...a], i, j, pivot_idx: hi, action: `a[j]=${a[j]} < pivot=${pivot}，i==j 无需交换，i++`, swapping: [] });
+        qsSteps.push({ arr: [...a], i: i + 1, j: j + 1, pivot_idx: hi, action: `i=${i+1}, j=${j+1}`, swapping: [] });
+      }
+      i++;
+    } else {
+      qsSteps.push({ arr: [...a], i, j, pivot_idx: hi, action: `a[j]=${a[j]} >= pivot=${pivot}，跳过，j++`, swapping: [] });
+    }
+  }
+
+  // Final: swap pivot to position i
+  qsSteps.push({ arr: [...a], i, j: hi, pivot_idx: hi, action: `扫描结束，将 pivot 放到位置 i=${i}`, swapping: [i, hi] });
+  [a[i], a[hi]] = [a[hi], a[i]];
+  qsSteps.push({ arr: [...a], i, j: -1, pivot_idx: i, action: `Partition 完成！pivot=${pivot} 在位置 ${i}，左边都 < ${pivot}，右边都 >= ${pivot}`, swapping: [], done: i });
+}
+computePartitionSteps();
+
+function renderQsArray() {
+  const container = document.getElementById('qs-array');
+  const state = qsSteps[qsStepIndex];
+  let html = '';
+  state.arr.forEach((v, idx) => {
+    let cls = 'arr-cell';
+    if (idx === state.pivot_idx) cls += ' pivot';
+    if (state.swapping && state.swapping.includes(idx)) cls += ' swapping';
+    if (state.done !== undefined && idx === state.done) cls += ' done';
+    if (state.done !== undefined && idx < state.done) cls += ' left-region';
+    if (state.done !== undefined && idx > state.done) cls += ' right-region';
+
+    let label = '';
+    if (idx === state.i && idx === state.j) {
+      label = '<span class="pointer-label pointer-i-label">i,j</span>';
+    } else {
+      if (idx === state.i && state.done === undefined) label += '<span class="pointer-label pointer-i-label">i</span>';
+      if (idx === state.j && state.j >= 0 && state.done === undefined) label += '<span class="pointer-label pointer-j-label">j</span>';
+    }
+    if (idx === state.i && state.done === undefined) cls += ' pointer-i';
+    if (idx === state.j && state.j >= 0 && state.done === undefined) cls += ' pointer-j';
+
+    html += `<div class="${cls}">${label}${v}</div>`;
+  });
+  container.innerHTML = html;
+  document.getElementById('qs-step-info').textContent = state.action;
+}
+
+document.getElementById('qs-next-btn').addEventListener('click', () => {
+  if (qsStepIndex < qsSteps.length - 1) { qsStepIndex++; renderQsArray(); }
+});
+document.getElementById('qs-reset-btn').addEventListener('click', () => {
+  qsStepIndex = 0; renderQsArray();
+  if (qsAutoInterval) { clearInterval(qsAutoInterval); qsAutoInterval = null; document.getElementById('qs-auto-btn').textContent = '自动播放'; }
+});
+document.getElementById('qs-auto-btn').addEventListener('click', () => {
+  if (qsAutoInterval) { clearInterval(qsAutoInterval); qsAutoInterval = null; document.getElementById('qs-auto-btn').textContent = '自动播放'; return; }
+  document.getElementById('qs-auto-btn').textContent = '暂停';
+  qsAutoInterval = setInterval(() => {
+    if (qsStepIndex < qsSteps.length - 1) { qsStepIndex++; renderQsArray(); }
+    else { clearInterval(qsAutoInterval); qsAutoInterval = null; document.getElementById('qs-auto-btn').textContent = '自动播放'; }
+  }, 1500);
+});
+
+renderQsArray();
+
+// 自动把高度汇报给父页面
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单调栈动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.7;
+  padding: 4px;
+}
+h3 { color: #76b900; margin: 12px 0 4px; font-size: 0.9em; }
+code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-family: 'Fira Code', monospace; font-size: 0.9em; }
+.anim-container {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.anim-controls {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+}
+.anim-controls button {
+  background: #76b900;
+  color: #0f0f23;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9em;
+  transition: all 0.2s;
+}
+.anim-controls button:hover { background: #8ed000; }
+.anim-controls button:disabled { background: #555; color: #999; cursor: not-allowed; }
+.speed-label { color: #aaa; font-size: 0.85em; }
+.array-vis {
+  display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; align-items: flex-end;
+}
+.arr-item {
+  display: flex; flex-direction: column; align-items: center; transition: all 0.3s;
+}
+.arr-bar {
+  width: 44px;
+  background: #333;
+  border-radius: 4px 4px 0 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 4px;
+  color: #e0e0e0;
+  font-weight: bold;
+  font-size: 0.85em;
+  transition: all 0.3s;
+}
+.arr-bar.current { background: #76b900; color: #0f0f23; }
+.arr-bar.in-stack { background: #00d4aa; color: #0f0f23; }
+.arr-bar.popped { background: #ff6b6b; color: #fff; }
+.arr-bar.done { background: #555; }
+.arr-idx { font-size: 0.75em; color: #888; margin-top: 4px; }
+.arr-ans { font-size: 0.75em; color: #76b900; margin-top: 2px; min-height: 16px; }
+.stack-vis {
+  display: flex; align-items: flex-end; gap: 4px; margin: 12px 0; min-height: 80px;
+  border-bottom: 2px solid #555; padding: 8px 0;
+}
+.stack-item {
+  width: 40px; background: #00d4aa; color: #0f0f23; text-align: center;
+  padding: 6px 4px; border-radius: 4px; font-weight: bold; font-size: 0.85em;
+  transition: all 0.3s;
+}
+.step-info {
+  color: #aaa; font-size: 0.9em; margin: 8px 0; min-height: 24px;
+}
+.step-info .hl { color: #76b900; font-weight: bold; }
+
+@media (max-width: 600px) {
+  .arr-bar { width: 36px; }
+  .stack-item { width: 34px; }
+  .anim-controls { gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<p>数组 <code>[2, 1, 5, 6, 2, 3]</code> 求"下一个更大元素"：</p>
+
+<div class="anim-container">
+  <div class="anim-controls">
+    <button id="btn-reset">重置</button>
+    <button id="btn-step">下一步</button>
+    <button id="btn-play">自动播放</button>
+    <span class="speed-label">速度：</span>
+    <input type="range" id="speed-slider" min="300" max="2000" value="1000" style="width:100px;">
+  </div>
+  <div class="step-info" id="step-info">点击"下一步"开始</div>
+  <h3 style="margin:12px 0 4px; font-size:0.9em;">数组：</h3>
+  <div class="array-vis" id="array-vis"></div>
+  <h3 style="margin:12px 0 4px; font-size:0.9em;">栈（栈底 → 栈顶）：</h3>
+  <div class="stack-vis" id="stack-vis"></div>
+</div>
+
+<script>
+const nums = [2, 1, 5, 6, 2, 3];
+const n = nums.length;
+const maxVal = Math.max(...nums);
+
+// Animation logic
+let steps = [];
+let currentStep = -1;
+let playing = false;
+let playTimer = null;
+
+function generateSteps() {
+  steps = [];
+  let stack = [];
+  let ans = Array(n).fill(-1);
+  // Initial state
+  steps.push({ type: 'init', stack: [], ans: [...ans], current: -1, popped: [], info: '初始状态：栈为空，开始遍历数组' });
+  for (let i = 0; i < n; i++) {
+    let x = nums[i];
+    steps.push({ type: 'visit', stack: [...stack], ans: [...ans], current: i, popped: [], info: `访问 nums[${i}] = <span class="hl">${x}</span>` });
+    let popped = [];
+    while (stack.length && nums[stack[stack.length-1]] < x) {
+      let top = stack.pop();
+      ans[top] = x;
+      popped.push(top);
+      steps.push({ type: 'pop', stack: [...stack], ans: [...ans], current: i, popped: [...popped], info: `弹出 ${nums[top]}（下标${top}），它的下一个更大元素是 <span class="hl">${x}</span>` });
+    }
+    stack.push(i);
+    steps.push({ type: 'push', stack: [...stack], ans: [...ans], current: i, popped: [], info: `将 ${x}（下标${i}）入栈` });
+  }
+  steps.push({ type: 'done', stack: [...stack], ans: [...ans], current: -1, popped: [], info: '遍历结束！栈中剩余元素的答案为 -1（没有更大元素）' });
+}
+generateSteps();
+
+function renderState(step) {
+  const arrayVis = document.getElementById('array-vis');
+  const stackVis = document.getElementById('stack-vis');
+  const stepInfo = document.getElementById('step-info');
+  stepInfo.innerHTML = step.info;
+
+  arrayVis.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const item = document.createElement('div');
+    item.className = 'arr-item';
+    const bar = document.createElement('div');
+    bar.className = 'arr-bar';
+    bar.style.height = (nums[i] / maxVal * 80 + 20) + 'px';
+    if (i === step.current) bar.classList.add('current');
+    else if (step.popped.includes(i)) bar.classList.add('popped');
+    else if (step.stack.includes(i)) bar.classList.add('in-stack');
+    else if (step.ans[i] !== -1) bar.classList.add('done');
+    bar.textContent = nums[i];
+    const idx = document.createElement('div');
+    idx.className = 'arr-idx';
+    idx.textContent = `i=${i}`;
+    const ansDiv = document.createElement('div');
+    ansDiv.className = 'arr-ans';
+    ansDiv.textContent = step.ans[i] !== -1 ? `→${step.ans[i]}` : '';
+    item.appendChild(bar);
+    item.appendChild(idx);
+    item.appendChild(ansDiv);
+    arrayVis.appendChild(item);
+  }
+
+  stackVis.innerHTML = '';
+  if (step.stack.length === 0) {
+    stackVis.innerHTML = '<span style="color:#666;font-size:0.85em;">（空）</span>';
+  } else {
+    step.stack.forEach(si => {
+      const el = document.createElement('div');
+      el.className = 'stack-item';
+      el.textContent = nums[si];
+      el.title = `下标 ${si}`;
+      stackVis.appendChild(el);
+    });
+  }
+}
+
+function doStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    renderState(steps[currentStep]);
+  } else {
+    stopPlay();
+  }
+  updateButtons();
+}
+
+function reset() {
+  stopPlay();
+  currentStep = -1;
+  document.getElementById('step-info').innerHTML = '点击"下一步"开始';
+  document.getElementById('array-vis').innerHTML = '';
+  document.getElementById('stack-vis').innerHTML = '';
+  // Show initial array
+  renderState(steps[0]);
+  currentStep = 0;
+  updateButtons();
+}
+
+function stopPlay() { playing = false; clearInterval(playTimer); updateButtons(); }
+
+function togglePlay() {
+  if (playing) { stopPlay(); return; }
+  playing = true;
+  updateButtons();
+  const speed = document.getElementById('speed-slider').value;
+  playTimer = setInterval(() => {
+    if (currentStep >= steps.length - 1) { stopPlay(); return; }
+    doStep();
+  }, speed);
+}
+
+function updateButtons() {
+  document.getElementById('btn-step').disabled = currentStep >= steps.length - 1;
+  document.getElementById('btn-play').textContent = playing ? '暂停' : '自动播放';
+}
+
+document.getElementById('btn-reset').onclick = reset;
+document.getElementById('btn-step').onclick = doStep;
+document.getElementById('btn-play').onclick = togglePlay;
+document.getElementById('speed-slider').onchange = () => { if (playing) { stopPlay(); togglePlay(); } };
+
+// Init
+reset();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

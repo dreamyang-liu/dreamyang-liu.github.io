@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Parallelism 训练流程</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-controls { text-align: center; margin: 15px 0; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.95em; }
+</style>
+</head>
+<body>
+
+<div id="dp-animation" style="background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0;">
+  <div id="dpGrid" style="overflow-x:auto; margin: 10px 0;"></div>
+  <div style="display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; font-size: 0.85em;">
+    <span><span style="display:inline-block;width:16px;height:16px;background:#2196f3;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Split Data</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#4caf50;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Forward</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#ff9800;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Backward</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#9c27b0;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> AllReduce</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#667eea;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Update</span>
+  </div>
+  <div id="dpStepText" style="color:#a78bfa; font-size:0.95em; min-height:40px; margin:10px 0; padding:10px; background:#1a1a2e; border-radius:6px;"></div>
+  <div class="anim-controls">
+    <button class="anim-btn" id="dpPrev" onclick="dpStep(-1)" disabled>&larr; 上一步</button>
+    <button class="anim-btn" id="dpNext" onclick="dpStep(1)">下一步 &rarr;</button>
+    <button class="anim-btn" onclick="dpReset()">重置</button>
+  </div>
+  <div class="step-indicator" id="dpStepCounter">Step 0 / 4</div>
+</div>
+
+<script>
+const gpuColors = ['#f44336','#4caf50','#2196f3','#ff9800'];
+
+let dpCurrentStep = 0;
+const dpSteps = [
+  { desc: '初始状态: Mini-batch (B=32) 准备分发到 4 个 GPU, 每个 GPU 持有完整模型副本', phase: 'init' },
+  { desc: 'Step 1 - 数据切分: Mini-batch 均分为 4 份, GPU0 得到 B[0:8], GPU1 得到 B[8:16], ...', phase: 'split' },
+  { desc: 'Step 2 - Forward + Backward: 每个 GPU 独立计算前向传播和反向传播 (无通信, 完全并行)', phase: 'compute' },
+  { desc: 'Step 3 - AllReduce 梯度同步: 所有 GPU 通过 Ring AllReduce 交换梯度, 确保梯度一致', phase: 'allreduce' },
+  { desc: 'Step 4 - 参数更新: 所有 GPU 使用相同梯度更新参数, 保持模型一致性', phase: 'update' }
+];
+
+function dpRenderGrid(step) {
+  const container = document.getElementById('dpGrid');
+  const phaseLabels = ['Split Data', 'Forward', 'Backward', 'AllReduce', 'Update'];
+  const phaseColors = ['#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#667eea'];
+
+  let html = '<table style="border-collapse:collapse; font-size:0.8em; width:100%; min-width:500px;">';
+  html += '<tr><td style="padding:6px 10px; color:#888;"></td>';
+  for (let i = 0; i < phaseLabels.length; i++) {
+    const active = (i < step) ? '1' : (i === step - 1 || (step === 0 && i === 0)) ? '1' : '0.3';
+    const isCurrent = (i === step - 1);
+    const border = isCurrent ? '2px solid #fff' : '1px solid #555';
+    html += `<td style="padding:6px 8px; text-align:center; color:${phaseColors[i]}; font-weight:bold; opacity:${step === 0 ? '0.3' : active}; border-bottom:${border};">${phaseLabels[i]}</td>`;
+  }
+  html += '</tr>';
+
+  for (let g = 0; g < 4; g++) {
+    html += `<tr><td style="padding:8px 10px; color:${gpuColors[g]}; font-weight:bold;">GPU ${g}</td>`;
+    for (let i = 0; i < phaseLabels.length; i++) {
+      const active = (i < step);
+      const isCurrent = (i === step - 1);
+      let bg = active ? phaseColors[i] : '#1a1a2e';
+      let text = '';
+      const border = isCurrent ? '2px solid #fff' : '1px solid #444';
+      const opacity = active ? '1' : '0.2';
+
+      if (active) {
+        if (i === 0) text = `B[${g*8}:${(g+1)*8}]`;
+        else if (i === 1) text = 'F(x)';
+        else if (i === 2) text = 'dL/dW';
+        else if (i === 3) text = 'send/recv';
+        else if (i === 4) text = 'W -= lr*g';
+      }
+      html += `<td style="padding:8px 6px; text-align:center; background:${bg}; color:#fff; font-weight:bold; font-size:0.9em; border:${border}; border-radius:4px; opacity:${opacity}; min-width:80px;">${text}</td>`;
+    }
+    html += '</tr>';
+  }
+
+  if (step >= 4) {
+    html += '<tr><td></td><td colspan="5" style="text-align:center; color:#9c27b0; padding:5px; font-size:0.85em;">--- Ring AllReduce: GPU0 &#8594; GPU1 &#8594; GPU2 &#8594; GPU3 &#8594; GPU0 ---</td></tr>';
+  }
+  html += '</table>';
+  container.innerHTML = html;
+}
+
+function dpStep(dir) {
+  dpCurrentStep += dir;
+  dpCurrentStep = Math.max(0, Math.min(dpCurrentStep, dpSteps.length - 1));
+  document.getElementById('dpPrev').disabled = (dpCurrentStep === 0);
+  document.getElementById('dpNext').disabled = (dpCurrentStep === dpSteps.length - 1);
+  dpRenderGrid(dpCurrentStep);
+  document.getElementById('dpStepText').textContent = dpSteps[dpCurrentStep].desc;
+  document.getElementById('dpStepCounter').textContent = `Step ${dpCurrentStep} / ${dpSteps.length - 1}`;
+}
+
+function dpReset() {
+  dpCurrentStep = 0;
+  dpRenderGrid(0);
+  document.getElementById('dpStepText').textContent = dpSteps[0].desc;
+  document.getElementById('dpStepCounter').textContent = `Step 0 / ${dpSteps.length - 1}`;
+  document.getElementById('dpPrev').disabled = true;
+  document.getElementById('dpNext').disabled = false;
+}
+
+dpReset();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

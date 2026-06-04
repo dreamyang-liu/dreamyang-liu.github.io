@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ring AllReduce 算法详解</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-controls { text-align: center; margin: 15px 0; }
+</style>
+</head>
+<body>
+
+<div style="background:#0a0a18; border:1px solid #333; border-radius:10px; padding:25px; margin:15px 0;">
+
+  <!-- Ring topology -->
+  <div style="text-align:center;margin-bottom:20px;">
+    <svg width="360" height="100" viewBox="0 0 360 100" style="display:inline-block;">
+      <defs>
+        <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#888"/></marker>
+      </defs>
+      <!-- GPU nodes -->
+      <circle cx="60" cy="50" r="24" fill="#f4433620" stroke="#f44336" stroke-width="2"/>
+      <text x="60" y="54" text-anchor="middle" fill="#f44336" font-size="11" font-weight="bold">GPU0</text>
+      <circle cx="150" cy="50" r="24" fill="#4caf5020" stroke="#4caf50" stroke-width="2"/>
+      <text x="150" y="54" text-anchor="middle" fill="#4caf50" font-size="11" font-weight="bold">GPU1</text>
+      <circle cx="240" cy="50" r="24" fill="#2196f320" stroke="#2196f3" stroke-width="2"/>
+      <text x="240" y="54" text-anchor="middle" fill="#2196f3" font-size="11" font-weight="bold">GPU2</text>
+      <circle cx="330" cy="50" r="24" fill="#ff980020" stroke="#ff9800" stroke-width="2"/>
+      <text x="330" y="54" text-anchor="middle" fill="#ff9800" font-size="11" font-weight="bold">GPU3</text>
+      <!-- Arrows -->
+      <line x1="84" y1="50" x2="124" y2="50" stroke="#888" stroke-width="1.5" marker-end="url(#arrowR)"/>
+      <line x1="174" y1="50" x2="214" y2="50" stroke="#888" stroke-width="1.5" marker-end="url(#arrowR)"/>
+      <line x1="264" y1="50" x2="304" y2="50" stroke="#888" stroke-width="1.5" marker-end="url(#arrowR)"/>
+      <!-- Wrap-around arrow -->
+      <path d="M 330 76 C 330 95 60 95 60 76" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowR)"/>
+    </svg>
+    <div style="font-size:0.78rem;color:#666;margin-top:4px;">环形拓扑: 每个 GPU 只向右邻居发送 (GPU3 &#8594; GPU0 wrap)</div>
+  </div>
+
+  <!-- Main visualization -->
+  <div id="ringDetailView" style="margin:10px 0;"></div>
+
+  <!-- Transfer description -->
+  <div id="ringDetailTransfer" style="background:#1a1a2e; border-radius:8px; padding:14px; margin:12px 0; font-size:0.88rem; color:#ccc; min-height:45px; line-height:1.7;"></div>
+
+  <!-- Step text -->
+  <div id="ringDetailText" style="background:#12122a; border:1px solid #333; border-radius:8px; padding:14px; margin:12px 0; font-size:0.92rem; color:#a78bfa; min-height:55px; line-height:1.6;"></div>
+
+  <!-- Controls -->
+  <div class="anim-controls" style="margin-top:15px;">
+    <button class="anim-btn" id="ringPrev" onclick="ringStep(-1)" disabled>&#8592; 上一步</button>
+    <span id="ringStepIndicator" style="color:#888;font-size:0.85rem;min-width:80px;text-align:center;">0 / 6</span>
+    <button class="anim-btn" id="ringNext" onclick="ringStep(1)">下一步 &#8594;</button>
+    <button class="anim-btn" onclick="ringReset()" style="margin-left:12px;">&#8635; 重置</button>
+  </div>
+</div>
+
+<script>
+let ringCurrentStep = 0;
+const RING_N = 4;
+const ringGpuColors = ['#f44336','#4caf50','#2196f3','#ff9800'];
+const ringGpuNames = ['GPU0','GPU1','GPU2','GPU3'];
+
+// Concrete values: each GPU has a gradient vector split into 4 chunks
+const ringInitValues = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 16]
+];
+const ringFinalValue = [28, 32, 36, 40];
+
+function ringComputeState(step) {
+  let st = [];
+  for (let g = 0; g < RING_N; g++) {
+    st[g] = [];
+    for (let c = 0; c < RING_N; c++) {
+      st[g][c] = { sources: new Set([g]), sum: ringInitValues[g][c] };
+    }
+  }
+
+  for (let s = 1; s <= step; s++) {
+    if (s <= 3) {
+      // Reduce-Scatter step s
+      const prev = st.map(gpu => gpu.map(ch => ({ sources: new Set(ch.sources), sum: ch.sum })));
+      for (let g = 0; g < RING_N; g++) {
+        const sendChunk = (g - (s - 1) + RING_N) % RING_N;
+        const dst = (g + 1) % RING_N;
+        prev[g][sendChunk].sources.forEach(v => st[dst][sendChunk].sources.add(v));
+        st[dst][sendChunk].sum = prev[dst][sendChunk].sum + prev[g][sendChunk].sum;
+      }
+    } else {
+      // AllGather step (s-3)
+      const prev = st.map(gpu => gpu.map(ch => ({ sources: new Set(ch.sources), sum: ch.sum })));
+      for (let g = 0; g < RING_N; g++) {
+        const sendChunk = (g - (s - 4) + 1 + RING_N) % RING_N;
+        const dst = (g + 1) % RING_N;
+        st[dst][sendChunk] = { sources: new Set(prev[g][sendChunk].sources), sum: prev[g][sendChunk].sum };
+      }
+    }
+  }
+  return st;
+}
+
+function ringGetSendInfo(step) {
+  let info = [];
+  if (step >= 1 && step <= 3) {
+    for (let g = 0; g < RING_N; g++) {
+      const sendChunk = (g - (step - 1) + RING_N) % RING_N;
+      info.push({from: g, to: (g + 1) % RING_N, chunk: sendChunk});
+    }
+  } else if (step >= 4 && step <= 6) {
+    for (let g = 0; g < RING_N; g++) {
+      const sendChunk = (g - (step - 4) + 1 + RING_N) % RING_N;
+      info.push({from: g, to: (g + 1) % RING_N, chunk: sendChunk});
+    }
+  }
+  return info;
+}
+
+function ringValueExpr(sources, chunkIdx) {
+  const parts = [...sources].sort().map(g => ringInitValues[g][chunkIdx]);
+  if (parts.length === 1) return `${parts[0]}`;
+  return parts.join('+');
+}
+
+function ringCellHtml(cellState, chunkIdx, isSending, isReceiving) {
+  const { sources, sum } = cellState;
+  const isComplete = sources.size === RING_N;
+  const borderColor = isSending ? '#ffd700' : isReceiving ? '#00e5ff' : (isComplete ? '#76b900' : '#444');
+  const borderWidth = (isSending || isReceiving) ? '2px' : isComplete ? '2px' : '1px';
+  const bgColor = isComplete ? '#76b90020' : (sources.size > 1 ? '#ffffff08' : `${ringGpuColors[[...sources][0]]}18`);
+  const glow = isComplete ? 'box-shadow:0 0 10px #76b90040;' : '';
+  const sendIcon = isSending ? '<div style="position:absolute;top:-8px;right:-8px;font-size:0.65rem;background:#ffd700;color:#000;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;">↗</div>' : '';
+  const recvIcon = isReceiving ? '<div style="position:absolute;top:-8px;left:-8px;font-size:0.65rem;background:#00e5ff;color:#000;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;">↙</div>' : '';
+
+  const expr = ringValueExpr(sources, chunkIdx);
+  const exprColor = isComplete ? '#76b900' : '#bbb';
+
+  const dots = [...sources].sort().map(g =>
+    `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${ringGpuColors[g]};margin:0 1px;"></span>`
+  ).join('');
+
+  return `<div style="position:relative;min-width:80px;padding:8px 6px;background:${bgColor};border:${borderWidth} solid ${borderColor};border-radius:6px;text-align:center;${glow}">
+    ${sendIcon}${recvIcon}
+    <div style="font-size:0.75rem;color:${exprColor};margin-bottom:3px;font-family:monospace;white-space:nowrap;">${expr}</div>
+    <div style="font-size:1.1rem;font-weight:bold;color:${isComplete ? '#76b900' : '#fff'};">${sum}</div>
+    <div style="margin-top:3px;">${dots}</div>
+  </div>`;
+}
+
+function ringRender() {
+  const state = ringComputeState(ringCurrentStep);
+  const sendInfo = ringGetSendInfo(ringCurrentStep);
+  const sendingSet = new Set(sendInfo.map(si => `${si.from}-${si.chunk}`));
+  const receivingSet = new Set(sendInfo.map(si => `${si.to}-${si.chunk}`));
+
+  let html = '<table style="border-collapse:separate;border-spacing:8px;width:100%;font-size:0.82rem;">';
+  html += '<tr>';
+  html += '<th style="padding:8px;text-align:left;color:#888;width:70px;"></th>';
+  for (let c = 0; c < RING_N; c++) {
+    html += `<th style="padding:8px;text-align:center;color:#888;font-size:0.8rem;">Chunk ${c}<br><span style="font-size:0.7rem;color:#555;">目标: ${ringFinalValue[c]}</span></th>`;
+  }
+  html += '</tr>';
+
+  for (let g = 0; g < RING_N; g++) {
+    html += '<tr>';
+    html += `<td style="padding:8px;vertical-align:middle;">
+      <div style="color:${ringGpuColors[g]};font-weight:bold;font-size:0.9rem;">${ringGpuNames[g]}</div>
+      <div style="color:#666;font-size:0.7rem;">初始: [${ringInitValues[g].join(', ')}]</div>
+    </td>`;
+    for (let c = 0; c < RING_N; c++) {
+      const sending = sendingSet.has(`${g}-${c}`);
+      const receiving = receivingSet.has(`${g}-${c}`);
+      html += `<td style="padding:4px;">${ringCellHtml(state[g][c], c, sending, receiving)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  document.getElementById('ringDetailView').innerHTML = html;
+
+  const transferEl = document.getElementById('ringDetailTransfer');
+  if (sendInfo.length > 0) {
+    const phase = ringCurrentStep <= 3 ? 'Reduce-Scatter' : 'AllGather';
+    const action = ringCurrentStep <= 3 ? '接收方: <strong>累加</strong> (sum += received)' : '接收方: <strong>覆盖</strong> (已是最终值)';
+    const prevState = ringComputeState(ringCurrentStep - 1);
+
+    const arrows = sendInfo.map(si => {
+      const sentValue = prevState[si.from][si.chunk].sum;
+      const sentExpr = ringValueExpr(prevState[si.from][si.chunk].sources, si.chunk);
+      return `<span style="color:${ringGpuColors[si.from]};font-weight:bold;">${ringGpuNames[si.from]}</span>` +
+        ` <span style="color:#ffd700;">→</span> ` +
+        `<span style="color:${ringGpuColors[si.to]};font-weight:bold;">${ringGpuNames[si.to]}</span>` +
+        `: chunk${si.chunk} = <code style="background:#1a1a3e;padding:2px 5px;border-radius:3px;font-size:0.8rem;">${sentExpr} = ${sentValue}</code>`;
+    }).join('<br>');
+    transferEl.innerHTML = `<div style="margin-bottom:6px;"><strong style="color:#ffd700;">[${phase}]</strong> ${action}</div>${arrows}`;
+  } else {
+    transferEl.innerHTML = '<span style="color:#888;">点击 "下一步" 开始。每 GPU 初始持有自己的梯度, 目标是让所有 GPU 都持有全局 sum。</span>';
+  }
+
+  const descriptions = [
+    '<strong>初始状态</strong> — 每个 GPU 持有自己的梯度, 切成 4 个 chunk。<br>GPU0=[1,2,3,4], GPU1=[5,6,7,8], GPU2=[9,10,11,12], GPU3=[13,14,15,16]<br>目标: 每个 chunk 位置都变成所有 GPU 的 sum → [28, 32, 36, 40]',
+    '<strong>Reduce-Scatter Step 1</strong> — 每 GPU 发送一个 chunk 给右邻居, 接收方<strong>累加</strong>。<br>例: GPU0 发 chunk0 (值=1) 给 GPU1, GPU1 的 chunk0 变成 5+1=6',
+    '<strong>Reduce-Scatter Step 2</strong> — 继续发送<strong>已经累加过的</strong> chunk。<br>例: GPU1 发 chunk0 (已=6, 即 1+5) 给 GPU2, GPU2 的 chunk0 变成 9+6=15 (三个 GPU 的和)',
+    '<strong>Reduce-Scatter Step 3 完成!</strong> — 每个 GPU 有且仅有 <strong>1 个 chunk 达到全局 sum</strong>。<br>这就是 "Reduce-Scatter" 的含义: reduce(归约) + scatter(分散到不同 GPU)',
+    '<strong>AllGather Step 1</strong> — 每 GPU 将已经<strong>完整归约</strong>的 chunk 发给右邻居。<br>接收方直接覆盖 (因为收到的就是最终值, 不需要再加)',
+    '<strong>AllGather Step 2</strong> — 继续广播。每个 GPU 逐步收集到更多完整 chunk。',
+    '<strong>AllGather Step 3 完成! ✓</strong> — 所有 GPU 的所有 chunk 都是 [28, 32, 36, 40]!<br><em>总通信: 每步每 GPU 发 1 chunk, 共 6 步 → 每 GPU 发送量 = 6/4 × chunk_size = 1.5 × chunk_size = 1.5M (与 GPU 数无关!)</em>'
+  ];
+  document.getElementById('ringDetailText').innerHTML = descriptions[ringCurrentStep];
+
+  document.getElementById('ringStepIndicator').textContent = `${ringCurrentStep} / 6`;
+  document.getElementById('ringPrev').disabled = (ringCurrentStep === 0);
+  document.getElementById('ringNext').disabled = (ringCurrentStep === 6);
+}
+
+function ringStep(direction) {
+  const target = ringCurrentStep + direction;
+  if (target < 0 || target > 6) return;
+  ringCurrentStep = target;
+  ringRender();
+}
+
+function ringReset() {
+  ringCurrentStep = 0;
+  ringRender();
+}
+ringReset();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

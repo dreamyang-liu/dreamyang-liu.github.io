@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RLHF 三阶段流水线动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; margin: 8px 0; }
+h3 { font-size: 1.4em; color: #ff9800; margin: 0 0 15px; }
+p { margin: 12px 0; color: #ccc; }
+.pipeline-container { position: relative; width: 100%; height: 200px; margin: 30px 0; overflow: hidden; }
+.pipeline-stage { position: absolute; top: 50%; transform: translateY(-50%); width: 140px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; text-align: center; transition: all 0.3s; }
+.pipeline-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: #ff9800; font-size: 1.5em; }
+.pipeline-data { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; }
+.stage-sft { left: 5%; background: linear-gradient(135deg, #1a5276, #2e86c1); }
+.stage-rm { left: 35%; background: linear-gradient(135deg, #6c3483, #a569bd); }
+.stage-ppo { left: 65%; background: linear-gradient(135deg, #b7950b, #f4d03f); color: #333; }
+.stage-output { left: 88%; background: linear-gradient(135deg, #1e8449, #52be80); }
+.arrow1 { left: 22%; }
+.arrow2 { left: 52%; }
+.arrow3 { left: 82%; }
+.btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; }
+.btn:hover { opacity: 0.85; }
+.btn-secondary { background: linear-gradient(135deg, #4488ff, #66aaff); }
+</style>
+</head>
+<body>
+
+<div class="card">
+<h3>三阶段流水线</h3>
+<p>标准 RLHF pipeline 分为三个训练阶段：</p>
+
+<div class="pipeline-container" id="pipeline-anim">
+<div class="pipeline-stage stage-sft">SFT<br><small>监督微调</small></div>
+<div class="pipeline-arrow arrow1">→</div>
+<div class="pipeline-stage stage-rm">Reward<br>Model</div>
+<div class="pipeline-arrow arrow2">→</div>
+<div class="pipeline-stage stage-ppo">PPO<br>Training</div>
+<div class="pipeline-arrow arrow3">→</div>
+<div class="pipeline-stage stage-output">Aligned<br>Model</div>
+</div>
+<button class="btn" id="btn-pipeline-play">▶ 播放动画</button>
+<button class="btn btn-secondary" id="btn-pipeline-reset">重置</button>
+</div>
+
+<script>
+// === RLHF Pipeline Animation ===
+(function() {
+    const container = document.getElementById('pipeline-anim');
+    const playBtn = document.getElementById('btn-pipeline-play');
+    const resetBtn = document.getElementById('btn-pipeline-reset');
+    let particles = [];
+    let animId = null;
+
+    function createParticle(startX, endX, startY, duration, delay) {
+        const p = document.createElement('div');
+        p.className = 'pipeline-data';
+        p.style.left = startX + '%';
+        p.style.top = startY + '%';
+        p.style.opacity = '0';
+        container.appendChild(p);
+        particles.push(p);
+
+        setTimeout(() => {
+            p.style.transition = `left ${duration}ms linear, opacity 0.3s`;
+            p.style.opacity = '1';
+            p.style.left = endX + '%';
+            setTimeout(() => { p.style.opacity = '0'; }, duration - 300);
+        }, delay);
+    }
+
+    function playAnimation() {
+        resetAnimation();
+        const stages = [
+            { startX: 2, endX: 18, startY: 48, duration: 1000, delay: 0 },
+            { startX: 22, endX: 48, startY: 48, duration: 1000, delay: 1200 },
+            { startX: 52, endX: 78, startY: 48, duration: 1000, delay: 2400 },
+            { startX: 82, endX: 95, startY: 48, duration: 800, delay: 3600 },
+        ];
+        stages.forEach(s => createParticle(s.startX, s.endX, s.startY, s.duration, s.delay));
+
+        // Second wave
+        setTimeout(() => {
+            stages.forEach(s => createParticle(s.startX, s.endX, s.startY - 8, s.duration, s.delay));
+        }, 800);
+    }
+
+    function resetAnimation() {
+        particles.forEach(p => p.remove());
+        particles = [];
+    }
+
+    playBtn.addEventListener('click', playAnimation);
+    resetBtn.addEventListener('click', resetAnimation);
+})();
+
+// === 自动把高度汇报给父页面（让 iframe 自适应高度）===
+(function () {
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'tc-anim-height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    setInterval(reportHeight, 500);
+  }
+})();
+</script>
+</body>
+</html>

@@ -62,6 +62,14 @@
         <i class="fas fa-home"></i>
         <span>Home</span>
       </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
       <a href="/archives/" class="nav-item ">
         <i class="fas fa-archive"></i>
         <span>Archives</span>
@@ -161,42 +169,42 @@
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/09/17/Parentheses-Problems/">括号问题</a>
+            <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/09/02/Backtracking-Template/">Backtracking Template</a>
+            <a href="/2026/06/02/Quickselect/">快速选择 Quickselect</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/08/Random-Algorithm/">随机算法</a>
+            <a href="/2026/06/02/Linked-List/">链表核心操作</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Union-Find/">并查集</a>
+            <a href="/2026/06/02/Heap-Priority-Queue/">堆 / 优先队列</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Fenwick-Tree/">树状数组</a>
+            <a href="/2026/06/02/Hash-Table/">哈希表 Hash Table</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Segment-Tree/">线段树</a>
+            <a href="/2026/06/02/Monotonic-Queue/">单调队列</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Binary-Exponentiation/">二进制快速幂</a>
+            <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
           </div>
         
           <div class="file">
             <i class="fas fa-file-code"></i>
-            <a href="/2023/08/06/Patience-Sorting/">耐心排序</a>
+            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
           </div>
         
       </div>
@@ -264,6 +272,24 @@
 <h3 id="前序遍历"><a href="#前序遍历" class="headerlink" title="前序遍历"></a>前序遍历</h3><p>前序遍历将按照根节点 -&gt; 左子节点 -&gt; 右子节点的顺序访问。</p>
 <h3 id="中序遍历"><a href="#中序遍历" class="headerlink" title="中序遍历"></a>中序遍历</h3><p>中序遍历将按照左子节点 -&gt; 根节点 -&gt; 右子节点的顺序访问。BST的中序遍历将返回一个有序数组。</p>
 <h3 id="后序遍历"><a href="#后序遍历" class="headerlink" title="后序遍历"></a>后序遍历</h3><p>后序遍历将按照左子节点 -&gt; 右子节点 -&gt; 根节点的顺序访问。</p>
+<p>下面的动画在同一棵 7 节点完全二叉树上对比三种遍历，直观展示「何时访问根节点」造成的访问顺序差异：</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/tree-traversal.html" loading="lazy" style="width:100%;height:460px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
 <blockquote>
 <p>要确定一棵二叉树，我们需要中序序列 + 前序&#x2F;后序序列。</p>
 </blockquote>
@@ -326,7 +352,7 @@
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2026-06-03
+      2026-06-04
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
@@ -427,6 +453,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
 <!-- 添加所有需要的脚本 -->
 <script src="/js/main.js"></script>
 <script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
 
 
     <script>

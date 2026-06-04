@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top K 最小堆演示</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.8;
+  padding: 4px;
+}
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; margin: 0; border: 1px solid #333; min-height: 300px; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #00d4aa; }
+
+/* Heap tree visualization */
+.heap-tree { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+.heap-level { display: flex; justify-content: center; gap: 8px; margin: 5px 0; }
+.heap-node { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; border: 2px solid #76b900; color: #e0e0e0; transition: all 0.4s ease; position: relative; }
+.heap-node.active { background: #76b900; color: #000; transform: scale(1.2); }
+.heap-node.removing { background: #ff4444; border-color: #ff4444; color: #fff; }
+.heap-node.empty { border: 2px dashed #333; color: #333; }
+.heap-array { display: flex; gap: 4px; margin: 15px 0; justify-content: center; flex-wrap: wrap; }
+.heap-arr-cell { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1a1a2e; border: 1px solid #444; border-radius: 6px; font-weight: bold; font-size: 0.85rem; transition: all 0.3s ease; }
+.heap-arr-cell.active { background: #76b900; color: #000; }
+.heap-arr-cell.removing { background: #ff4444; color: #fff; }
+.heap-arr-cell.incoming { background: #00d4aa; color: #000; }
+
+@media (max-width: 600px) {
+  .heap-node { width: 36px; height: 36px; font-size: 0.8rem; }
+  .heap-arr-cell { width: 34px; height: 34px; font-size: 0.8rem; }
+  .controls { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<p style="color:#888;">数组 <code>[3, 1, 5, 2, 4, 6]</code>，k=3。观察最小堆如何维护最大的 3 个元素。</p>
+
+<div class="animation-container">
+  <div class="step-info" id="heap-step-info">点击「下一步」开始演示</div>
+  <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:flex-start;">
+    <div>
+      <div style="text-align:center; color:#76b900; font-size:0.85rem; margin-bottom:8px;">堆（树形）</div>
+      <div class="heap-tree" id="heap-tree"></div>
+    </div>
+    <div>
+      <div style="text-align:center; color:#76b900; font-size:0.85rem; margin-bottom:8px;">堆数组</div>
+      <div class="heap-array" id="heap-array"></div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:10px;">
+    <div style="color:#888; font-size:0.85rem;">待处理: <span id="heap-remaining"></span></div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="heap-next-btn">下一步</button>
+    <button class="btn btn-secondary" id="heap-auto-btn">自动播放</button>
+    <button class="btn btn-secondary" id="heap-reset-btn">重置</button>
+  </div>
+</div>
+
+<script>
+// === Heap Animation ===
+const INPUT = [3, 1, 5, 2, 4, 6];
+const K = 3;
+let heap = [];
+let stepIndex = 0;
+let autoInterval = null;
+
+// Steps: for each element, push then maybe pop
+// We'll precompute all states
+let states = [];
+function computeStates() {
+  states = [];
+  let h = [];
+  states.push({ heap: [...h], action: '初始状态：空堆，k=3', highlight: -1, removing: -1, incoming: -1 });
+  for (let idx = 0; idx < INPUT.length; idx++) {
+    const x = INPUT[idx];
+    h.push(x);
+    // sift up
+    let i = h.length - 1;
+    while (i > 0) {
+      const parent = Math.floor((i - 1) / 2);
+      if (h[parent] > h[i]) { [h[parent], h[i]] = [h[i], h[parent]]; i = parent; }
+      else break;
+    }
+    states.push({ heap: [...h], action: `Push ${x} 入堆`, highlight: h.indexOf(x), removing: -1, incoming: idx });
+
+    if (h.length > K) {
+      const popped = h[0];
+      // remove top: move last to top, sift down
+      h[0] = h[h.length - 1];
+      h.pop();
+      let i = 0;
+      while (true) {
+        let smallest = i;
+        const l = 2 * i + 1, r = 2 * i + 2;
+        if (l < h.length && h[l] < h[smallest]) smallest = l;
+        if (r < h.length && h[r] < h[smallest]) smallest = r;
+        if (smallest !== i) { [h[i], h[smallest]] = [h[smallest], h[i]]; i = smallest; }
+        else break;
+      }
+      states.push({ heap: [...h], action: `堆大小>${K}，弹出堆顶 ${popped}`, highlight: -1, removing: -1, incoming: -1 });
+    }
+  }
+  states.push({ heap: [...h], action: `完成！堆中是最大的 ${K} 个元素，堆顶=${h[0]} 是第${K}大`, highlight: -1, removing: -1, incoming: -1 });
+}
+computeStates();
+
+function renderHeapTree(state) {
+  const container = document.getElementById('heap-tree');
+  const h = state.heap;
+  if (h.length === 0) { container.innerHTML = '<div style="color:#555;text-align:center;padding:40px;">空堆</div>'; return; }
+  let html = '';
+  let level = 0, idx = 0;
+  while (idx < h.length) {
+    const count = Math.pow(2, level);
+    html += '<div class="heap-level">';
+    for (let i = 0; i < count && idx < h.length; i++, idx++) {
+      let cls = 'heap-node';
+      if (idx === state.highlight) cls += ' active';
+      if (idx === state.removing) cls += ' removing';
+      html += `<div class="${cls}">${h[idx]}</div>`;
+    }
+    html += '</div>';
+    level++;
+  }
+  container.innerHTML = html;
+}
+
+function renderHeapArray(state) {
+  const container = document.getElementById('heap-array');
+  const h = state.heap;
+  if (h.length === 0) { container.innerHTML = ''; return; }
+  let html = '';
+  h.forEach((v, i) => {
+    let cls = 'heap-arr-cell';
+    if (i === state.highlight) cls += ' active';
+    if (i === state.removing) cls += ' removing';
+    html += `<div class="${cls}">${v}</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderState() {
+  const state = states[stepIndex];
+  renderHeapTree(state);
+  renderHeapArray(state);
+  document.getElementById('heap-step-info').textContent = state.action;
+  // Show remaining
+  const processed = Math.min(Math.floor((stepIndex) / 2) + (stepIndex > 0 ? 1 : 0), INPUT.length);
+  const remaining = INPUT.slice(Math.min(stepIndex > 0 ? Math.ceil(stepIndex/2) : 0, INPUT.length));
+  document.getElementById('heap-remaining').textContent = INPUT.map((v, i) => {
+    // figure out which have been processed
+    return v;
+  }).join(', ');
+  // Simple: show full array with processed ones dimmed
+  let remHTML = '';
+  let processedCount = 0;
+  for (let i = 0; i < states.length; i++) {
+    if (i <= stepIndex && states[i].incoming >= 0) processedCount = states[i].incoming + 1;
+  }
+  remHTML = INPUT.map((v, i) => i < processedCount ? `<span style="color:#555;text-decoration:line-through;">${v}</span>` : `<span style="color:#00d4aa;">${v}</span>`).join(' ');
+  document.getElementById('heap-remaining').innerHTML = remHTML;
+}
+
+document.getElementById('heap-next-btn').addEventListener('click', () => {
+  if (stepIndex < states.length - 1) { stepIndex++; renderState(); }
+});
+document.getElementById('heap-reset-btn').addEventListener('click', () => {
+  stepIndex = 0; renderState();
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; document.getElementById('heap-auto-btn').textContent = '自动播放'; }
+});
+document.getElementById('heap-auto-btn').addEventListener('click', () => {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; document.getElementById('heap-auto-btn').textContent = '自动播放'; return; }
+  document.getElementById('heap-auto-btn').textContent = '暂停';
+  autoInterval = setInterval(() => {
+    if (stepIndex < states.length - 1) { stepIndex++; renderState(); }
+    else { clearInterval(autoInterval); autoInterval = null; document.getElementById('heap-auto-btn').textContent = '自动播放'; }
+  }, 1200);
+});
+
+renderState();
+
+// 自动把高度汇报给父页面
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

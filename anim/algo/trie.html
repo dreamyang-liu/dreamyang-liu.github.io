@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trie 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.7;
+  padding: 4px;
+}
+h3 { color: #00d4aa; margin: 16px 0 8px; font-size: 1.05em; }
+.anim-container {
+  background: #1a1a2e; border: 1px solid #333; border-radius: 8px;
+  padding: 16px; margin: 16px 0; min-height: 300px; position: relative;
+}
+.anim-controls { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.anim-controls button {
+  padding: 8px 16px; background: #76b900; color: #0f0f23; border: none;
+  border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em;
+}
+.anim-controls button:hover { background: #8dd100; }
+.anim-controls button:disabled { background: #555; color: #999; cursor: not-allowed; }
+.anim-controls button.secondary { background: #00d4aa; }
+.anim-controls button.secondary:hover { background: #00eebb; }
+.anim-status { margin-top: 8px; font-size: 0.9em; color: #aaa; min-height: 1.5em; }
+
+/* SVG tree styles */
+svg text { font-family: 'Fira Code', monospace; }
+.tree-node circle { transition: fill 0.3s, stroke 0.3s; }
+.tree-edge { transition: stroke 0.3s; }
+
+@media (max-width: 600px) {
+  .anim-container { min-height: 250px; padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<h3>插入可视化</h3>
+<div class="anim-container">
+  <svg id="trie-svg" width="100%" height="280" viewBox="0 0 700 280"></svg>
+  <div class="anim-controls">
+    <button id="btn-insert" onclick="insertNext()">插入下一个</button>
+    <button id="btn-reset" class="secondary" onclick="resetTrie()">重置</button>
+  </div>
+  <div class="anim-status" id="insert-status">点击"插入下一个"依次插入: apple, app, ant, bee</div>
+</div>
+
+<h3>搜索过程演示</h3>
+<div class="anim-container">
+  <svg id="search-svg" width="100%" height="280" viewBox="0 0 700 280"></svg>
+  <div class="anim-controls">
+    <button id="btn-search-app" onclick="doSearch('app')" disabled>search("app")</button>
+    <button id="btn-search-ap" onclick="doSearch('ap')" disabled>search("ap")</button>
+    <button id="btn-search-reset" class="secondary" onclick="resetSearch()">重置高亮</button>
+  </div>
+  <div class="anim-status" id="search-status">请先完成上方的插入动画</div>
+</div>
+
+<script>
+// ===== Trie Animation =====
+const WORDS = ['apple', 'app', 'ant', 'bee'];
+let insertIndex = 0;
+let trieData = { children: {}, id: 0 };
+let nodeCount = 0;
+let allInserted = false;
+
+// Layout: compute positions for each node
+// We'll use a simple tree layout
+function getNodeId() { return ++nodeCount; }
+
+function insertWord(trie, word) {
+  let node = trie;
+  const path = [];
+  for (const c of word) {
+    if (!node.children[c]) {
+      node.children[c] = { children: {}, id: getNodeId(), char: c, isEnd: false, parent: node.id };
+    }
+    path.push({ from: node.id, to: node.children[c].id, char: c });
+    node = node.children[c];
+  }
+  node.isEnd = true;
+  path.push({ nodeId: node.id, isEnd: true });
+  return path;
+}
+
+// Layout computation
+function computeLayout(trie, x, y, xSpan) {
+  const nodes = [];
+  const edges = [];
+
+  function traverse(node, cx, cy, span, parentPos) {
+    nodes.push({ id: node.id, x: cx, y: cy, char: node.char || 'root', isEnd: node.isEnd });
+    if (parentPos) {
+      edges.push({ from: parentPos, to: { x: cx, y: cy }, char: node.char });
+    }
+    const keys = Object.keys(node.children).sort();
+    if (keys.length === 0) return;
+    const childSpan = span / keys.length;
+    let startX = cx - span / 2 + childSpan / 2;
+    for (let i = 0; i < keys.length; i++) {
+      const child = node.children[keys[i]];
+      traverse(child, startX + i * childSpan, cy + 55, childSpan, { x: cx, y: cy });
+    }
+  }
+
+  traverse(trie, x, y, xSpan, null);
+  return { nodes, edges };
+}
+
+function renderTrie(svgId, layout, highlightPath, searchResult) {
+  const svg = document.getElementById(svgId);
+  let html = '';
+
+  // Edges
+  for (const e of layout.edges) {
+    const isHL = highlightPath && highlightPath.edges &&
+      highlightPath.edges.some(he => he.from.x === e.from.x && he.from.y === e.from.y && he.to.x === e.to.x && he.to.y === e.to.y);
+    html += `<line x1="${e.from.x}" y1="${e.from.y}" x2="${e.to.x}" y2="${e.to.y}"
+      stroke="${isHL ? '#76b900' : '#555'}" stroke-width="${isHL ? 3 : 1.5}"
+      class="tree-edge"/>`;
+    // Edge label
+    const mx = (e.from.x + e.to.x) / 2 - 5;
+    const my = (e.from.y + e.to.y) / 2 - 5;
+    html += `<text x="${mx}" y="${my}" fill="${isHL ? '#76b900' : '#aaa'}" font-size="12">${e.char}</text>`;
+  }
+
+  // Nodes
+  for (const n of layout.nodes) {
+    let fill = '#2a2a4a';
+    let stroke = '#555';
+    const isHLNode = highlightPath && highlightPath.nodes && highlightPath.nodes.includes(n.id);
+    if (isHLNode) { fill = '#2a4a0a'; stroke = '#76b900'; }
+    if (n.isEnd) { stroke = '#00d4aa'; if (isHLNode) fill = '#0a3a3a'; }
+
+    if (searchResult && searchResult.nodeId === n.id) {
+      if (searchResult.found) { fill = '#1a4a1a'; stroke = '#76b900'; }
+      else { fill = '#4a1a1a'; stroke = '#ff6b6b'; }
+    }
+
+    html += `<circle cx="${n.x}" cy="${n.y}" r="16" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    if (n.isEnd) {
+      html += `<text x="${n.x}" y="${n.y + 4}" text-anchor="middle" fill="#00d4aa" font-size="11" font-weight="bold">#</text>`;
+    }
+  }
+
+  svg.innerHTML = html;
+}
+
+function getCurrentLayout() {
+  return computeLayout(trieData, 350, 30, 600);
+}
+
+function insertNext() {
+  if (insertIndex >= WORDS.length) return;
+  const word = WORDS[insertIndex];
+  const path = insertWord(trieData, word);
+  insertIndex++;
+
+  const layout = getCurrentLayout();
+  // Highlight the path of this insertion
+  const hlNodes = [];
+  const hlEdges = [];
+  let node = trieData;
+  hlNodes.push(node.id);
+  for (const c of word) {
+    const parentPos = layout.nodes.find(n => n.id === node.id);
+    node = node.children[c];
+    const childPos = layout.nodes.find(n => n.id === node.id);
+    hlNodes.push(node.id);
+    if (parentPos && childPos) {
+      hlEdges.push({ from: { x: parentPos.x, y: parentPos.y }, to: { x: childPos.x, y: childPos.y } });
+    }
+  }
+
+  renderTrie('trie-svg', layout, { nodes: hlNodes, edges: hlEdges });
+  document.getElementById('insert-status').textContent = `已插入: "${word}" (${insertIndex}/${WORDS.length})`;
+
+  if (insertIndex >= WORDS.length) {
+    document.getElementById('btn-insert').disabled = true;
+    document.getElementById('insert-status').textContent += ' - 全部插入完成!';
+    allInserted = true;
+    // Enable search buttons and render search SVG
+    document.getElementById('btn-search-app').disabled = false;
+    document.getElementById('btn-search-ap').disabled = false;
+    document.getElementById('search-status').textContent = '点击按钮演示搜索过程';
+    renderTrie('search-svg', layout, null);
+  }
+}
+
+function resetTrie() {
+  trieData = { children: {}, id: 0 };
+  nodeCount = 0;
+  insertIndex = 0;
+  allInserted = false;
+  document.getElementById('trie-svg').innerHTML = '';
+  document.getElementById('insert-status').textContent = '点击"插入下一个"依次插入: apple, app, ant, bee';
+  document.getElementById('btn-insert').disabled = false;
+  document.getElementById('btn-search-app').disabled = true;
+  document.getElementById('btn-search-ap').disabled = true;
+  document.getElementById('search-svg').innerHTML = '';
+  document.getElementById('search-status').textContent = '请先完成上方的插入动画';
+}
+
+// ===== Search Animation =====
+function doSearch(word) {
+  if (!allInserted) return;
+  const layout = getCurrentLayout();
+  const hlNodes = [];
+  const hlEdges = [];
+  let node = trieData;
+  hlNodes.push(node.id);
+  let found = true;
+
+  for (const c of word) {
+    if (!node.children[c]) { found = false; break; }
+    const parentPos = layout.nodes.find(n => n.id === node.id);
+    node = node.children[c];
+    const childPos = layout.nodes.find(n => n.id === node.id);
+    hlNodes.push(node.id);
+    if (parentPos && childPos) {
+      hlEdges.push({ from: { x: parentPos.x, y: parentPos.y }, to: { x: childPos.x, y: childPos.y } });
+    }
+  }
+
+  const hasEnd = found && node.isEnd;
+  const searchRes = found ? { nodeId: node.id, found: hasEnd } : null;
+
+  renderTrie('search-svg', layout, { nodes: hlNodes, edges: hlEdges }, searchRes);
+
+  if (!found) {
+    document.getElementById('search-status').textContent = `search("${word}") -> 路径不存在，返回 False`;
+  } else if (hasEnd) {
+    document.getElementById('search-status').textContent = `search("${word}") -> 找到节点且有 # 标记，返回 True`;
+  } else {
+    document.getElementById('search-status').textContent = `search("${word}") -> 找到节点但没有 # 标记，返回 False（只是前缀，不是完整单词）`;
+  }
+}
+
+function resetSearch() {
+  if (!allInserted) return;
+  const layout = getCurrentLayout();
+  renderTrie('search-svg', layout, null);
+  document.getElementById('search-status').textContent = '点击按钮演示搜索过程';
+}
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

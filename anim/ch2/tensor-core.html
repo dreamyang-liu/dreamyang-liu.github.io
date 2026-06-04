@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tensor Core MMA 可视化</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.tensor-core-visual { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+.tc-matrix { display: grid; grid-template-columns: repeat(4, 28px); gap: 2px; }
+.tc-cell { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; border-radius: 3px; font-weight: bold; }
+.tc-op { font-size: 1.5rem; color: #7b2ff7; font-weight: bold; }
+code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #7df9ff; }
+@media (max-width: 768px) {
+  .tensor-core-visual { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- Warp-level MMA fragment view -->
+<div style="background: #12122a; border-radius: 8px; padding: 20px; margin: 5px 0 20px; border: 1px solid #7b2ff7;">
+  <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center;">
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #ff6b6b; margin-bottom: 4px;">A Fragment</div>
+      <div style="display: grid; grid-template-columns: repeat(4,24px); gap: 1px;">
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
+      </div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 4px;">[m=16, k=16] FP16</div>
+    </div>
+    <div style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">×</div>
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #00d2ff; margin-bottom: 4px;">B Fragment</div>
+      <div style="display: grid; grid-template-columns: repeat(4,24px); gap: 1px;">
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
+      </div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 4px;">[k=16, n=8] FP16</div>
+    </div>
+    <div style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">+</div>
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #7b2ff7; margin-bottom: 4px;">C/D Accumulator</div>
+      <div style="display: grid; grid-template-columns: repeat(2,24px); gap: 1px;">
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+        <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
+      </div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 4px;">[m=16, n=8] FP32</div>
+    </div>
+  </div>
+  <div style="text-align: center; margin-top: 15px; font-size: 0.85rem; color: #ccc;">
+    <strong style="color:#7b2ff7;">D</strong>[16×8] = <strong style="color:#ff6b6b;">A</strong>[16×16] × <strong style="color:#00d2ff;">B</strong>[16×8] + <strong style="color:#7b2ff7;">C</strong>[16×8]
+    <span style="color: #888; margin-left: 10px;">(单次 Warp MMA 指令, FP16→FP32)</span>
+  </div>
+</div>
+
+<!-- Conceptual 4x4 MMA -->
+<p style="margin-bottom:10px;">每个 Tensor Core 在<strong>一个时钟周期</strong>内完成一次 4×4 的矩阵乘加运算 <code>D = A × B + C</code>：</p>
+<div class="tensor-core-visual">
+  <div>
+    <div style="text-align:center;font-size:0.8rem;color:#ff6b6b;margin-bottom:4px;">A (FP16) 4×4</div>
+    <div class="tc-matrix">
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b20;color:#ff6b6b;">a</div>
+      <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
+    </div>
+  </div>
+  <div class="tc-op">×</div>
+  <div>
+    <div style="text-align:center;font-size:0.8rem;color:#00d2ff;margin-bottom:4px;">B (FP16) 4×4</div>
+    <div class="tc-matrix">
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff20;color:#00d2ff;">b</div>
+      <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
+    </div>
+  </div>
+  <div class="tc-op">+</div>
+  <div>
+    <div style="text-align:center;font-size:0.8rem;color:#6ab04c;margin-bottom:4px;">C (FP32) 4×4</div>
+    <div class="tc-matrix">
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c20;color:#6ab04c;">c</div>
+      <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
+    </div>
+  </div>
+  <div class="tc-op">=</div>
+  <div>
+    <div style="text-align:center;font-size:0.8rem;color:#7b2ff7;margin-bottom:4px;">D (FP32) 4×4</div>
+    <div class="tc-matrix">
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff720;color:#7b2ff7;">d</div>
+      <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
+    </div>
+  </div>
+</div>
+<p style="font-size:0.85rem;color:#aaa;margin-top:10px;">H100 的 Tensor Core 支持更大的 <code>mma.m16n8k16</code> 指令，一个 Warp 协作完成 16×8×16 的矩阵乘加。FP16 输入 → FP32 累加器，保证精度。</p>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>快速选择 Quickselect | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E6%9D%BF"><span class="toc-text">核心模板</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E8%B7%AF%E5%88%92%E5%88%86%EF%BC%88%E5%BA%94%E5%AF%B9%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0%EF%BC%89"><span class="toc-text">三路划分（应对重复元素）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%89-vs-%E5%A0%86-%E5%AF%B9%E6%AF%94"><span class="toc-text">快选 vs 堆 对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Partition-%E5%8A%A8%E7%94%BB%E6%BC%94%E7%A4%BA"><span class="toc-text">Partition 动画演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Linked-List/">链表核心操作</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Heap-Priority-Queue/">堆 / 优先队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Hash-Table/">哈希表 Hash Table</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Queue/">单调队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Two-Pointers/">双指针技巧</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+            <span class="count">(2)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%88%86%E6%B2%BB/">分治</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>快速选择 Quickselect.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>快速选择 Quickselect</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%88%86%E6%B2%BB/" rel="tag">分治</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <p>快排只递归 K 所在的那一半。期望 O(n)，最坏 O(n^2)。</p>
+<span id="more"></span>
+
+<h2 id="核心模板"><a href="#核心模板" class="headerlink" title="核心模板"></a>核心模板</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> random<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">quickselect</span>(<span class="hljs-params">nums, k</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">partition</span>(<span class="hljs-params">lo, hi</span>):<br>        p = random.randint(lo, hi)<br>        nums[p], nums[hi] = nums[hi], nums[p]<br>        pivot = nums[hi]<br>        i = lo<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(lo, hi):<br>            <span class="hljs-keyword">if</span> nums[j] &lt; pivot:<br>                nums[i], nums[j] = nums[j], nums[i]<br>                i += <span class="hljs-number">1</span><br>        nums[i], nums[hi] = nums[hi], nums[i]<br>        <span class="hljs-keyword">return</span> i<br><br>    lo, hi = <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(nums) - <span class="hljs-number">1</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        p = partition(lo, hi)<br>        <span class="hljs-keyword">if</span> p == k: <span class="hljs-keyword">return</span> nums[p]<br>        <span class="hljs-keyword">elif</span> p &lt; k: lo = p + <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>: hi = p - <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="三路划分（应对重复元素）"><a href="#三路划分（应对重复元素）" class="headerlink" title="三路划分（应对重复元素）"></a>三路划分（应对重复元素）</h2><p>当数组有大量重复元素时，普通 partition 退化。三路划分将数组分为 <code>&lt;pivot</code>、<code>=pivot</code>、<code>&gt;pivot</code> 三段。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">partition3</span>(<span class="hljs-params">nums, lo, hi</span>):<br>    pivot = nums[random.randint(lo, hi)]<br>    lt, gt, i = lo, hi, lo  <span class="hljs-comment"># lt: &lt;pivot 的右边界, gt: &gt;pivot 的左边界</span><br>    <span class="hljs-keyword">while</span> i &lt;= gt:<br>        <span class="hljs-keyword">if</span> nums[i] &lt; pivot:<br>            nums[lt], nums[i] = nums[i], nums[lt]<br>            lt += <span class="hljs-number">1</span>; i += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">elif</span> nums[i] &gt; pivot:<br>            nums[gt], nums[i] = nums[i], nums[gt]<br>            gt -= <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>:<br>            i += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> lt, gt  <span class="hljs-comment"># [lt, gt] 区间全是 pivot</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="快选-vs-堆-对比"><a href="#快选-vs-堆-对比" class="headerlink" title="快选 vs 堆 对比"></a>快选 vs 堆 对比</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>快速选择</th>
+<th>堆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>时间</td>
+<td>期望 O(n)</td>
+<td>O(n log k)</td>
+</tr>
+<tr>
+<td>空间</td>
+<td>O(1) 原地</td>
+<td>O(k)</td>
+</tr>
+<tr>
+<td>是否排序</td>
+<td>不保证顺序</td>
+<td>堆顶有序</td>
+</tr>
+<tr>
+<td>在线&#x2F;离线</td>
+<td>离线（需全部数据）</td>
+<td>在线（流式）</td>
+</tr>
+<tr>
+<td>最坏情况</td>
+<td>O(n^2)</td>
+<td>稳定 O(n log k)</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>一次性找第 k 个</td>
+<td>动态维护 Top K</td>
+</tr>
+</tbody></table>
+<h2 id="Partition-动画演示"><a href="#Partition-动画演示" class="headerlink" title="Partition 动画演示"></a>Partition 动画演示</h2><p>数组 <code>[3, 6, 2, 8, 1, 5, 4]</code>，pivot&#x3D;4（选最后一个元素）。观察 i&#x2F;j 指针如何将小于 pivot 的元素交换到左边。</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/quickselect.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
+<details>
+<summary><strong>为什么要随机化 pivot？不随机化最坏情况是什么？</strong></summary>
+
+<p>如果每次都选第一个或最后一个元素作为 pivot，遇到已排序数组时，每次 partition 只能排除一个元素，退化为 O(n^2)。随机化使得最坏情况的概率极低，期望复杂度稳定在 O(n)。</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>快速选择的期望时间为什么是 O(n) 而不是 O(n log n)？</strong></summary>
+
+<p>快排需要递归两边，总工作量是 n + n + … &#x3D; O(n log n)。但快选只递归一边，每次问题规模期望缩小一半：n + n&#x2F;2 + n&#x2F;4 + … &#x3D; 2n &#x3D; O(n)。这是一个等比级数收敛的结果。</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>什么情况下用堆比快选更合适？</strong></summary>
+
+<ol>
+<li>数据是流式到达的（在线），无法一次拿到全部数据；</li>
+<li>需要动态维护 Top K（频繁插入&#x2F;删除）；</li>
+<li>需要稳定的最坏时间复杂度保证；</li>
+<li>k 远小于 n 时，O(n log k) 和 O(n) 差距不大但堆更简单。</li>
+</ol>
+</details>
+</div>
+
+<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>：215、347。</p>
+<p><strong>进阶</strong>：973、324、462。</p>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2026/06/02/Bit-Manipulation/">
+              <i class="fas fa-chevron-left"></i>
+              位运算 Bit Manipulation
+            </a>
+          
+          
+            <a class="next" href="/2026/06/02/Linked-List/">
+              链表核心操作
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-04
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

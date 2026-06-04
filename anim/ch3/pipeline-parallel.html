@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Forward/Backward 数据流</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-controls { text-align: center; margin: 15px 0; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.95em; }
+</style>
+</head>
+<body>
+
+<div id="pp-animation" style="background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0;">
+  <div style="margin-bottom: 15px;">
+    <button class="anim-btn" id="ppScheduleGPipe" onclick="ppSwitchSchedule('gpipe')" style="opacity:1;">GPipe Schedule</button>
+    <button class="anim-btn" id="ppSchedule1F1B" onclick="ppSwitchSchedule('1f1b')" style="opacity:0.5;">1F1B Schedule</button>
+  </div>
+  <div id="ppGrid" style="overflow-x:auto; margin: 10px 0;"></div>
+  <div style="display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; font-size: 0.85em;">
+    <span><span style="display:inline-block;width:16px;height:16px;background:#4caf50;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Forward</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#f44336;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Backward</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#333;border:1px solid #555;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Idle (Bubble)</span>
+  </div>
+  <div id="ppStepText" style="color:#a78bfa; font-size:0.95em; min-height:40px; margin:10px 0; padding:10px; background:#1a1a2e; border-radius:6px;"></div>
+  <div class="anim-controls">
+    <button class="anim-btn" id="ppPrev" onclick="ppStep(-1)" disabled>&larr; 上一步</button>
+    <button class="anim-btn" id="ppNext" onclick="ppStep(1)">下一步 &rarr;</button>
+    <button class="anim-btn" onclick="ppReset()">重置</button>
+  </div>
+  <div class="step-indicator" id="ppStepCounter">Step 0 / --</div>
+  <div id="pp1f1bInfo" style="display:none; margin-top:15px; padding:15px; background:#1a2a3e; border:1px solid #2196f3; border-radius:8px;">
+    <div style="color:#2196f3; font-weight:bold; margin-bottom:8px;">1F1B 优势解析:</div>
+    <ul style="color:#ccc; font-size:0.9em; padding-left:20px;">
+      <li>每个 GPU 完成一次 Forward 后立即可以开始 Backward (不需等所有 Forward 完成)</li>
+      <li><strong>稳态阶段:</strong> 每个 GPU 交替执行 F 和 B, 流水线保持满载</li>
+      <li><strong>内存优势:</strong> 同一时刻每个 stage 只需保存 1 个 micro-batch 的 activation (而非 GPipe 的 m 个)</li>
+      <li>Bubble ratio 相同, 但峰值内存从 O(m) 降低到 O(1)</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const ppColors = {
+  F: ['#2e7d32','#388e3c','#43a047','#4caf50'],
+  B: ['#c62828','#d32f2f','#e53935','#f44336'],
+  idle: '#333'
+};
+const gpuColors = ['#f44336','#4caf50','#2196f3','#ff9800'];
+
+let ppCurrentStep = 0;
+let ppScheduleType = 'gpipe';
+let ppScheduleData = null;
+
+function ppGenerateGPipeSchedule(p, m) {
+  const totalTime = 2 * (m + p - 1);
+  const grid = Array.from({length: p}, () => Array(totalTime).fill(null));
+  for (let mb = 0; mb < m; mb++) {
+    for (let s = 0; s < p; s++) {
+      grid[s][s + mb] = {type: 'F', mb: mb};
+    }
+  }
+  const bStart = m + p - 1;
+  for (let mb = 0; mb < m; mb++) {
+    for (let s = p - 1; s >= 0; s--) {
+      grid[s][bStart + mb + (p - 1 - s)] = {type: 'B', mb: mb};
+    }
+  }
+  return {grid, totalTime, p, m};
+}
+
+function ppGenerate1F1BSchedule(p, m) {
+  const totalTime = 2 * (m + p - 1);
+  const grid = Array.from({length: p}, () => Array(totalTime).fill(null));
+  for (let s = 0; s < p; s++) {
+    let t = s;
+    let fwdDone = 0, bwdDone = 0;
+    const warmupCount = Math.min(p - s, m);
+    for (let i = 0; i < warmupCount; i++) {
+      if (t < totalTime) { grid[s][t] = {type: 'F', mb: fwdDone}; fwdDone++; t++; }
+    }
+    while (fwdDone < m) {
+      if (t < totalTime) { grid[s][t] = {type: 'B', mb: bwdDone}; bwdDone++; t++; }
+      if (t < totalTime && fwdDone < m) { grid[s][t] = {type: 'F', mb: fwdDone}; fwdDone++; t++; }
+    }
+    while (bwdDone < m) {
+      if (t < totalTime) { grid[s][t] = {type: 'B', mb: bwdDone}; bwdDone++; t++; }
+    }
+  }
+  return {grid, totalTime, p, m};
+}
+
+function ppBuildSteps(schedData) {
+  const {grid, totalTime, p, m} = schedData;
+  const steps = [];
+  steps.push({time: -1, desc: '初始状态: 4 个 Stage, 准备处理 4 个 micro-batch'});
+  for (let t = 0; t < totalTime; t++) {
+    let actions = [];
+    for (let s = 0; s < p; s++) {
+      const cell = grid[s][t];
+      if (cell) {
+        const label = cell.type === 'F' ? 'Forward' : 'Backward';
+        actions.push(`Stage ${s}: ${label} uB${cell.mb}`);
+      }
+    }
+    const desc = actions.length > 0 ? actions.join(' | ') : '所有 Stage 空闲 (Bubble)';
+    steps.push({time: t, desc: `Time ${t}: ${desc}`});
+  }
+  return steps;
+}
+
+function ppRenderGrid(schedData, highlightTime) {
+  const {grid, totalTime, p, m} = schedData;
+  const container = document.getElementById('ppGrid');
+  let html = '<table style="border-collapse:collapse; font-size:0.75em; width:100%; min-width:600px;">';
+  html += '<tr><td style="padding:4px 8px; color:#888; font-weight:bold;"></td>';
+  for (let t = 0; t < totalTime; t++) {
+    const hl = (t <= highlightTime) ? '' : 'opacity:0.3;';
+    html += `<td style="padding:4px 2px; text-align:center; color:#888; font-size:0.8em; ${hl}">t${t}</td>`;
+  }
+  html += '</tr>';
+  for (let s = 0; s < p; s++) {
+    html += `<tr><td style="padding:4px 8px; color:${gpuColors[s]}; font-weight:bold; white-space:nowrap;">Stage ${s}</td>`;
+    for (let t = 0; t < totalTime; t++) {
+      const cell = grid[s][t];
+      const isActive = (t <= highlightTime);
+      const isCurrent = (t === highlightTime);
+      let bg = ppColors.idle;
+      let text = '';
+      let border = isCurrent ? '2px solid #fff' : '1px solid #555';
+      if (cell && isActive) {
+        if (cell.type === 'F') { bg = ppColors.F[cell.mb % 4]; text = `F${cell.mb}`; }
+        else { bg = ppColors.B[cell.mb % 4]; text = `B${cell.mb}`; }
+      } else if (cell && !isActive) { bg = '#1a1a2e'; text = ''; }
+      else if (!cell && isActive) { bg = ppColors.idle; text = ''; }
+      else { bg = '#1a1a2e'; }
+      const opacity = isActive ? '1' : '0.25';
+      html += `<td style="padding:3px 1px; text-align:center; background:${bg}; color:#fff; font-weight:bold; font-size:0.85em; border:${border}; border-radius:3px; opacity:${opacity}; min-width:32px;">${text}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  container.innerHTML = html;
+}
+
+function ppSwitchSchedule(type) {
+  ppScheduleType = type;
+  document.getElementById('ppScheduleGPipe').style.opacity = (type === 'gpipe') ? '1' : '0.5';
+  document.getElementById('ppSchedule1F1B').style.opacity = (type === '1f1b') ? '1' : '0.5';
+  document.getElementById('pp1f1bInfo').style.display = (type === '1f1b') ? 'block' : 'none';
+  ppReset();
+}
+
+function ppGetSchedule() {
+  if (ppScheduleType === 'gpipe') return ppGenerateGPipeSchedule(4, 4);
+  else return ppGenerate1F1BSchedule(4, 4);
+}
+
+function ppReset() {
+  ppCurrentStep = 0;
+  ppScheduleData = ppGetSchedule();
+  const steps = ppBuildSteps(ppScheduleData);
+  ppRenderGrid(ppScheduleData, -1);
+  document.getElementById('ppStepText').textContent = steps[0].desc;
+  document.getElementById('ppStepCounter').textContent = `Step 0 / ${steps.length - 1}`;
+  document.getElementById('ppPrev').disabled = true;
+  document.getElementById('ppNext').disabled = false;
+}
+
+function ppStep(dir) {
+  if (!ppScheduleData) ppScheduleData = ppGetSchedule();
+  const steps = ppBuildSteps(ppScheduleData);
+  ppCurrentStep += dir;
+  ppCurrentStep = Math.max(0, Math.min(ppCurrentStep, steps.length - 1));
+  document.getElementById('ppPrev').disabled = (ppCurrentStep === 0);
+  document.getElementById('ppNext').disabled = (ppCurrentStep === steps.length - 1);
+  ppRenderGrid(ppScheduleData, steps[ppCurrentStep].time);
+  document.getElementById('ppStepText').textContent = steps[ppCurrentStep].desc;
+  document.getElementById('ppStepCounter').textContent = `Step ${ppCurrentStep} / ${steps.length - 1}`;
+}
+
+ppReset();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

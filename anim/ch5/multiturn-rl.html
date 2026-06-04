@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-turn RL Loop</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; margin: 8px 0; }
+h3 { font-size: 1.4em; color: #ff9800; margin: 0 0 15px; }
+.multiturn-container { position: relative; width: 100%; height: 350px; background: #12122a; border-radius: 12px; border: 1px solid #333; margin: 20px 0; overflow: hidden; }
+.mt-agent { position: absolute; left: 10%; top: 40%; width: 100px; height: 60px; background: linear-gradient(135deg, #ff4444, #ff6666); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8em; }
+.mt-env { position: absolute; right: 10%; top: 40%; width: 100px; height: 60px; background: linear-gradient(135deg, #4488ff, #66aaff); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8em; }
+.mt-tool { position: absolute; left: 45%; top: 10%; width: 90px; height: 50px; background: linear-gradient(135deg, #50fa7b, #2ecc71); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75em; color: #333; }
+.mt-reward { position: absolute; left: 45%; bottom: 10%; width: 90px; height: 50px; background: linear-gradient(135deg, #ff9800, #ffcc80); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75em; color: #333; }
+.mt-message { position: absolute; padding: 4px 8px; background: #2a2a4e; border-radius: 6px; font-size: 0.7em; opacity: 0; white-space: nowrap; }
+.btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; }
+.btn:hover { opacity: 0.85; }
+.btn-secondary { background: linear-gradient(135deg, #4488ff, #66aaff); }
+</style>
+</head>
+<body>
+
+<div class="card">
+<h3>交互式：Multi-turn RL Loop</h3>
+<div class="multiturn-container" id="multiturn-anim">
+<div class="mt-agent">Agent<br>(Policy)</div>
+<div class="mt-env">Environment<br>(User/API)</div>
+<div class="mt-tool">Tool<br>Executor</div>
+<div class="mt-reward">Reward<br>Signal</div>
+</div>
+<button class="btn" id="btn-multiturn-play">▶ 播放交互循环</button>
+<button class="btn btn-secondary" id="btn-multiturn-reset">重置</button>
+<div id="multiturn-log" style="background:#12122a; border-radius:8px; padding:10px; margin-top:10px; max-height:120px; overflow-y:auto; font-size:0.8em; font-family:monospace; color:#aaa;"></div>
+</div>
+
+<script>
+// === Multi-turn RL Animation ===
+(function() {
+    const playBtn = document.getElementById('btn-multiturn-play');
+    const resetBtn = document.getElementById('btn-multiturn-reset');
+    const container = document.getElementById('multiturn-anim');
+    const log = document.getElementById('multiturn-log');
+    let messages = [];
+    let animTimeout = null;
+
+    const steps = [
+        { from: 'agent', to: 'env', text: 'Query: "2+3=?"', delay: 0 },
+        { from: 'env', to: 'agent', text: 'Response needed', delay: 1000 },
+        { from: 'agent', to: 'tool', text: 'tool_call: calc(2+3)', delay: 2000 },
+        { from: 'tool', to: 'agent', text: 'result: 5', delay: 3000 },
+        { from: 'agent', to: 'env', text: 'Answer: 5', delay: 4000 },
+        { from: 'env', to: 'reward', text: 'Evaluate...', delay: 5000 },
+        { from: 'reward', to: 'agent', text: 'reward: +1.0', delay: 6000 },
+    ];
+
+    function getPos(name) {
+        const el = container.querySelector('.mt-' + name);
+        if (!el) return { x: 50, y: 50 };
+        return {
+            x: el.offsetLeft + el.offsetWidth / 2,
+            y: el.offsetTop + el.offsetHeight / 2
+        };
+    }
+
+    function animateMessage(step) {
+        const fromPos = getPos(step.from);
+        const toPos = getPos(step.to);
+
+        const msg = document.createElement('div');
+        msg.className = 'mt-message';
+        msg.textContent = step.text;
+        msg.style.left = fromPos.x + 'px';
+        msg.style.top = fromPos.y + 'px';
+        msg.style.opacity = '1';
+        msg.style.transition = 'left 0.8s ease, top 0.8s ease, opacity 0.3s';
+        container.appendChild(msg);
+        messages.push(msg);
+
+        setTimeout(() => {
+            msg.style.left = toPos.x + 'px';
+            msg.style.top = toPos.y + 'px';
+        }, 50);
+
+        setTimeout(() => { msg.style.opacity = '0'; }, 900);
+
+        // Log
+        const logEntry = document.createElement('div');
+        logEntry.textContent = `[Turn] ${step.from} → ${step.to}: ${step.text}`;
+        logEntry.style.color = step.from === 'reward' ? '#50fa7b' : '#aaa';
+        log.appendChild(logEntry);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function playAnimation() {
+        resetAnimation();
+        steps.forEach(step => {
+            animTimeout = setTimeout(() => animateMessage(step), step.delay);
+        });
+    }
+
+    function resetAnimation() {
+        messages.forEach(m => m.remove());
+        messages = [];
+        log.innerHTML = '';
+        if (animTimeout) clearTimeout(animTimeout);
+    }
+
+    playBtn.addEventListener('click', playAnimation);
+    resetBtn.addEventListener('click', resetAnimation);
+})();
+
+// === 自动把高度汇报给父页面（让 iframe 自适应高度）===
+(function () {
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'tc-anim-height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    setInterval(reportHeight, 500);
+  }
+})();
+</script>
+</body>
+</html>

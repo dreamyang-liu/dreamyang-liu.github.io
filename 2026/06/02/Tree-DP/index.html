@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>树形 DP | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-text">核心思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E5%A4%A7%E6%A8%A1%E5%BC%8F"><span class="toc-text">四大模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-1%EF%BC%9A%E5%8D%95%E7%8A%B6%E6%80%81%EF%BC%88%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6%EF%BC%89"><span class="toc-text">模式 1：单状态（最大深度）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-2%EF%BC%9A%E4%B8%A4%E4%B8%AA%E8%BF%94%E5%9B%9E%E5%80%BC%E8%AF%80%E7%AA%8D%EF%BC%88%E7%9B%B4%E5%BE%84-%E6%9C%80%E5%A4%A7%E8%B7%AF%E5%BE%84%E5%92%8C%EF%BC%89"><span class="toc-text">模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-3%EF%BC%9A%E9%80%89-%E4%B8%8D%E9%80%89%E6%A8%A1%E6%9D%BF%EF%BC%88%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D-III%EF%BC%89"><span class="toc-text">模式 3：选&#x2F;不选模板（打家劫舍 III）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%BC%8F-4%EF%BC%9A%E6%8D%A2%E6%A0%B9-DP%EF%BC%88%E6%9C%80%E9%9A%BE%EF%BC%89"><span class="toc-text">模式 4：换根 DP（最难）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9A%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9B%B4%E5%BE%84%E8%AE%A1%E7%AE%97"><span class="toc-text">动画：二叉树直径计算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">LeetCode 练习</span></a></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Quickselect/">快速选择 Quickselect</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Linked-List/">链表核心操作</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Heap-Priority-Queue/">堆 / 优先队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Hash-Table/">哈希表 Hash Table</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Queue/">单调队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</a>
+            <span class="count">(3)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%A0%91/">树</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>树形 DP.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>树形 DP</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <p>后序遍历 + 在每个节点汇总子树信息，返回状态让父节点组合答案。本文正文为 markdown，二叉树直径计算配有可交互动画。</p>
+<span id="more"></span>
+
+<h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>树形 DP 的套路：<strong>从叶子往根算</strong>（后序遍历）。每个节点处理完所有子节点后，把子节点的结果组合成自己的答案，再返回给父节点。</p>
+<blockquote>
+<p>口诀：选当前 → 子不能选；不选当前 → 子取最大。</p>
+</blockquote>
+<h2 id="四大模式"><a href="#四大模式" class="headerlink" title="四大模式"></a>四大模式</h2><h3 id="模式-1：单状态（最大深度）"><a href="#模式-1：单状态（最大深度）" class="headerlink" title="模式 1：单状态（最大深度）"></a>模式 1：单状态（最大深度）</h3><p>最简单。每个节点返回”以我为根的子树深度”。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">maxDepth</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> root: <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> + <span class="hljs-built_in">max</span>(maxDepth(root.left), maxDepth(root.right))<br></code></pre></td></tr></table></figure>
+
+<h3 id="模式-2：两个返回值诀窍（直径-最大路径和）"><a href="#模式-2：两个返回值诀窍（直径-最大路径和）" class="headerlink" title="模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）"></a>模式 2：两个返回值诀窍（直径 &#x2F; 最大路径和）</h3><blockquote>
+<p><strong>关键区分：</strong></p>
+<ul>
+<li><strong>“经过我的路径”</strong> &#x3D; 左链 + 右链 + 我 → 只用来更新全局 ans</li>
+<li><strong>“给上面用的链”</strong> &#x3D; max(左链, 右链) + 我 → 作为返回值给父节点</li>
+</ul>
+<p>为什么？因为路径不能分叉！往上传的只能是一条直链。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">diameterOfBinaryTree</span>(<span class="hljs-params">root</span>):<br>    ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">nonlocal</span> ans<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>        left = dfs(node.left)      <span class="hljs-comment"># 左子树最长链</span><br>        right = dfs(node.right)    <span class="hljs-comment"># 右子树最长链</span><br>        ans = <span class="hljs-built_in">max</span>(ans, left + right)  <span class="hljs-comment"># 经过我的路径（更新全局）</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(left, right) + <span class="hljs-number">1</span>   <span class="hljs-comment"># 给上面用的（只能选一边）</span><br>    dfs(root)<br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<h3 id="模式-3：选-不选模板（打家劫舍-III）"><a href="#模式-3：选-不选模板（打家劫舍-III）" class="headerlink" title="模式 3：选&#x2F;不选模板（打家劫舍 III）"></a>模式 3：选&#x2F;不选模板（打家劫舍 III）</h3><p>每个节点返回 <code>(选我的最大值, 不选我的最大值)</code> 元组。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">rob</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> node: <span class="hljs-keyword">return</span> (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        left = dfs(node.left)<br>        right = dfs(node.right)<br>        rob_me = node.val + left[<span class="hljs-number">1</span>] + right[<span class="hljs-number">1</span>]      <span class="hljs-comment"># 选我，子不能选</span><br>        skip_me = <span class="hljs-built_in">max</span>(left) + <span class="hljs-built_in">max</span>(right)             <span class="hljs-comment"># 不选我，子随意</span><br>        <span class="hljs-keyword">return</span> (rob_me, skip_me)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(root))<br></code></pre></td></tr></table></figure>
+
+<h3 id="模式-4：换根-DP（最难）"><a href="#模式-4：换根-DP（最难）" class="headerlink" title="模式 4：换根 DP（最难）"></a>模式 4：换根 DP（最难）</h3><blockquote>
+<p><strong>思路：</strong> 如果要求”以每个节点为根时的答案”，暴力要 $O(n^2)$。换根 DP 用两次 DFS：</p>
+<ol>
+<li>第一次 DFS：以节点 0 为根，算出 dp[0] 的答案</li>
+<li>第二次 DFS：从根往下，利用父节点的答案<strong>增量更新</strong>子节点的答案</li>
+</ol>
+<p>关键公式：dp[child] &#x3D; dp[parent] − child 对 parent 的贡献 + parent 对 child 的贡献。</p>
+</blockquote>
+<h2 id="动画：二叉树直径计算"><a href="#动画：二叉树直径计算" class="headerlink" title="动画：二叉树直径计算"></a>动画：二叉树直径计算</h2><p>后序遍历，每个节点计算”返回给父亲的深度”（蓝色 ↑）和”经过我的路径长度”（绿色），并更新全局 ans（红色）：</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/tree-dp.html" loading="lazy" style="width:100%;height:560px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
+<details>
+<summary><strong>1. 为什么树形 DP 要用后序遍历？前序行不行？</strong></summary>
+
+<p>后序遍历意味着”先处理子节点，再处理当前节点”。树形 DP 中，当前节点的答案需要子节点的结果才能计算，所以必须后序。前序是先处理自己再处理子节点，此时子节点信息还没算出来，无法组合。唯一例外是换根 DP 的第二次 DFS，那是用父节点信息更新子节点，所以用前序。</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>2. "经过当前节点的路径"和"延伸到当前节点的链"有什么区别？</strong></summary>
+
+<p>“经过当前节点的路径” &#x3D; 左子树最长链 + 当前节点 + 右子树最长链，形成一个倒 V 字形，可能是全局最优解。”延伸到当前节点的链” &#x3D; max(左链, 右链) + 当前节点，是一条直线，只能选一个方向。区别本质：路径可以在当前节点”拐弯”（两边都用），但传给父节点时不能拐弯（只能选一边），否则父节点那里就会出现分叉。</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>3. 换根 DP 为什么只需要两次 DFS？</strong></summary>
+
+<p>第一次 DFS 确定了一个基准答案（以某个节点为根）。换根时，从 parent 到 child 只发生了一个变化：child 的子树从 parent 的”下方”变成了”上方”。这个变化是 O(1) 可计算的增量。所以从根往下逐层传递，每个节点都能 O(1) 算出自己为根的答案。两次 DFS 总复杂度 O(n)，比暴力 O(n^2) 快得多。</p>
+</details>
+</div>
+
+<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-depth-of-binary-tree/">104. 二叉树的最大深度</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/diameter-of-binary-tree/">543. 二叉树的直径</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/balanced-binary-tree/">110. 平衡二叉树</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-univalue-path/">687. 最长同值路径</a></p>
+<p><strong>进阶</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/">124. 二叉树中的最大路径和</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/house-robber-iii/">337. 打家劫舍 III</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-cameras/">968. 监控二叉树</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sum-of-distances-in-tree/">834. 树中距离之和</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">310. 最小高度树</a></p>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2026/06/02/Difference-Array/">
+              <i class="fas fa-chevron-left"></i>
+              差分数组与前缀和
+            </a>
+          
+          
+            <a class="next" href="/2026/06/02/Interval-DP/">
+              区间 DP
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-04
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

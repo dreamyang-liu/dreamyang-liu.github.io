@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash Attention 分块计算过程</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; padding: 4px; }
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+</style>
+</head>
+<body>
+
+<div class="animation-container" id="flash-animation" style="min-height: 500px;">
+  <div class="controls">
+    <button class="btn" onclick="flashDemo.next()">下一步 →</button>
+    <button class="btn btn-secondary" onclick="flashDemo.prev()">← 上一步</button>
+    <button class="btn btn-secondary" onclick="flashDemo.reset()">重置</button>
+  </div>
+  <div class="step-info" id="flash-step-info" style="font-weight: bold; margin-bottom: 10px;">Step 0: 初始状态 — Q, K, V 在 HBM，O 初始化为 0</div>
+
+  <!-- Top row: Source matrices Q, K, V with block highlights -->
+  <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 15px;">
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #2196f3; margin-bottom: 4px; font-weight: bold;">Q [8×4]</div>
+      <div id="flash-q-matrix" style="display: grid; grid-template-columns: repeat(4, 22px); gap: 1px;"></div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 3px;">行 = token, 列 = d</div>
+    </div>
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #4caf50; margin-bottom: 4px; font-weight: bold;">K<sup>T</sup> [4×8]</div>
+      <div id="flash-k-matrix" style="display: grid; grid-template-columns: repeat(8, 22px); gap: 1px;"></div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 3px;">行 = d, 列 = token</div>
+    </div>
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #ff9800; margin-bottom: 4px; font-weight: bold;">V [8×4]</div>
+      <div id="flash-v-matrix" style="display: grid; grid-template-columns: repeat(4, 22px); gap: 1px;"></div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 3px;">行 = token, 列 = d</div>
+    </div>
+    <div style="display: flex; align-items: center; color: #888; font-size: 1.5rem; padding-top: 20px;">→</div>
+    <div style="text-align: center;">
+      <div style="font-size: 0.75rem; color: #9c27b0; margin-bottom: 4px; font-weight: bold;">O [8×4] (输出)</div>
+      <div id="flash-o-matrix" style="display: grid; grid-template-columns: repeat(4, 22px); gap: 1px;"></div>
+      <div style="font-size: 0.65rem; color: #888; margin-top: 3px;">逐步累加更新</div>
+    </div>
+  </div>
+
+  <!-- Middle: SRAM computation detail -->
+  <div style="background: #0a0a1a; border: 2px solid #76b90044; border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+    <div style="font-size: 0.8rem; color: #76b900; margin-bottom: 8px; font-weight: bold;">📦 Shared Memory (SRAM) 中的当前计算:</div>
+    <div id="flash-sram-detail" style="font-size: 0.8rem; color: #ccc; min-height: 80px;"></div>
+  </div>
+
+  <!-- Bottom: Attention score matrix (N×N) with block accumulation view -->
+  <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+    <div>
+      <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: bold;">Score 矩阵 S [8×8] 计算进度 (不写入 HBM!)</div>
+      <div id="flash-grid" style="display: grid; grid-template-columns: repeat(8, 22px); gap: 1px;"></div>
+      <div style="display: flex; gap: 8px; margin-top: 6px; font-size: 0.65rem;">
+        <span style="color: #76b900;">■ 当前 S<sub>ij</sub></span>
+        <span style="color: #00d4aa88;">■ 已处理</span>
+        <span style="color: #222;">■ 未计算</span>
+      </div>
+    </div>
+    <div id="flash-formula-box" style="flex: 1; min-width: 250px; background: #1a1a2e; border-radius: 8px; padding: 12px; font-size: 0.78rem; color: #aaa; border: 1px solid #333;">
+      <div id="flash-formula-content">点击 "下一步" 开始动画</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== Flash Attention Block Matrix Visualization（从 ch1 原文件抽取）==========
+const flashDemo = (() => {
+  const N = 8, d = 4, Br = 2, Bc = 2;
+  const Tr = N / Br, Tc = N / Bc; // 4 blocks each
+  let currentStep = 0;
+  const totalSteps = Tc * Tr + 1;
+  let scoreCells = [];
+
+  const colors = {
+    q: '#2196f3', k: '#4caf50', v: '#ff9800', o: '#9c27b0',
+    active: '#76b900', computed: '#00d4aa', dim: '#1a1a2e', border: '#333'
+  };
+
+  function makeGrid(containerId, rows, cols) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    const cells = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        cell.style.cssText = 'width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:2px;font-size:0.55rem;transition:all 0.3s;background:#1a1a2e;border:1px solid #2a2a3e;';
+        el.appendChild(cell);
+        cells.push(cell);
+      }
+    }
+    return cells;
+  }
+
+  function highlightBlock(cells, cols, rowStart, rowEnd, colStart, colEnd, color, borderColor) {
+    for (let r = rowStart; r < rowEnd; r++) {
+      for (let c = colStart; c < colEnd; c++) {
+        const idx = r * cols + c;
+        if (idx < cells.length) {
+          cells[idx].style.background = color;
+          cells[idx].style.borderColor = borderColor;
+        }
+      }
+    }
+  }
+
+  function dimAll(cells) {
+    cells.forEach(c => { c.style.background = '#1a1a2e'; c.style.borderColor = '#2a2a3e'; c.textContent = ''; });
+  }
+
+  let qCells, kCells, vCells, oCells;
+
+  function init() {
+    qCells = makeGrid('flash-q-matrix', N, d);
+    kCells = makeGrid('flash-k-matrix', d, N);
+    vCells = makeGrid('flash-v-matrix', N, d);
+    oCells = makeGrid('flash-o-matrix', N, d);
+    const sg = document.getElementById('flash-grid');
+    sg.innerHTML = '';
+    scoreCells = [];
+    for (let i = 0; i < N * N; i++) {
+      const cell = document.createElement('div');
+      cell.style.cssText = 'width:22px;height:22px;border-radius:2px;transition:all 0.3s;background:#111;border:1px solid #222;';
+      sg.appendChild(cell);
+      scoreCells.push(cell);
+    }
+    currentStep = 0;
+    renderStep();
+  }
+
+  function getBlockIndices(step) {
+    const s = step - 1;
+    const j = Math.floor(s / Tr);
+    const i = s % Tr;
+    return { i, j };
+  }
+
+  function renderStep() {
+    dimAll(qCells); dimAll(kCells); dimAll(vCells);
+
+    scoreCells.forEach(c => { c.style.background = '#111'; c.style.borderColor = '#222'; });
+    for (let s = 1; s < currentStep && s <= Tc * Tr; s++) {
+      const { i, j } = getBlockIndices(s);
+      for (let r = i * Br; r < (i + 1) * Br; r++) {
+        for (let c = j * Bc; c < (j + 1) * Bc; c++) {
+          scoreCells[r * N + c].style.background = '#00d4aa33';
+          scoreCells[r * N + c].style.borderColor = '#00d4aa55';
+        }
+      }
+    }
+
+    dimAll(oCells);
+    if (currentStep > 0) {
+      for (let s = 1; s <= Math.min(currentStep, Tc * Tr); s++) {
+        const { i, j } = getBlockIndices(s);
+        const alpha = Math.min(0.3 + (j + 1) * 0.15, 0.9);
+        for (let r = i * Br; r < (i + 1) * Br; r++) {
+          for (let c = 0; c < d; c++) {
+            const idx = r * d + c;
+            oCells[idx].style.background = `rgba(156, 39, 176, ${alpha})`;
+            oCells[idx].style.borderColor = '#9c27b0';
+          }
+        }
+      }
+    }
+
+    const info = document.getElementById('flash-step-info');
+    const sramDetail = document.getElementById('flash-sram-detail');
+    const formulaBox = document.getElementById('flash-formula-content');
+
+    if (currentStep === 0) {
+      info.textContent = 'Step 0: 初始状态 — Q[8×4], K[8×4], V[8×4] 在 HBM 中, O 初始化为全 0';
+      sramDetail.innerHTML = '<span style="color:#666;">Shared Memory 空闲，等待加载第一个 block...</span>';
+      formulaBox.innerHTML = `
+        <div style="color:#76b900; font-weight:bold;">参数设定:</div>
+        N=${N}, d=${d}, B<sub>r</sub>=${Br}, B<sub>c</sub>=${Bc}<br>
+        T<sub>r</sub> = N/B<sub>r</sub> = ${Tr} 个 Q 块<br>
+        T<sub>c</sub> = N/B<sub>c</sub> = ${Tc} 个 KV 块<br>
+        总迭代: T<sub>c</sub> × T<sub>r</sub> = ${Tc * Tr} 步<br><br>
+        <span style="color:#888;">每步只在 SRAM 中存: Q<sub>i</sub>[${Br}×${d}] + K<sub>j</sub>[${Bc}×${d}] + V<sub>j</sub>[${Bc}×${d}] + O<sub>i</sub>[${Br}×${d}] + S<sub>ij</sub>[${Br}×${Bc}]</span>
+      `;
+    } else if (currentStep <= Tc * Tr) {
+      const { i, j } = getBlockIndices(currentStep);
+      const qRowStart = i * Br, qRowEnd = (i + 1) * Br;
+      const kRowStart = j * Bc, kRowEnd = (j + 1) * Bc;
+
+      info.textContent = `Step ${currentStep}/${Tc * Tr}: 外循环 j=${j} (KV块 rows ${kRowStart}-${kRowEnd-1}), 内循环 i=${i} (Q块 rows ${qRowStart}-${qRowEnd-1})`;
+
+      highlightBlock(qCells, d, qRowStart, qRowEnd, 0, d, '#2196f333', '#2196f3');
+      highlightBlock(kCells, N, 0, d, kRowStart, kRowEnd, '#4caf5033', '#4caf50');
+      highlightBlock(vCells, d, kRowStart, kRowEnd, 0, d, '#ff980033', '#ff9800');
+
+      for (let r = qRowStart; r < qRowEnd; r++) {
+        for (let c = kRowStart; c < kRowEnd; c++) {
+          scoreCells[r * N + c].style.background = '#76b900';
+          scoreCells[r * N + c].style.borderColor = '#76b900';
+        }
+      }
+
+      highlightBlock(oCells, d, qRowStart, qRowEnd, 0, d, 'rgba(156,39,176,0.8)', '#e040fb');
+
+      sramDetail.innerHTML = `
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <span style="background:#2196f322; border:1px solid #2196f3; padding:3px 8px; border-radius:4px; color:#2196f3;">Q<sub>${i}</sub> [${Br}×${d}]<br><span style="font-size:0.65rem;">Q rows ${qRowStart}-${qRowEnd-1}</span></span>
+          <span style="color:#888;">×</span>
+          <span style="background:#4caf5022; border:1px solid #4caf50; padding:3px 8px; border-radius:4px; color:#4caf50;">K<sub>${j}</sub><sup>T</sup> [${d}×${Bc}]<br><span style="font-size:0.65rem;">K<sup>T</sup> cols ${kRowStart}-${kRowEnd-1}</span></span>
+          <span style="color:#888;">=</span>
+          <span style="background:#76b90022; border:1px solid #76b900; padding:3px 8px; border-radius:4px; color:#76b900;">S<sub>${i},${j}</sub> [${Br}×${Bc}]<br><span style="font-size:0.65rem;">score 块</span></span>
+          <span style="color:#888;">→ online softmax →</span>
+          <span style="background:#76b90022; border:1px solid #76b900; padding:3px 8px; border-radius:4px; color:#76b900;">P<sub>${i},${j}</sub> [${Br}×${Bc}]</span>
+          <span style="color:#888;">×</span>
+          <span style="background:#ff980022; border:1px solid #ff9800; padding:3px 8px; border-radius:4px; color:#ff9800;">V<sub>${j}</sub> [${Bc}×${d}]<br><span style="font-size:0.65rem;">V rows ${kRowStart}-${kRowEnd-1}</span></span>
+          <span style="color:#888;">→ 累加到</span>
+          <span style="background:#9c27b022; border:1px solid #9c27b0; padding:3px 8px; border-radius:4px; color:#9c27b0;">O<sub>${i}</sub> [${Br}×${d}]<br><span style="font-size:0.65rem;">O rows ${qRowStart}-${qRowEnd-1}</span></span>
+        </div>
+      `;
+
+      const prevBlocks = j > 0 ? `已累加 KV 块 0..${j-1} 的贡献` : '首次计算';
+      formulaBox.innerHTML = `
+        <div style="color:#76b900; font-weight:bold; margin-bottom:5px;">当前计算 (全在 SRAM 中):</div>
+        <code style="color:#e0e0e0;">
+        S<sub>${i}${j}</sub> = Q<sub>${i}</sub>[${Br}×${d}] @ K<sub>${j}</sub>[${Bc}×${d}]<sup>T</sup> = [${Br}×${Bc}]</code><br>
+        <code style="color:#e0e0e0;">
+        m_new = max(m<sub>${i}</sub>, rowmax(S<sub>${i}${j}</sub>))</code><br>
+        <code style="color:#e0e0e0;">
+        P<sub>${i}${j}</sub> = exp(S<sub>${i}${j}</sub> - m_new) → [${Br}×${Bc}]</code><br>
+        <code style="color:#e0e0e0;">
+        l_new = e<sup>(m_old-m_new)</sup> × l<sub>${i}</sub> + rowsum(P<sub>${i}${j}</sub>)</code><br>
+        <code style="color:#e0e0e0;">
+        <strong style="color:#9c27b0;">O<sub>${i}</sub></strong> = rescale(O<sub>${i}</sub>) + (1/l_new) × P<sub>${i}${j}</sub>[${Br}×${Bc}] @ V<sub>${j}</sub>[${Bc}×${d}] = [${Br}×${d}]</code><br><br>
+        <span style="color:#888;">${prevBlocks} | O<sub>${i}</sub> 写回 HBM 的 O[${qRowStart}:${qRowEnd}] 行</span><br>
+        <span style="color:#ff9800;">S<sub>${i}${j}</sub> 的 [${Br}×${Bc}] 块对应最终 Attention 矩阵的 rows [${qRowStart},${qRowEnd-1}], cols [${kRowStart},${kRowEnd-1}]</span>
+      `;
+    } else {
+      info.textContent = `✓ 完成! ${Tc * Tr} 步迭代后, O[${N}×${d}] 包含完整的 Attention 输出`;
+      sramDetail.innerHTML = '<span style="color:#76b900; font-weight:bold;">所有计算完成! N×N 的 Attention 矩阵从未在 HBM 中存在过。</span>';
+      formulaBox.innerHTML = `
+        <div style="color:#76b900; font-weight:bold;">总结:</div>
+        • 每个 O<sub>i</sub> 块经过 T<sub>c</sub>=${Tc} 次外循环逐步累加完成<br>
+        • 第 j 次外循环贡献了 K[${Bc}j:${Bc}(j+1)] 和 V[${Bc}j:${Bc}(j+1)] 对应的 attention<br>
+        • 在线 softmax 的 rescale 保证数学等价性<br>
+        • <strong>HBM 额外内存: O(N) = ${N} (仅 l, m 向量)</strong><br>
+        • <strong>S[${N}×${N}] 矩阵从未被物化!</strong>
+      `;
+      scoreCells.forEach(c => { c.style.background = '#00d4aa33'; c.style.borderColor = '#00d4aa55'; });
+    }
+  }
+
+  return {
+    next() { if (currentStep <= Tc * Tr) { currentStep++; renderStep(); } },
+    prev() { if (currentStep > 0) { currentStep--; renderStep(); } },
+    reset() { init(); }
+  };
+})();
+flashDemo.reset();
+
+// ========== 自动把高度汇报给父页面 ==========
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>哈希表 Hash Table | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%BC%8F"><span class="toc-text">三大模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%EF%BC%88%E4%B8%80%E8%BE%B9%E9%81%8D%E5%8E%86%E4%B8%80%E8%BE%B9%E6%9F%A5%EF%BC%89"><span class="toc-text">1. 两数之和（一边遍历一边查）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%89%8D%E7%BC%80%E5%92%8C-%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%88%E5%92%8C%E4%B8%BA-K-%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84%EF%BC%89"><span class="toc-text">2. 前缀和 + 哈希表（和为 K 的子数组）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%86%E7%BB%84-%E8%AE%A1%E6%95%B0-%E5%BC%82%E4%BD%8D%E8%AF%8D"><span class="toc-text">3. 分组 &#x2F; 计数 &#x2F; 异位词</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python-%E9%80%9F%E6%9F%A5"><span class="toc-text">Python 速查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%BB%9A%E5%8A%A8%E5%93%88%E5%B8%8C%EF%BC%88Rabin-Karp%EF%BC%89"><span class="toc-text">进阶：滚动哈希（Rabin-Karp）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%EF%BC%9A%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%E8%BF%87%E7%A8%8B"><span class="toc-text">动画：两数之和过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-%E9%A2%98%E7%9B%AE"><span class="toc-text">LeetCode 题目</span></a></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Quickselect/">快速选择 Quickselect</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Linked-List/">链表核心操作</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Heap-Priority-Queue/">堆 / 优先队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Queue/">单调队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Two-Pointers/">双指针技巧</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+            <span class="count">(8)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/">哈希表</a>
+            <span class="count">(1)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>哈希表 Hash Table.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>哈希表 Hash Table</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/" rel="tag">哈希表</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <p>用空间换时间，把找过的东西存起来 O(1) 查。面试高频中的高频。</p>
+<span id="more"></span>
+
+<h2 id="三大模式"><a href="#三大模式" class="headerlink" title="三大模式"></a>三大模式</h2><h3 id="1-两数之和（一边遍历一边查）"><a href="#1-两数之和（一边遍历一边查）" class="headerlink" title="1. 两数之和（一边遍历一边查）"></a>1. 两数之和（一边遍历一边查）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">twoSum</span>(<span class="hljs-params">nums, target</span>):<br>    seen = &#123;&#125;<br>    <span class="hljs-keyword">for</span> i, x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(nums):<br>        <span class="hljs-keyword">if</span> target - x <span class="hljs-keyword">in</span> seen:      <span class="hljs-comment"># 先查</span><br>            <span class="hljs-keyword">return</span> [seen[target - x], i]<br>        seen[x] = i                  <span class="hljs-comment"># 后存</span><br></code></pre></td></tr></table></figure>
+
+<p>关键：先查后存，防止自己配自己。</p>
+<h3 id="2-前缀和-哈希表（和为-K-的子数组）"><a href="#2-前缀和-哈希表（和为-K-的子数组）" class="headerlink" title="2. 前缀和 + 哈希表（和为 K 的子数组）"></a>2. 前缀和 + 哈希表（和为 K 的子数组）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">subarraySum</span>(<span class="hljs-params">nums, k</span>):<br>    prefix = &#123;<span class="hljs-number">0</span>: <span class="hljs-number">1</span>&#125;  <span class="hljs-comment"># 初始化！空前缀和为 0 出现 1 次</span><br>    curr_sum = count = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        curr_sum += x<br>        count += prefix.get(curr_sum - k, <span class="hljs-number">0</span>)<br>        prefix[curr_sum] = prefix.get(curr_sum, <span class="hljs-number">0</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> count<br></code></pre></td></tr></table></figure>
+
+<p>核心思想：<code>curr_sum - prev_sum = k</code>，即 <code>prev_sum = curr_sum - k</code>。</p>
+<h3 id="3-分组-计数-异位词"><a href="#3-分组-计数-异位词" class="headerlink" title="3. 分组 &#x2F; 计数 &#x2F; 异位词"></a>3. 分组 &#x2F; 计数 &#x2F; 异位词</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 异位词分组：选什么做 key？</span><br><span class="hljs-comment"># 方法 1: 排序后的字符串</span><br>key = <span class="hljs-built_in">tuple</span>(<span class="hljs-built_in">sorted</span>(word))<br><br><span class="hljs-comment"># 方法 2: 字母频率元组</span><br>key = <span class="hljs-built_in">tuple</span>(count[c] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;abcdefghijklmnopqrstuvwxyz&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>选 key 的技巧：能唯一标识一组的、可哈希的东西。</p>
+<h2 id="Python-速查"><a href="#Python-速查" class="headerlink" title="Python 速查"></a>Python 速查</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># dict.get(key, default) — 不存在时返回默认值</span><br>d.get(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">0</span>)<br><br><span class="hljs-comment"># dict.setdefault(key, default) — 不存在时设置并返回</span><br>d.setdefault(<span class="hljs-string">&#x27;x&#x27;</span>, []).append(val)<br><br><span class="hljs-comment"># defaultdict — 自动初始化</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> defaultdict<br>d = defaultdict(<span class="hljs-built_in">list</span>)   <span class="hljs-comment"># d[&#x27;key&#x27;] 自动是 []</span><br>d = defaultdict(<span class="hljs-built_in">int</span>)    <span class="hljs-comment"># d[&#x27;key&#x27;] 自动是 0</span><br><br><span class="hljs-comment"># Counter — 计数神器</span><br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>c = Counter(<span class="hljs-string">&quot;hello&quot;</span>)    <span class="hljs-comment"># Counter(&#123;&#x27;l&#x27;: 2, &#x27;h&#x27;: 1, &#x27;e&#x27;: 1, &#x27;o&#x27;: 1&#125;)</span><br>c.most_common(<span class="hljs-number">2</span>)        <span class="hljs-comment"># [(&#x27;l&#x27;, 2), (&#x27;h&#x27;, 1)]</span><br>c1 - c2                 <span class="hljs-comment"># 减法，只保留正数计数</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="进阶：滚动哈希（Rabin-Karp）"><a href="#进阶：滚动哈希（Rabin-Karp）" class="headerlink" title="进阶：滚动哈希（Rabin-Karp）"></a>进阶：滚动哈希（Rabin-Karp）</h2><p>用多项式哈希在 O(1) 时间内从一个窗口滑动到下一个窗口。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 字符串匹配：O(n+m) 平均</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rabinKarp</span>(<span class="hljs-params">text, pattern</span>):<br>    base, mod = <span class="hljs-number">31</span>, <span class="hljs-number">10</span>**<span class="hljs-number">9</span> + <span class="hljs-number">7</span><br>    m = <span class="hljs-built_in">len</span>(pattern)<br><br>    <span class="hljs-comment"># 计算 pattern 的哈希</span><br>    pat_hash = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> pattern:<br>        pat_hash = (pat_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br><br>    <span class="hljs-comment"># 滑动窗口</span><br>    win_hash = <span class="hljs-number">0</span><br>    power = <span class="hljs-built_in">pow</span>(base, m - <span class="hljs-number">1</span>, mod)<br>    <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(text):<br>        win_hash = (win_hash * base + <span class="hljs-built_in">ord</span>(c)) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m:<br>            win_hash = (win_hash - <span class="hljs-built_in">ord</span>(text[i - m]) * power * base) % mod<br>        <span class="hljs-keyword">if</span> i &gt;= m - <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> win_hash == pat_hash:<br>            <span class="hljs-keyword">if</span> text[i-m+<span class="hljs-number">1</span>:i+<span class="hljs-number">1</span>] == pattern:  <span class="hljs-comment"># 验证（防哈希碰撞）</span><br>                <span class="hljs-keyword">return</span> i - m + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="动画：两数之和过程"><a href="#动画：两数之和过程" class="headerlink" title="动画：两数之和过程"></a>动画：两数之和过程</h2><p>数组 <code>[2, 7, 11, 15]</code>，target &#x3D; <code>9</code>，逐步演示「先查后存」的查找过程。</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/hash-table.html" loading="lazy" style="width:100%;height:380px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h2><div class="exercise">
+<details>
+<summary><strong>为什么两数之和要"先查后存"？举一个如果"先存后查"会出错的例子。</strong></summary>
+
+<p>例子：<code>nums = [3, 3]</code>, <code>target = 6</code>。</p>
+<p>如果”先存后查”：遍历到第一个 3 时，先存 <code>seen[3]=0</code>。然后查 <code>target-3=3</code>，发现 seen 里有！返回 <code>[0, 0]</code>。但这是同一个元素，不是两个不同的数。</p>
+<p>“先查后存”：遍历到第一个 3 时，先查 seen 里有没有 <code>6-3=3</code>，没有。再存 <code>seen[3]=0</code>。遍历到第二个 3 时，先查 seen 里有没有 <code>6-3=3</code>，有！返回 <code>[0, 1]</code>。正确！</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>前缀和+哈希表中，{0: 1} 初始化的含义是什么？不加会漏掉哪些情况？</strong></summary>
+
+<p><code>&#123;0: 1&#125;</code> 表示”前缀和为 0 出现过 1 次”，对应的是空前缀（一个元素都不取）。</p>
+<p>如果不加：当 <code>curr_sum</code> 恰好等于 <code>k</code> 时（即从数组开头到当前位置的子数组和就是 k），我们需要找 <code>curr_sum - k = 0</code> 在 prefix 中出现的次数。如果没有初始化 <code>&#123;0:1&#125;</code>，就找不到，漏掉了这种情况。</p>
+<p>例：<code>nums = [1, 2, 3]</code>, <code>k = 3</code>。前缀和到第 2 个元素时是 3，需要 <code>prefix[0] = 1</code> 才能数到子数组 <code>[1,2]</code>。</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Counter 的减法 c1 - c2 为什么只保留正数？这在什么场景下有用？</strong></summary>
+
+<p>设计哲学：Counter 代表”多重集合”，元素个数不能为负。减法表示”从集合中移除”，移除比拥有的多就是 0。</p>
+<p>有用场景：</p>
+<ul>
+<li>判断一个单词能否由另一个的字母组成：<code>Counter(word) - Counter(available)</code> 为空则可以。</li>
+<li>找缺少的字母：<code>Counter(required) - Counter(have)</code> 得到还差什么。</li>
+<li>滑动窗口中比较字符频率。</li>
+</ul>
+</details>
+</div>
+
+<h2 id="LeetCode-题目"><a href="#LeetCode-题目" class="headerlink" title="LeetCode 题目"></a>LeetCode 题目</h2><p><strong>热身</strong>：1. Two Sum、49. Group Anagrams、560. Subarray Sum Equals K、128. Longest Consecutive、217. Contains Duplicate。</p>
+<p><strong>进阶</strong>：454. 4Sum II、974. Subarray Sums Divisible by K、437. Path Sum III、146. LRU Cache、355. Design Twitter。</p>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2026/06/02/Heap-Priority-Queue/">
+              <i class="fas fa-chevron-left"></i>
+              堆 / 优先队列
+            </a>
+          
+          
+            <a class="next" href="/2026/06/02/Monotonic-Queue/">
+              单调队列
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-04
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

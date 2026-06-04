@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>位操作可视化</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; margin: 0; border: 1px solid #333; position: relative; overflow: hidden; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+
+.bit-row { display: flex; gap: 4px; margin: 8px 0; align-items: center; font-family: 'SF Mono', 'Fira Code', monospace; }
+.bit-cell { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #1a1a2e; border: 1px solid #444; border-radius: 4px; font-size: 1rem; transition: all 0.4s ease; }
+.bit-cell.on { background: #76b900; color: #000; font-weight: bold; }
+.bit-cell.off { background: #1a1a2e; color: #555; }
+.bit-cell.highlight { background: #00d4aa; color: #000; font-weight: bold; animation: pulse 0.6s ease; }
+.bit-cell.removed { background: #ff4444; color: #fff; animation: fadeOut 0.6s ease; }
+.bit-label { width: 120px; color: #888; font-size: 0.85rem; text-align: right; padding-right: 12px; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+@keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0.3; } }
+
+@media (max-width: 600px) {
+  .bit-cell { width: 28px; height: 28px; font-size: 0.8rem; }
+  .bit-label { width: 80px; font-size: 0.75rem; }
+  .controls { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<div class="animation-container">
+<div class="controls">
+  <button class="btn" onclick="startDemo('clear')">n & (n-1) 清最低位1</button>
+  <button class="btn btn-secondary" onclick="startDemo('lowbit')">n & -n 取最低位1</button>
+  <button class="btn btn-secondary" onclick="resetDemo()">重置</button>
+</div>
+<div id="bit-display">
+  <div class="bit-row">
+    <span class="bit-label">n = 13</span>
+    <div id="bits-n" style="display:flex; gap:4px;"></div>
+    <span style="margin-left:12px; color:#888;" id="decimal-n">= 13</span>
+  </div>
+  <div class="bit-row" id="row-operand" style="display:none;">
+    <span class="bit-label" id="label-operand">n-1 = 12</span>
+    <div id="bits-operand" style="display:flex; gap:4px;"></div>
+    <span style="margin-left:12px; color:#888;" id="decimal-operand">= 12</span>
+  </div>
+  <div class="bit-row" id="row-result" style="display:none;">
+    <span class="bit-label" id="label-result">结果</span>
+    <div id="bits-result" style="display:flex; gap:4px;"></div>
+    <span style="margin-left:12px; color:#888;" id="decimal-result">= ?</span>
+  </div>
+</div>
+<div class="step-info" id="bit-step-info">点击按钮开始演示</div>
+</div>
+
+<script>
+// Bit animation
+const NUM = 13;
+const BITS = 8;
+
+function toBits(n) {
+  return Array.from({length: BITS}, (_, i) => (n >> (BITS - 1 - i)) & 1);
+}
+
+function renderBits(containerId, bits, highlights = [], classes = []) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  bits.forEach((b, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'bit-cell ' + (b ? 'on' : 'off');
+    if (highlights.includes(i)) cell.className += ' ' + (classes[highlights.indexOf(i)] || 'highlight');
+    cell.textContent = b;
+    container.appendChild(cell);
+  });
+}
+
+function resetDemo() {
+  const bits = toBits(NUM);
+  renderBits('bits-n', bits);
+  document.getElementById('decimal-n').textContent = '= 13';
+  document.getElementById('row-operand').style.display = 'none';
+  document.getElementById('row-result').style.display = 'none';
+  document.getElementById('bit-step-info').textContent = '点击按钮开始演示';
+}
+
+function startDemo(type) {
+  resetDemo();
+  const n = NUM;
+  const bitsN = toBits(n);
+
+  if (type === 'clear') {
+    // n & (n-1): clear lowest set bit
+    const operand = n - 1; // 12
+    const result = n & operand; // 12
+    const bitsOp = toBits(operand);
+    const bitsRes = toBits(result);
+
+    setTimeout(() => {
+      document.getElementById('bit-step-info').textContent = 'Step 1: n = 13，二进制为 00001101';
+      renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
+    }, 300);
+
+    setTimeout(() => {
+      document.getElementById('row-operand').style.display = 'flex';
+      document.getElementById('label-operand').textContent = 'n-1 = 12';
+      document.getElementById('decimal-operand').textContent = '= 12';
+      renderBits('bits-operand', bitsOp);
+      document.getElementById('bit-step-info').textContent = 'Step 2: n-1 = 12。最低位的1（第0位）变0，更低位全变1';
+      // Highlight the difference: bit 7 (LSB) was 1->0, bit 6 was 0->1
+      renderBits('bits-operand', bitsOp, [6, 7], ['highlight', 'highlight']);
+    }, 1500);
+
+    setTimeout(() => {
+      document.getElementById('row-result').style.display = 'flex';
+      document.getElementById('label-result').textContent = 'n&(n-1)';
+      document.getElementById('decimal-result').textContent = '= 12';
+      renderBits('bits-result', bitsRes);
+      document.getElementById('bit-step-info').textContent = 'Step 3: AND 操作 — 最低位的1被清掉了！13 (3个1) -> 12 (2个1)';
+      // Highlight cleared bit
+      renderBits('bits-n', bitsN, [7], ['removed']);
+      renderBits('bits-result', bitsRes, [4, 5], ['highlight', 'highlight']);
+    }, 3000);
+
+  } else if (type === 'lowbit') {
+    // n & -n: get lowest set bit
+    const neg = (~n + 1) & 0xFF; // -n in 8-bit two's complement = 243
+    const result = n & ((~n + 1) & 0xFF); // 1
+    const bitsNeg = toBits(neg);
+    const bitsRes = toBits(result);
+
+    setTimeout(() => {
+      document.getElementById('bit-step-info').textContent = 'Step 1: n = 13，二进制为 00001101';
+      renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
+    }, 300);
+
+    setTimeout(() => {
+      document.getElementById('row-operand').style.display = 'flex';
+      document.getElementById('label-operand').textContent = '-n (补码)';
+      document.getElementById('decimal-operand').textContent = '= ~n+1';
+      renderBits('bits-operand', bitsNeg);
+      document.getElementById('bit-step-info').textContent = 'Step 2: -n = ~n + 1。取反再加1，最低位的1保持，更高位全反转';
+      renderBits('bits-operand', bitsNeg, [7], ['highlight']);
+    }, 1500);
+
+    setTimeout(() => {
+      document.getElementById('row-result').style.display = 'flex';
+      document.getElementById('label-result').textContent = 'n&(-n)';
+      document.getElementById('decimal-result').textContent = '= 1';
+      renderBits('bits-result', bitsRes, [7], ['highlight']);
+      document.getElementById('bit-step-info').textContent = 'Step 3: AND 操作 — 只留下最低位的1！lowbit(13) = 1';
+    }, 3000);
+  }
+}
+
+// Initialize
+resetDemo();
+
+// 自动把高度汇报给父页面
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

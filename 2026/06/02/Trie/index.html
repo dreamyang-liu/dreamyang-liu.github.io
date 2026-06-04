@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Trie 前缀树 | Tuntun&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Tuntun&#39;s Blog
+      </a>
+    </div>
+    
+    <div class="nav-right">
+      <a href="/" class="nav-item ">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
+      <a href="/archives/" class="nav-item ">
+        <i class="fas fa-archive"></i>
+        <span>Archives</span>
+      </a>
+      <a href="/categories/" class="nav-item ">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </a>
+      <a href="/tags/" class="nav-item ">
+        <i class="fas fa-tags"></i>
+        <span>Tags</span>
+      </a>
+      <a href="/search/" class="nav-item ">
+        <i class="fas fa-search"></i>
+        <span>Search</span>
+      </a>
+      <a href="/about/" class="nav-item ">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- 左侧资源管理器 -->
+  <div class="sidebar-explorer">
+    <!-- TOC导航 -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-dict-%E7%89%88%E6%A8%A1%E6%9D%BF%EF%BC%88%E6%9C%80%E5%B8%B8%E7%94%A8%EF%BC%89"><span class="toc-text">1. dict 版模板（最常用）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%95%B0%E7%BB%84%E7%89%88%EF%BC%88%E6%9B%B4%E5%BF%AB%EF%BC%8C%E5%9B%BA%E5%AE%9A%E5%AD%97%E7%AC%A6%E9%9B%86%EF%BC%89"><span class="toc-text">2. 数组版（更快，固定字符集）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8D%E5%86%99%E9%94%99%E8%A6%81%E7%82%B9"><span class="toc-text">3. 不写错要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%BB%8F%E5%85%B8%E5%A5%97%E8%B7%AF"><span class="toc-text">4. 经典套路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E8%AF%8D%E6%90%9C%E7%B4%A2-II%EF%BC%88Trie-%E5%9B%9E%E6%BA%AF%EF%BC%89"><span class="toc-text">单词搜索 II（Trie + 回溯）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%A4%A7%E5%BC%82%E6%88%96%E5%AF%B9%EF%BC%8801-Trie%EF%BC%89"><span class="toc-text">最大异或对（01 Trie）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%8F%92%E5%85%A5%E4%B8%8E%E6%90%9C%E7%B4%A2%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="toc-text">5. 插入与搜索可视化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-text">6. 思考题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-LeetCode-%E7%BB%83%E4%B9%A0"><span class="toc-text">7. LeetCode 练习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E8%BA%AB"><span class="toc-text">热身</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6"><span class="toc-text">进阶</span></a></li></ol></li></ol>
+      </div>
+    </div>
+    
+    <!-- 同分类文章 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-folder"></i>
+        <span>CATEGORY POSTS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Quickselect/">快速选择 Quickselect</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Linked-List/">链表核心操作</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Heap-Priority-Queue/">堆 / 优先队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Hash-Table/">哈希表 Hash Table</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Queue/">单调队列</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
+            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
+          </div>
+        
+      </div>
+    </div>
+    
+    
+    <!-- 标签列表 -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+            <span class="count">(8)</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/">字符串</a>
+            <span class="count">(3)</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 主要内容区域 -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Trie 前缀树.md</span>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Trie 前缀树</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>            
+              <span class="categories">
+                <i class="fas fa-folder"></i>
+                <div class="categories-list">
+                  <ul class="category-item-post-list"><li class="category-item-post-list-item"><a class="category-item-post-list-link" href="/categories/Algorithm/">Algorithm</a></li></ul>
+                </div>
+              </span>
+            
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  <ul class="tag-item-post-list" itemprop="keywords"><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a></li><li class="tag-item-post-list-item"><a class="tag-item-post-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li></ul>
+                </div>
+              </span>
+            
+          </div>
+        </div>
+        
+        <div class="post-body vscode-markdown">
+          <p>每个节点代表”走到这里时的前缀”。共享前缀的字符串共享路径。本文正文为 markdown，配有插入与搜索的可交互动画。</p>
+<span id="more"></span>
+
+<h2 id="1-dict-版模板（最常用）"><a href="#1-dict-版模板（最常用）" class="headerlink" title="1. dict 版模板（最常用）"></a>1. dict 版模板（最常用）</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Trie</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-variable language_">self</span>.root = &#123;&#125;<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">insert</span>(<span class="hljs-params">self, word</span>):<br>        node = <span class="hljs-variable language_">self</span>.root<br>        <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> word:<br>            <span class="hljs-keyword">if</span> c <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> node:<br>                node[c] = &#123;&#125;<br>            node = node[c]<br>        node[<span class="hljs-string">&#x27;#&#x27;</span>] = <span class="hljs-literal">True</span>          <span class="hljs-comment"># 结尾标记</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">search</span>(<span class="hljs-params">self, word</span>):<br>        node = <span class="hljs-variable language_">self</span>._walk(word)<br>        <span class="hljs-keyword">return</span> node <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> <span class="hljs-string">&#x27;#&#x27;</span> <span class="hljs-keyword">in</span> node<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">starts_with</span>(<span class="hljs-params">self, prefix</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>._walk(prefix) <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">_walk</span>(<span class="hljs-params">self, s</span>):<br>        node = <span class="hljs-variable language_">self</span>.root<br>        <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> s:<br>            <span class="hljs-keyword">if</span> c <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> node:<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>            node = node[c]<br>        <span class="hljs-keyword">return</span> node<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>核心思想</strong>：沿着字符一步步走，走到头能找到 <code>#</code> 标记就说明这个词存在。<code>starts_with</code> 只需要能走完就行，不要求有结尾标记。</p>
+</blockquote>
+<h2 id="2-数组版（更快，固定字符集）"><a href="#2-数组版（更快，固定字符集）" class="headerlink" title="2. 数组版（更快，固定字符集）"></a>2. 数组版（更快，固定字符集）</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">TrieArray</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-comment"># 预分配节点池，children[i][c] = 下一个节点编号</span><br>        <span class="hljs-variable language_">self</span>.children = [[<span class="hljs-number">0</span>]*<span class="hljs-number">26</span> <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100001</span>)]<br>        <span class="hljs-variable language_">self</span>.is_end = [<span class="hljs-literal">False</span>] * <span class="hljs-number">100001</span><br>        <span class="hljs-variable language_">self</span>.cnt = <span class="hljs-number">0</span>  <span class="hljs-comment"># 当前已用节点数</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">insert</span>(<span class="hljs-params">self, word</span>):<br>        node = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> word:<br>            c = <span class="hljs-built_in">ord</span>(ch) - <span class="hljs-built_in">ord</span>(<span class="hljs-string">&#x27;a&#x27;</span>)<br>            <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.children[node][c] == <span class="hljs-number">0</span>:<br>                <span class="hljs-variable language_">self</span>.cnt += <span class="hljs-number">1</span><br>                <span class="hljs-variable language_">self</span>.children[node][c] = <span class="hljs-variable language_">self</span>.cnt<br>            node = <span class="hljs-variable language_">self</span>.children[node][c]<br>        <span class="hljs-variable language_">self</span>.is_end[node] = <span class="hljs-literal">True</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>dict vs 数组</strong>：</p>
+<ul>
+<li>dict 版：灵活，字符集不限，写起来快，Python 首选。</li>
+<li>数组版：访问更快（O(1) 数组索引 vs 哈希），内存紧凑，C++ &#x2F; 竞赛常用。</li>
+</ul>
+<h2 id="3-不写错要点"><a href="#3-不写错要点" class="headerlink" title="3. 不写错要点"></a>3. 不写错要点</h2><blockquote>
+<p><strong>结尾标记不能省！</strong> 如果不加 <code>#</code>（或 <code>is_end</code>），插入 “apple” 后 <code>search(&quot;app&quot;)</code> 会返回 True —— 因为 “app” 是 “apple” 的前缀，路径确实存在，但 “app” 这个词并没有被插入过。</p>
+</blockquote>
+<h2 id="4-经典套路"><a href="#4-经典套路" class="headerlink" title="4. 经典套路"></a>4. 经典套路</h2><h3 id="单词搜索-II（Trie-回溯）"><a href="#单词搜索-II（Trie-回溯）" class="headerlink" title="单词搜索 II（Trie + 回溯）"></a>单词搜索 II（Trie + 回溯）</h3><p>把所有待搜索词建成 Trie，然后在网格上 DFS。每走一步看 Trie 中有没有对应分支，没有就剪枝。比逐个词搜索快得多。</p>
+<h3 id="最大异或对（01-Trie）"><a href="#最大异或对（01-Trie）" class="headerlink" title="最大异或对（01 Trie）"></a>最大异或对（01 Trie）</h3><p>把每个数的二进制表示插入 Trie（从高位到低位）。查询时贪心地走相反方向 —— 每一位尽量选和当前位不同的路径，这样异或结果该位为 1，最终得到最大值。</p>
+<h2 id="5-插入与搜索可视化"><a href="#5-插入与搜索可视化" class="headerlink" title="5. 插入与搜索可视化"></a>5. 插入与搜索可视化</h2><p>上半部分依次插入 <code>apple, app, ant, bee</code> 演示共享前缀；插入完成后用下半部分的搜索按钮体会”有 <code>#</code> 标记才算完整单词”：</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/trie.html" loading="lazy" style="width:100%;height:760px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="6-思考题"><a href="#6-思考题" class="headerlink" title="6. 思考题"></a>6. 思考题</h2><div class="exercise">
+<details>
+<summary><strong>三道思考题</strong></summary>
+
+<ol>
+<li>为什么需要 <code>#</code> 结尾标记？不加会出什么问题？</li>
+<li>dict 版和数组版 Trie 各有什么优劣？</li>
+<li>01 Trie 的”每一位尽量选相反方向”为什么能得到最大异或？</li>
+</ol>
+</details>
+</div>
+
+<h2 id="7-LeetCode-练习"><a href="#7-LeetCode-练习" class="headerlink" title="7. LeetCode 练习"></a>7. LeetCode 练习</h2><h3 id="热身"><a href="#热身" class="headerlink" title="热身"></a>热身</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/implement-trie-prefix-tree/">208. 实现 Trie（前缀树）</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-suggestions-system/">1268. 搜索推荐系统</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/replace-words/">648. 单词替换</a></li>
+</ul>
+<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/word-search-ii/">212. 单词搜索 II</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-xor-of-two-numbers-in-an-array/">421. 数组中两个数的最大异或值</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/palindrome-pairs/">336. 回文对</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/map-sum-pairs/">677. 键值映射</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/prefix-and-suffix-search/">745. 前缀和后缀搜索</a></li>
+</ul>
+
+        </div>
+        
+        <!-- 文章导航 -->
+        <nav class="post-nav">
+          
+            <a class="prev" href="/2026/06/02/Dynamic-Programming/">
+              <i class="fas fa-chevron-left"></i>
+              动态规划
+            </a>
+          
+          
+            <a class="next" href="/2026/06/02/Topological-Sort/">
+              拓扑排序 Topological Sort
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Tuntun
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-04
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

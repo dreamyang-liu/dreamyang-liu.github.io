@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>并查集 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: transparent; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; padding: 4px; }
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; margin: 0.5rem 0; border: 1px solid #333; min-height: 350px; position: relative; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+svg text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+@media (max-width: 600px) {
+  .animation-container { padding: 12px; min-height: 280px; }
+  .controls { gap: 6px; }
+  .btn { padding: 8px 14px; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="animation-container">
+<div class="controls">
+  <button class="btn" id="btn-next">下一步 Union</button>
+  <button class="btn btn-secondary" id="btn-find">执行 Find (路径压缩)</button>
+  <button class="btn btn-secondary" id="btn-reset">重置</button>
+</div>
+<div class="step-info" id="step-info">点击"下一步"开始演示 union 操作</div>
+<svg id="uf-svg" width="100%" height="280" viewBox="0 0 600 280"></svg>
+</div>
+
+<script>
+(function() {
+  const operations = [
+    [0, 1, 'union(0, 1): 节点0指向1'],
+    [2, 3, 'union(2, 3): 节点2指向3'],
+    [1, 3, 'union(1, 3): 节点1的根(1)指向3'],
+    [4, 5, 'union(4, 5): 节点4指向5'],
+    [3, 5, 'union(3, 5): 节点3的根(3)指向5']
+  ];
+  let parent, step, findMode;
+
+  function reset() {
+    parent = [0,1,2,3,4,5];
+    step = 0;
+    findMode = false;
+    document.getElementById('step-info').textContent = '点击"下一步"开始演示 union 操作';
+    draw();
+  }
+
+  function find(x) {
+    if (parent[x] !== x) {
+      parent[x] = find(parent[x]);
+    }
+    return parent[x];
+  }
+
+  function doUnion() {
+    if (step >= operations.length) {
+      document.getElementById('step-info').textContent = '所有 union 操作已完成！试试点击 Find 看路径压缩效果';
+      return;
+    }
+    const [x, y, msg] = operations[step];
+    const rx = find(x), ry = find(y);
+    if (rx !== ry) parent[rx] = ry;
+    step++;
+    document.getElementById('step-info').textContent = msg;
+    draw();
+  }
+
+  function doFind() {
+    // compress all paths
+    for (let i = 0; i < 6; i++) find(i);
+    document.getElementById('step-info').textContent = 'Find 路径压缩：所有节点直接指向根，树变扁了！';
+    draw();
+  }
+
+  function getPositions() {
+    // compute tree layout
+    const children = Array.from({length:6}, ()=>[]);
+    const roots = [];
+    for (let i = 0; i < 6; i++) {
+      if (parent[i] === i) roots.push(i);
+      else children[parent[i]].push(i);
+    }
+
+    const pos = {};
+    let xOffset = 50;
+    const xGap = 100;
+
+    function layoutTree(root, baseX, depth) {
+      const ch = children[root];
+      if (ch.length === 0) {
+        pos[root] = { x: baseX, y: 40 + depth * 80 };
+        return { left: baseX, right: baseX };
+      }
+      let currentX = baseX;
+      let leftmost = Infinity, rightmost = -Infinity;
+      for (const c of ch) {
+        const bounds = layoutTree(c, currentX, depth + 1);
+        leftmost = Math.min(leftmost, bounds.left);
+        rightmost = Math.max(rightmost, bounds.right);
+        currentX = bounds.right + xGap;
+      }
+      const myX = (leftmost + rightmost) / 2;
+      pos[root] = { x: myX, y: 40 + depth * 80 };
+      return { left: leftmost, right: rightmost };
+    }
+
+    let cursor = 50;
+    for (const r of roots) {
+      const bounds = layoutTree(r, cursor, 0);
+      cursor = bounds.right + 120;
+    }
+
+    // normalize to fit in viewBox
+    const xs = Object.values(pos).map(p => p.x);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const scale = maxX > minX ? 500 / (maxX - minX) : 1;
+    for (const k of Object.keys(pos)) {
+      pos[k].x = 50 + (pos[k].x - minX) * scale;
+    }
+    return pos;
+  }
+
+  function draw() {
+    const svg = document.getElementById('uf-svg');
+    const pos = getPositions();
+    const colors = ['#76b900','#00d4aa','#e06c75','#61afef','#d19a66','#c678dd'];
+    let html = '';
+
+    // edges
+    for (let i = 0; i < 6; i++) {
+      if (parent[i] !== i) {
+        const from = pos[i], to = pos[parent[i]];
+        html += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>`;
+      }
+    }
+
+    // arrow marker
+    html = `<defs><marker id="arrow" viewBox="0 0 10 10" refX="20" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/></marker></defs>` + html;
+
+    // nodes
+    for (let i = 0; i < 6; i++) {
+      const {x, y} = pos[i];
+      const isRoot = parent[i] === i;
+      const fill = isRoot ? '#76b900' : '#1a1a2e';
+      const stroke = isRoot ? '#76b900' : '#00d4aa';
+      html += `<circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+      html += `<text x="${x}" y="${y+5}" text-anchor="middle" fill="${isRoot?'#000':'#e0e0e0'}" font-size="14" font-weight="bold">${i}</text>`;
+    }
+
+    // parent array display
+    html += `<text x="300" y="270" text-anchor="middle" fill="#888" font-size="12">parent: [${parent.join(', ')}]</text>`;
+
+    svg.innerHTML = html;
+  }
+
+  document.getElementById('btn-next').onclick = doUnion;
+  document.getElementById('btn-find').onclick = doFind;
+  document.getElementById('btn-reset').onclick = reset;
+  reset();
+})();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

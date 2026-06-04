@@ -135,12 +135,12 @@
   color: #569cd6;
 }
 
-/* 分类和标签垂直排列样式 */
+/* 分类和标签：横向自动换行的 chip 样式 */
 .categories-list,
 .tags-list {
-  display: flex;
-  flex-direction: column;
-  margin-top: 0.5rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .categories-list ul,
@@ -148,27 +148,32 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .categories-list li,
 .tags-list li {
-  margin-bottom: 0.3rem;
+  margin: 0;
 }
 
 .category-item-post a,
 .tag-item-post a {
-  display: block;
+  display: inline-block;
   text-decoration: none;
   color: var(--vscode-text);
-  padding: 0.3rem 0.5rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--vscode-border);
+  border-radius: 4px;
   transition: all 0.2s ease;
-  border-left: 2px solid transparent;
+  white-space: nowrap;
 }
 
 .category-item-post a:hover,
 .tag-item-post a:hover {
   background: var(--vscode-active);
-  border-left-color: #569cd6;
+  border-color: #569cd6;
   color: #569cd6;
 }
 

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPU 全局架构总览 (Blackwell)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+@keyframes nvlinkPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- Full GPU Architecture Diagram -->
+<div style="background: #0a0a1a; border-radius: 12px; padding: 30px; margin: 0; border: 1px solid #333; position: relative; overflow: hidden;">
+
+  <!-- Title -->
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="font-size: 1.1em; font-weight: bold; color: #fff; background: linear-gradient(90deg, #00d2ff, #7b2ff7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GPU Die Overview</span>
+  </div>
+
+  <!-- Main layout: GPC array + Memory -->
+  <div style="display: flex; gap: 20px; align-items: stretch;">
+
+    <!-- Left: GPU Compute Side -->
+    <div style="flex: 3; display: flex; flex-direction: column; gap: 15px;">
+
+      <!-- GPC Array -->
+      <div style="border: 2px solid #444; border-radius: 10px; padding: 18px; position: relative; background: #0f0f20;">
+        <div style="position: absolute; top: -11px; left: 16px; background: #0a0a1a; padding: 0 10px; color: #00d2ff; font-weight: bold; font-size: 0.85em;">GPC × 12 (Graphics Processing Clusters)</div>
+
+        <!-- GPC grid showing SM clusters -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
+
+          <!-- One detailed GPC -->
+          <div style="border: 1.5px solid #7b2ff7; border-radius: 8px; padding: 10px; background: #12122a; grid-column: span 2; grid-row: span 2;">
+            <div style="color: #7b2ff7; font-size: 0.72em; font-weight: bold; margin-bottom: 8px; text-align: center;">GPC 0 (详细展开)</div>
+
+            <!-- SM Units inside GPC -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+              <!-- Detailed SM -->
+              <div style="border: 1px solid #00d2ff; border-radius: 6px; padding: 6px; background: #1a1a30; grid-column: span 3;">
+                <div style="color: #00d2ff; font-size: 0.65em; font-weight: bold; text-align: center; margin-bottom: 6px;">SM (Streaming Multiprocessor)</div>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
+                  <!-- CUDA Cores -->
+                  <div style="background: #4caf5025; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                    <div style="font-size: 0.55em; color: #81c784; white-space: nowrap;">CUDA Cores</div>
+                    <div style="display: grid; grid-template-columns: repeat(8, 6px); gap: 1px; margin-top: 3px;">
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                      <div style="width:6px;height:6px;background:#66bb6a;border-radius:1px;"></div>
+                    </div>
+                    <div style="font-size: 0.5em; color: #666; margin-top: 2px;">128 FP32</div>
+                  </div>
+                  <!-- Tensor Cores -->
+                  <div style="background: #7b2ff725; border: 1px solid #7b2ff7; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                    <div style="font-size: 0.55em; color: #b388ff; white-space: nowrap;">Tensor Cores</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 12px); gap: 2px; margin-top: 3px; justify-content: center;">
+                      <div style="width:12px;height:12px;background:linear-gradient(135deg,#7b2ff7,#a855f7);border-radius:2px;"></div>
+                      <div style="width:12px;height:12px;background:linear-gradient(135deg,#7b2ff7,#a855f7);border-radius:2px;"></div>
+                      <div style="width:12px;height:12px;background:linear-gradient(135deg,#7b2ff7,#a855f7);border-radius:2px;"></div>
+                      <div style="width:12px;height:12px;background:linear-gradient(135deg,#7b2ff7,#a855f7);border-radius:2px;"></div>
+                    </div>
+                    <div style="font-size: 0.5em; color: #666; margin-top: 2px;">4× 5th Gen</div>
+                  </div>
+                  <!-- RT Cores -->
+                  <div style="background: #f9ca2425; border: 1px solid #f9ca24; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                    <div style="font-size: 0.55em; color: #f9ca24; white-space: nowrap;">RT Core</div>
+                    <div style="display: flex; justify-content: center; margin-top: 3px;">
+                      <div style="width:14px;height:14px;background:linear-gradient(135deg,#f9ca24,#f0932b);border-radius:2px;"></div>
+                    </div>
+                    <div style="font-size: 0.5em; color: #666; margin-top: 2px;">4th Gen</div>
+                  </div>
+                  <!-- SRAM / Shared Memory -->
+                  <div style="background: #ff6b6b20; border: 1px solid #ff6b6b; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                    <div style="font-size: 0.55em; color: #ff8a80; white-space: nowrap;">Shared Mem / L1</div>
+                    <div style="width: 100%; height: 10px; background: linear-gradient(90deg, #ff6b6b, #ff6b6b88); border-radius: 2px; margin-top: 4px;"></div>
+                    <div style="font-size: 0.5em; color: #666; margin-top: 2px;">228 KB SRAM</div>
+                  </div>
+                </div>
+                <!-- Register File -->
+                <div style="margin-top: 6px; background: #ff980020; border: 1px solid #ff980066; border-radius: 3px; padding: 3px; text-align: center;">
+                  <span style="font-size: 0.5em; color: #ffcc80;">Register File: 256 KB (65536 × 32-bit)</span>
+                </div>
+              </div>
+
+              <!-- Other SMs in this GPC (simplified) -->
+              <div style="border: 1px solid #444; border-radius: 4px; padding: 4px; background: #1a1a30; text-align: center;">
+                <div style="font-size: 0.55em; color: #888;">SM 1</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 4px); gap: 1px; margin: 3px auto; width: fit-content;">
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#7b2ff7;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#f9ca24;border-radius:1px;"></div>
+                </div>
+              </div>
+              <div style="border: 1px solid #444; border-radius: 4px; padding: 4px; background: #1a1a30; text-align: center;">
+                <div style="font-size: 0.55em; color: #888;">SM 2</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 4px); gap: 1px; margin: 3px auto; width: fit-content;">
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#7b2ff7;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#f9ca24;border-radius:1px;"></div>
+                </div>
+              </div>
+              <div style="border: 1px solid #444; border-radius: 4px; padding: 4px; background: #1a1a30; text-align: center;">
+                <div style="font-size: 0.55em; color: #888;">SM 3</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 4px); gap: 1px; margin: 3px auto; width: fit-content;">
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#4caf50;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#7b2ff7;border-radius:1px;"></div>
+                  <div style="width:4px;height:4px;background:#f9ca24;border-radius:1px;"></div>
+                </div>
+              </div>
+              <div style="border: 1px solid #444; border-radius: 4px; padding: 4px; background: #1a1a30; text-align: center; font-size: 0.55em; color: #666;">... ×12 SMs/GPC</div>
+            </div>
+          </div>
+
+          <!-- Other GPCs (simplified) -->
+          <div style="border: 1px solid #444; border-radius: 6px; padding: 8px; background: #12122a; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="color: #888; font-size: 0.7em;">GPC 1</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 8px); gap: 2px; margin-top: 6px;">
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+            </div>
+          </div>
+          <div style="border: 1px solid #444; border-radius: 6px; padding: 8px; background: #12122a; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="color: #888; font-size: 0.7em;">GPC 2</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 8px); gap: 2px; margin-top: 6px;">
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+            </div>
+          </div>
+          <div style="border: 1px solid #444; border-radius: 6px; padding: 8px; background: #12122a; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="color: #888; font-size: 0.7em;">GPC 3</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 8px); gap: 2px; margin-top: 6px;">
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+              <div style="width:8px;height:8px;background:#1e3a5f;border:1px solid #444;border-radius:1px;"></div>
+            </div>
+          </div>
+          <div style="border: 1px solid #444; border-radius: 6px; padding: 8px; background: #12122a; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="color: #888; font-size: 0.7em;">GPC 4-11</div>
+            <div style="color: #555; font-size: 1.2em; margin-top: 4px;">...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interconnect: L2 Cache + Crossbar -->
+      <div style="display: flex; gap: 10px;">
+        <!-- L2 Cache -->
+        <div style="flex: 2; border: 2px solid #6ab04c; border-radius: 8px; padding: 12px; background: #0f1f0f; position: relative;">
+          <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #6ab04c; font-weight: bold; font-size: 0.8em;">L2 Cache</div>
+          <div style="display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+            <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
+          </div>
+          <div style="text-align: center; font-size: 0.68em; color: #aaa; margin-top: 6px;">96 MB | ~12 TB/s | All SMs share</div>
+        </div>
+        <!-- GigaThread Engine -->
+        <div style="flex: 1; border: 2px solid #ff9800; border-radius: 8px; padding: 12px; background: #1a1208; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #ff9800; font-weight: bold; font-size: 0.72em; white-space: nowrap;">GigaThread Engine</div>
+          <div style="font-size: 0.62em; color: #ffcc80; text-align: center; margin-top: 4px;">Block 调度<br>Warp 分配<br>负载均衡</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Memory Subsystem -->
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+
+      <!-- HBM -->
+      <div style="border: 2px solid #00d2ff; border-radius: 8px; padding: 14px; background: #001a2e; position: relative; flex: 1;">
+        <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #00d2ff; font-weight: bold; font-size: 0.8em;">HBM3e (GDDR7)</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+          <div style="display: flex; gap: 3px;">
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 0</div>
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 1</div>
+          </div>
+          <div style="display: flex; gap: 3px;">
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 2</div>
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 3</div>
+          </div>
+          <div style="display: flex; gap: 3px;">
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 4</div>
+            <div style="flex:1; height: 22px; background: linear-gradient(180deg, #004466, #001a2e); border: 1px solid #006699; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55em; color: #66ccff;">Stack 5</div>
+          </div>
+        </div>
+        <div style="text-align: center; font-size: 0.65em; color: #88ccee; margin-top: 8px; line-height: 1.5;">
+          96 GB 总容量<br>
+          1792 GB/s 带宽<br>
+          512-bit 接口
+        </div>
+      </div>
+
+      <!-- NVLink -->
+      <div style="border: 2px solid #76ff03; border-radius: 8px; padding: 10px; background: #0a1a0a; position: relative;">
+        <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #76ff03; font-weight: bold; font-size: 0.75em;">NVLink 5.0</div>
+        <div style="display: flex; gap: 3px; margin-top: 4px; justify-content: center;">
+          <div style="width: 4px; height: 30px; background: linear-gradient(180deg, #76ff03, #33691e); border-radius: 2px; animation: nvlinkPulse 1.5s ease-in-out infinite;"></div>
+          <div style="width: 4px; height: 30px; background: linear-gradient(180deg, #76ff03, #33691e); border-radius: 2px; animation: nvlinkPulse 1.5s ease-in-out infinite 0.2s;"></div>
+          <div style="width: 4px; height: 30px; background: linear-gradient(180deg, #76ff03, #33691e); border-radius: 2px; animation: nvlinkPulse 1.5s ease-in-out infinite 0.4s;"></div>
+          <div style="width: 4px; height: 30px; background: linear-gradient(180deg, #76ff03, #33691e); border-radius: 2px; animation: nvlinkPulse 1.5s ease-in-out infinite 0.6s;"></div>
+        </div>
+        <div style="text-align: center; font-size: 0.6em; color: #a5d6a7; margin-top: 6px;">1800 GB/s<br>GPU↔GPU</div>
+      </div>
+
+      <!-- PCIe -->
+      <div style="border: 2px solid #888; border-radius: 8px; padding: 10px; background: #111; position: relative;">
+        <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #aaa; font-weight: bold; font-size: 0.75em;">PCIe 5.0 x16</div>
+        <div style="text-align: center; font-size: 0.62em; color: #999; margin-top: 4px;">128 GB/s<br>CPU↔GPU</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: Data flow legend -->
+  <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding-top: 15px; border-top: 1px solid #333;">
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: #4caf50; border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">CUDA Core (FP32/INT32)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #7b2ff7, #a855f7); border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">Tensor Core (FP4/FP8/BF16/TF32)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #f9ca24, #f0932b); border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">RT Core (Ray Tracing)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: #ff6b6b; border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">SRAM (Shared Mem + L1)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #00d2ff, #006699); border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">HBM (Global Memory)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <div style="width: 12px; height: 12px; background: #6ab04c; border-radius: 2px;"></div>
+      <span style="font-size: 0.72em; color: #aaa;">L2 Cache</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

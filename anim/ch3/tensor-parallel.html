@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tensor Parallel MLP 计算流</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.anim-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-controls { text-align: center; margin: 15px 0; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.95em; }
+</style>
+</head>
+<body>
+
+<div id="tp-animation" style="background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0;">
+  <div id="tpGrid" style="overflow-x:auto; margin: 10px 0;"></div>
+  <div style="display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; font-size: 0.85em;">
+    <span><span style="display:inline-block;width:16px;height:16px;background:#2196f3;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Input (Replicated)</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#4caf50;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Compute (No Comm)</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#ff9800;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Partial Result</span>
+    <span><span style="display:inline-block;width:16px;height:16px;background:#f44336;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> AllReduce (Communication)</span>
+  </div>
+  <div id="tpStepText" style="color:#a78bfa; font-size:0.95em; min-height:40px; margin:10px 0; padding:10px; background:#1a1a2e; border-radius:6px;"></div>
+  <div class="anim-controls">
+    <button class="anim-btn" id="tpPrev" onclick="tpStep(-1)" disabled>&larr; 上一步</button>
+    <button class="anim-btn" id="tpNext" onclick="tpStep(1)">下一步 &rarr;</button>
+    <button class="anim-btn" onclick="tpReset()">重置</button>
+  </div>
+  <div class="step-indicator" id="tpStepCounter">Step 0 / 5</div>
+</div>
+
+<script>
+const gpuColors = ['#f44336','#4caf50','#2196f3','#ff9800'];
+
+let tpCurrentStep = 0;
+const tpStepsData = [
+  { desc: '初始状态: Input X (shape [B, H]) 被复制到所有 GPU (replicated)' },
+  { desc: 'Step 1 - Column Parallel Linear: X * [W1_part] on GPU0, X * [W2_part] on GPU1 → 得到 partial Y (无通信!)' },
+  { desc: 'Step 2 - GeLU 激活函数: 各 GPU 独立对 partial Y 执行 GeLU (无通信, 完全并行)' },
+  { desc: 'Step 3 - Row Parallel Linear: Y_partial * W_row on each GPU → 得到 partial output' },
+  { desc: 'Step 4 - AllReduce 通信: 对 partial outputs 求和 → 得到最终 output (唯一的通信点!)' },
+  { desc: 'Step 5 - 完成: Output = sum of partial outputs, 与单卡计算结果数学等价' }
+];
+
+function renderTPStep(step) {
+  const stages = [
+    {label: 'Input X\n(replicated)', color: '#2196f3', comm: false},
+    {label: 'Column Parallel\nX * W_part', color: '#4caf50', comm: false},
+    {label: 'GeLU\n(independent)', color: '#4caf50', comm: false},
+    {label: 'Row Parallel\nY * W_row', color: '#ff9800', comm: false},
+    {label: 'AllReduce\n(SUM)', color: '#f44336', comm: true},
+    {label: 'Output\n(complete)', color: '#667eea', comm: false}
+  ];
+
+  let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+
+  html += '<div style="display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap; margin-bottom:15px;">';
+  for (let i = 0; i <= 5; i++) {
+    const active = (i <= step);
+    const isCurrent = (i === step);
+    const s = stages[i];
+    const opacity = active ? '1' : '0.25';
+    const border = isCurrent ? '3px solid #fff' : `2px solid ${s.color}`;
+    const bg = active ? s.color + '33' : '#1a1a2e';
+    html += `<div style="padding:8px 12px; border:${border}; border-radius:8px; background:${bg}; opacity:${opacity}; text-align:center; font-size:0.8em; min-width:80px; white-space:pre-line;">`;
+    html += `<div style="color:${s.color}; font-weight:bold;">${s.label}</div>`;
+    if (s.comm && active) html += `<div style="color:#f44336; font-size:0.8em; margin-top:3px;">COMMUNICATION</div>`;
+    html += '</div>';
+    if (i < 5) html += '<span style="color:#888; font-size:1.2em;">&#8594;</span>';
+  }
+  html += '</div>';
+
+  html += '<table style="border-collapse:collapse; font-size:0.8em; width:100%;">';
+  html += '<tr><td style="padding:4px 8px; color:#888;"></td>';
+  const colLabels = ['Input', 'ColParallel', 'GeLU', 'RowParallel', 'AllReduce', 'Output'];
+  for (let i = 0; i < 6; i++) {
+    const active = (i <= step);
+    html += `<td style="padding:4px 6px; text-align:center; color:#888; font-size:0.85em; opacity:${active?'1':'0.3'};">${colLabels[i]}</td>`;
+  }
+  html += '</tr>';
+
+  for (let g = 0; g < 4; g++) {
+    html += `<tr><td style="padding:6px 8px; color:${gpuColors[g]}; font-weight:bold;">GPU ${g}</td>`;
+    const gpuData = [ `X (full)`, `X*W${g}`, `GeLU(Y${g})`, `Z${g}*Wr${g}`, `Sum(all)`, `Output` ];
+    for (let i = 0; i < 6; i++) {
+      const active = (i <= step);
+      const isCurrent = (i === step);
+      const s = stages[i];
+      const bg = active ? s.color + '44' : '#1a1a2e';
+      const border = isCurrent ? '2px solid #fff' : '1px solid #444';
+      const opacity = active ? '1' : '0.2';
+      html += `<td style="padding:6px 4px; text-align:center; background:${bg}; border:${border}; border-radius:3px; opacity:${opacity}; color:#fff; font-size:0.85em;">${active ? gpuData[i] : ''}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+
+  if (step === 4) {
+    html += '<div style="text-align:center; margin-top:10px; padding:8px; background:#f4433622; border:1px solid #f44336; border-radius:6px; color:#f44336; font-weight:bold; font-size:0.9em;">';
+    html += 'AllReduce: GPU0 partial + GPU1 partial + GPU2 partial + GPU3 partial = Final Output';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function tpStep(dir) {
+  tpCurrentStep += dir;
+  tpCurrentStep = Math.max(0, Math.min(tpCurrentStep, tpStepsData.length - 1));
+  document.getElementById('tpPrev').disabled = (tpCurrentStep === 0);
+  document.getElementById('tpNext').disabled = (tpCurrentStep === tpStepsData.length - 1);
+  document.getElementById('tpGrid').innerHTML = renderTPStep(tpCurrentStep);
+  document.getElementById('tpStepText').textContent = tpStepsData[tpCurrentStep].desc;
+  document.getElementById('tpStepCounter').textContent = `Step ${tpCurrentStep} / ${tpStepsData.length - 1}`;
+}
+
+function tpReset() {
+  tpCurrentStep = 0;
+  document.getElementById('tpGrid').innerHTML = renderTPStep(0);
+  document.getElementById('tpStepText').textContent = tpStepsData[0].desc;
+  document.getElementById('tpStepCounter').textContent = `Step 0 / ${tpStepsData.length - 1}`;
+  document.getElementById('tpPrev').disabled = true;
+  document.getElementById('tpNext').disabled = false;
+}
+
+tpReset();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

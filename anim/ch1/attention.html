@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attention 逐步计算</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+
+/* ---- 组件用到的样式（从 ch1 原文件抽取）---- */
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
+.matrix-grid { display: inline-grid; gap: 2px; margin: 10px; }
+.matrix-cell { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1a1a2e; border: 1px solid #444; border-radius: 4px; font-size: 0.8rem; font-family: monospace; transition: all 0.3s ease; }
+.matrix-cell.highlight { background: #76b900; color: #000; font-weight: bold; }
+.matrix-cell.result { background: #00d4aa; color: #000; font-weight: bold; }
+.matrix-label { text-align: center; font-weight: bold; color: #76b900; margin-bottom: 5px; font-size: 0.9rem; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+</style>
+</head>
+<body>
+
+<div class="animation-container" id="attention-animation">
+  <div class="controls">
+    <button class="btn" onclick="attentionDemo.start()">开始演示</button>
+    <button class="btn btn-secondary" onclick="attentionDemo.step()">下一步</button>
+    <button class="btn btn-secondary" onclick="attentionDemo.reset()">重置</button>
+  </div>
+  <div class="step-info" id="attention-step-info">点击 "开始演示" 查看 Attention 计算过程</div>
+  <div id="attention-matrices" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 15px; margin-top: 15px;">
+    <!-- Matrices will be rendered by JS -->
+  </div>
+</div>
+
+<script>
+// ========== Demo: Attention Matrix Computation（从 ch1 原文件抽取）==========
+const attentionDemo = (() => {
+  const Q = [[1, 0.5], [0.3, 1]];
+  const K = [[1, 0], [0, 1], [0.5, 0.5]];
+  const V = [[1, 0], [0, 1], [1, 1]];
+  let currentStep = 0;
+  const steps = [
+    'Step 0: 初始矩阵 Q (2x2), K (3x2), V (3x2)',
+    'Step 1: 计算 QK^T → Scores (2x3)',
+    'Step 2: 缩放 Scores / √d_k (d_k=2, √2≈1.41)',
+    'Step 3: Softmax (每行归一化)',
+    'Step 4: Attention Weights × V → Output (2x2)'
+  ];
+
+  function matMul(A, B_T) {
+    const rows = A.length, cols = B_T.length;
+    const result = [];
+    for (let i = 0; i < rows; i++) {
+      result[i] = [];
+      for (let j = 0; j < cols; j++) {
+        let sum = 0;
+        for (let k = 0; k < A[0].length; k++) {
+          sum += A[i][k] * B_T[j][k];
+        }
+        result[i][j] = sum;
+      }
+    }
+    return result;
+  }
+
+  function softmax(row) {
+    const max = Math.max(...row);
+    const exps = row.map(x => Math.exp(x - max));
+    const sum = exps.reduce((a, b) => a + b, 0);
+    return exps.map(x => x / sum);
+  }
+
+  function renderMatrix(data, label, className) {
+    const rows = data.length;
+    const cols = data[0].length;
+    let html = `<div style="display:inline-block; margin: 5px 10px; vertical-align: top;">`;
+    html += `<div class="matrix-label">${label}</div>`;
+    html += `<div class="matrix-grid" style="grid-template-columns: repeat(${cols}, 40px);">`;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        const val = typeof data[i][j] === 'number' ? data[i][j].toFixed(2) : data[i][j];
+        html += `<div class="matrix-cell ${className}">${val}</div>`;
+      }
+    }
+    html += `</div></div>`;
+    return html;
+  }
+
+  function render() {
+    const container = document.getElementById('attention-matrices');
+    const info = document.getElementById('attention-step-info');
+    info.textContent = steps[currentStep] || '';
+
+    let html = '';
+    if (currentStep >= 0) {
+      html += renderMatrix(Q, 'Q (2×2)', '');
+      html += renderMatrix(K, 'K (3×2)', '');
+      html += renderMatrix(V, 'V (3×2)', '');
+    }
+    if (currentStep >= 1) {
+      const scores = matMul(Q, K);
+      html += `<div style="display:inline-block; margin: 5px; vertical-align:top; padding-top:30px; color:#76b900;">→</div>`;
+      html += renderMatrix(scores, 'QK<sup>T</sup> (2×3)', 'highlight');
+    }
+    if (currentStep >= 2) {
+      const scores = matMul(Q, K);
+      const scaled = scores.map(row => row.map(x => x / Math.sqrt(2)));
+      html += renderMatrix(scaled, 'Scaled (÷√2)', 'highlight');
+    }
+    if (currentStep >= 3) {
+      const scores = matMul(Q, K);
+      const scaled = scores.map(row => row.map(x => x / Math.sqrt(2)));
+      const sm = scaled.map(row => softmax(row));
+      html += renderMatrix(sm, 'Softmax', 'highlight');
+    }
+    if (currentStep >= 4) {
+      const scores = matMul(Q, K);
+      const scaled = scores.map(row => row.map(x => x / Math.sqrt(2)));
+      const sm = scaled.map(row => softmax(row));
+      const output = [];
+      for (let i = 0; i < 2; i++) {
+        output[i] = [];
+        for (let j = 0; j < 2; j++) {
+          let sum = 0;
+          for (let k = 0; k < 3; k++) {
+            sum += sm[i][k] * V[k][j];
+          }
+          output[i][j] = sum;
+        }
+      }
+      html += `<div style="display:inline-block; margin: 5px; vertical-align:top; padding-top:30px; color:#00d4aa;">→</div>`;
+      html += renderMatrix(output, 'Output (2×2)', 'result');
+    }
+    container.innerHTML = html;
+  }
+
+  return {
+    start() { currentStep = 0; render(); this._interval = setInterval(() => { if (currentStep < 4) { currentStep++; render(); } else { clearInterval(this._interval); } }, 1200); },
+    step() { if (currentStep < 4) { currentStep++; render(); } },
+    reset() { clearInterval(this._interval); currentStep = 0; render(); }
+  };
+})();
+attentionDemo.reset();
+
+// ========== 自动把高度汇报给父页面（让 iframe 自适应高度）==========
+(function () {
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'tc-anim-height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    setInterval(reportHeight, 500);
+  }
+})();
+</script>
+</body>
+</html>

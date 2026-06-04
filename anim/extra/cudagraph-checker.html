@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph-Friendly 检查器</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+h3 { color: #00d4aa; margin: 0 0 10px; }
+</style>
+</head>
+<body>
+
+<div id="friendly-checker" style="margin:0;">
+<h3>交互式检查器：这段代码是否 Graph-Friendly？</h3>
+<div style="display:grid; gap:12px; margin-top:15px;">
+<div class="check-item" onclick="toggleCheck(this)" data-answer="yes" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">output = torch.matmul(A, B)  # A, B shape 固定</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="no" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">if x.item() > 0.5: output = branch_a(x)</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="yes" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">y = F.layer_norm(x, normalized_shape=[512])</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="no" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">result = torch.cat(list_of_variable_tensors)</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="no" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">new_tensor = torch.empty(dynamic_batch, 512).cuda()</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="yes" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">static_buf.copy_(new_data); out = model(static_buf)</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+<div class="check-item" onclick="toggleCheck(this)" data-answer="no" style="background:#16213e; padding:15px; border-radius:8px; cursor:pointer; border:2px solid #333; transition:all 0.3s;">
+<code style="color:#ffd700;">print(f"Loss: {loss.item()}")  # 在 capture 区域内</code>
+<div class="answer" style="display:none; margin-top:8px; font-size:13px;"></div>
+</div>
+</div>
+<p style="margin-top:12px; color:#888; font-size:13px;">点击每一行代码来检查它是否 Graph-Friendly</p>
+</div>
+
+<script>
+// 交互式检查器
+function toggleCheck(el) {
+    const answer = el.querySelector('.answer');
+    const isYes = el.dataset.answer === 'yes';
+
+    if (answer.style.display === 'none') {
+        answer.style.display = 'block';
+        if (isYes) {
+            el.style.borderColor = '#76b900';
+            answer.innerHTML = '<span style="color:#76b900;">&#9989; Graph-Friendly！</span> 固定 shape，无同步，无内存分配。';
+        } else {
+            el.style.borderColor = '#ff4444';
+            answer.innerHTML = '<span style="color:#ff4444;">&#10060; 非 Graph-Friendly！</span> ' +
+                (el.querySelector('code').textContent.includes('.item()') ? '强制 GPU-CPU 同步，产生数据依赖分支。' :
+                 el.querySelector('code').textContent.includes('cat') ? '可变数量的 tensor = 可变的输出 shape。' :
+                 el.querySelector('code').textContent.includes('empty') ? 'Replay 期间不允许动态分配内存。' :
+                 el.querySelector('code').textContent.includes('print') ? 'print() 强制 GPU 同步以读取 tensor 值。' :
+                 '数据依赖分支需要 GPU-CPU 同步。');
+        }
+    } else {
+        answer.style.display = 'none';
+        el.style.borderColor = '#333';
+    }
+}
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPU Die Overview</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: transparent;
+  color: #e0e0e0;
+  padding: 4px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+.section-subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.95em; }
+
+.gpu-die { max-width: 1000px; margin: 0 auto; position: relative; background: #0c0c18; border: 3px solid #1a1a3a; border-radius: 20px; padding: 30px; box-shadow: 0 0 60px rgba(0,210,255,0.05), inset 0 0 30px rgba(0,0,0,0.5); }
+.gpu-die::before { content: 'H100 GPU Die (814mm²)'; position: absolute; top: -14px; left: 30px; background: #0a0a1a; padding: 0 12px; font-size: 0.8em; color: #555; }
+.gpu-die-layout { display: grid; grid-template-columns: 80px 1fr 80px; grid-template-rows: auto; gap: 15px; min-height: 600px; }
+.hbm-stack { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.hbm-chip { background: linear-gradient(135deg, #1a0a0a, #2a1515); border: 2px solid #ff6b6b; border-radius: 8px; padding: 10px 6px; text-align: center; font-size: 0.65em; color: #ff6b6b; cursor: pointer; transition: all 0.3s; }
+.hbm-chip:hover, .hbm-chip.active { background: rgba(255,107,107,0.15); box-shadow: 0 0 15px rgba(255,107,107,0.4); transform: scale(1.05); }
+.hbm-chip .hbm-label { font-weight: bold; font-size: 1.1em; }
+.hbm-chip .hbm-spec { color: #aa5555; margin-top: 3px; }
+.compute-area { display: flex; flex-direction: column; gap: 12px; }
+.mem-ctrl-bar { background: linear-gradient(90deg, rgba(255,217,61,0.1), rgba(255,217,61,0.05)); border: 1px solid #ffd93d; border-radius: 6px; padding: 8px 15px; text-align: center; font-size: 0.75em; color: #ffd93d; cursor: pointer; transition: all 0.3s; }
+.mem-ctrl-bar:hover, .mem-ctrl-bar.active { background: rgba(255,217,61,0.15); box-shadow: 0 0 12px rgba(255,217,61,0.3); }
+.l2-cache-bar { background: linear-gradient(90deg, rgba(255,165,0,0.08), rgba(255,165,0,0.03)); border: 1px solid #ffa500; border-radius: 6px; padding: 10px 15px; text-align: center; font-size: 0.75em; color: #ffa500; cursor: pointer; transition: all 0.3s; }
+.l2-cache-bar:hover, .l2-cache-bar.active { background: rgba(255,165,0,0.15); box-shadow: 0 0 12px rgba(255,165,0,0.3); }
+.gpc-grid { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(4, 1fr); gap: 6px; flex: 1; }
+.sm-unit { background: #0f0f20; border: 1px solid #2a2a4a; border-radius: 6px; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.6em; cursor: pointer; transition: all 0.3s; position: relative; min-height: 70px; }
+.sm-unit:hover, .sm-unit.active { border-color: #6bff6b; background: rgba(107,255,107,0.05); box-shadow: 0 0 10px rgba(107,255,107,0.2); }
+.sm-unit .sm-label { color: #6bff6b; font-weight: bold; font-size: 1.1em; }
+.sm-unit .sm-sub { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; }
+.sm-sub-item { width: 8px; height: 8px; border-radius: 2px; transition: all 0.3s; }
+.sm-sub-item.tc { background: #c77dff; }
+.sm-sub-item.cuda-c { background: #ff9f43; }
+.sm-sub-item.sram-c { background: #6bff6b; }
+.sm-unit.active .sm-sub-item.tc { box-shadow: 0 0 4px #c77dff; }
+.sm-unit.active .sm-sub-item.cuda-c { box-shadow: 0 0 4px #ff9f43; }
+.crossbar { background: linear-gradient(90deg, rgba(0,210,255,0.05), rgba(123,47,247,0.05)); border: 1px dashed #00d2ff; border-radius: 6px; padding: 6px 15px; text-align: center; font-size: 0.7em; color: #00d2ff; cursor: pointer; transition: all 0.3s; }
+.crossbar:hover, .crossbar.active { background: rgba(0,210,255,0.1); box-shadow: 0 0 12px rgba(0,210,255,0.3); }
+@media (max-width: 700px) {
+  .gpu-die-layout { grid-template-columns: 1fr; }
+  .hbm-stack { flex-direction: row; }
+  .gpc-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<p class="section-subtitle">H100 SXM — 814mm², 132 个 SM, 80GB HBM3, 3.35 TB/s 带宽 — 点击任意组件查看详细说明</p>
+
+<div class="gpu-die">
+    <div class="gpu-die-layout">
+        <div class="hbm-stack">
+            <div class="hbm-chip" onclick="showExplain('hbm')"><div class="hbm-label">HBM3</div><div class="hbm-spec">20GB</div></div>
+            <div class="hbm-chip" onclick="showExplain('hbm')"><div class="hbm-label">HBM3</div><div class="hbm-spec">20GB</div></div>
+            <div class="hbm-chip" onclick="showExplain('hbm')"><div class="hbm-label">HBM3</div><div class="hbm-spec">20GB</div></div>
+        </div>
+
+        <div class="compute-area">
+            <div class="mem-ctrl-bar" onclick="showExplain('memctrl')">Memory Controller × 6 — 连接 HBM ↔ L2 — 总 BW: 3.35 TB/s</div>
+            <div class="l2-cache-bar" onclick="showExplain('l2')">L2 Cache — 50MB — 所有 SM 共享 — 带宽 ~12 TB/s</div>
+            <div class="crossbar" onclick="showExplain('crossbar')">Crossbar / NoC (片上网络) — SM ↔ L2 ↔ Memory Controller 互联</div>
+
+            <div class="gpc-grid" id="sm-grid"></div>
+
+            <div class="crossbar" onclick="showExplain('nvlink')">NVLink 4.0 × 18 — 总 900 GB/s — 连接其他 GPU (Tensor Parallelism)</div>
+        </div>
+
+        <div class="hbm-stack">
+            <div class="hbm-chip" onclick="showExplain('hbm')"><div class="hbm-label">HBM3</div><div class="hbm-spec">20GB</div></div>
+            <div class="hbm-chip" onclick="showExplain('hbm')"><div class="hbm-label">HBM3</div><div class="hbm-spec">10GB</div></div>
+        </div>
+    </div>
+</div>
+
+<div id="die-explain" style="max-width:1000px; margin:20px auto; min-height:80px; padding:16px 20px; background:#111122; border-radius:10px; border:1px solid #2a2a4a; font-size:0.88em; color:#bbb; transition: all 0.3s;">
+    <span style="color:#666;">点击上图任意组件查看详细说明</span>
+</div>
+
+<script>
+(function() {
+    const grid = document.getElementById('sm-grid');
+    let html = '';
+    for (let i = 0; i < 32; i++) {
+        html += `<div class="sm-unit" onclick="showExplain('sm')">
+            <div class="sm-label">SM${i}</div>
+            <div class="sm-sub">
+                <div class="sm-sub-item tc"></div>
+                <div class="sm-sub-item tc"></div>
+                <div class="sm-sub-item cuda-c"></div>
+                <div class="sm-sub-item cuda-c"></div>
+                <div class="sm-sub-item sram-c"></div>
+            </div>
+        </div>`;
+    }
+    grid.innerHTML = html;
+})();
+
+const explains = {
+    hbm: '<strong style="color:#ff6b6b">HBM3 (High Bandwidth Memory)</strong> — GPU 的"主内存"。5 个 HBM3 堆栈通过硅中介层 (interposer) 连接到 GPU die。总容量 80GB，带宽 3.35TB/s。<br><br>LLM 的<strong>所有权重、KV Cache、激活值</strong>都存在这里。模型越大，HBM 越不够用 → 需要多卡/量化。<br>访问延迟约 400ns（约 600 个时钟周期），这就是为什么需要大量 Warp 来隐藏延迟。',
+    memctrl: '<strong style="color:#ffd93d">Memory Controller</strong> — HBM 和 GPU 内部之间的"翻译官"。把 SM 发出的 load/store 请求转换为 HBM 的读写命令。<br><br>6 个 Memory Controller 并行工作，合计提供 3.35TB/s 带宽。每个管理一个或多个 HBM stack 的通道。<br>它还负责合并相邻地址的请求（coalescing）以最大化 HBM 效率。',
+    l2: '<strong style="color:#ffa500">L2 Cache</strong> — 50MB 的全局共享缓存。当 SM 需要的数据不在自己的 L1/SRAM 中时，先查 L2。<br><br>命中 L2 → ~150ns（比 HBM 快 2.5×）<br>对 LLM：RoPE 的 cos/sin 表、layer norm 的 γ 参数等小型频繁访问数据会缓存在这里。<br>但 384MB 的 W_qkv 不可能放进 50MB 的 L2 → 必须流式从 HBM 读取。',
+    crossbar: '<strong style="color:#00d2ff">Crossbar / NoC (片上网络)</strong> — 连接所有 SM 和 L2 Cache 切片的高速互联。<br><br>任何 SM 都能访问任何 L2 切片。带宽约 12 TB/s。<br>AllReduce 操作时，SM 之间的部分结果就是通过 NoC 交换的。',
+    nvlink: '<strong style="color:#00d2ff">NVLink 4.0</strong> — GPU 间的高速互联。H100 有 18 条 NVLink，总双向带宽 900 GB/s。<br><br>Tensor Parallelism 的 AllReduce 通过 NVLink 完成。比走 PCIe (64GB/s) 快 14 倍。<br>8 卡 NVLink full-mesh 是 TP=8 的硬件基础。',
+    sm: '<strong style="color:#6bff6b">Streaming Multiprocessor (SM)</strong> — GPU 的基本计算单元。H100 有 132 个 SM。<br><br>每个 SM 内含：4 个 Tensor Core、128 个 CUDA Core、4 个 Warp Scheduler、228KB SRAM、256KB Register。<br>一个 CUDA kernel launch 后，Warp 被分配到可用的 SM 上执行。SM 之间互相独立（SIMT 模型）。',
+};
+
+window.showExplain = function(key) {
+    document.getElementById('die-explain').innerHTML = explains[key] || '';
+};
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

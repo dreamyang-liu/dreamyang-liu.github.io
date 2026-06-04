@@ -62,6 +62,14 @@
         <i class="fas fa-home"></i>
         <span>Home</span>
       </a>
+      <a href="/mlsys/" class="nav-item ">
+        <i class="fas fa-microchip"></i>
+        <span>ML Systems</span>
+      </a>
+      <a href="/algorithms/" class="nav-item ">
+        <i class="fas fa-code"></i>
+        <span>算法</span>
+      </a>
       <a href="/archives/" class="nav-item ">
         <i class="fas fa-archive"></i>
         <span>Archives</span>
@@ -206,7 +214,7 @@
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2026-06-03
+      2026-06-04
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
@@ -307,6 +315,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
 <!-- 添加所有需要的脚本 -->
 <script src="/js/main.js"></script>
 <script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-4o-mini","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
 
 
     <script>

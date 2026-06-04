@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>区间 DP 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.8;
+  padding: 4px;
+}
+.animation-box {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 8px 0;
+}
+.controls {
+  text-align: center;
+  margin: 16px 0;
+}
+button {
+  background: linear-gradient(135deg, #76b900, #00d4aa);
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0 6px;
+  font-weight: bold;
+}
+button:hover { opacity: 0.85; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.dp-table {
+  display: grid;
+  gap: 4px;
+  margin: 16px auto;
+  width: fit-content;
+}
+.dp-cell {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+.dp-cell.empty { background: #222; color: #555; }
+.dp-cell.filled { background: #1a3a1a; color: #76b900; border: 1px solid #76b900; }
+.dp-cell.active { background: #2a4a0a; color: #fff; border: 2px solid #00d4aa; box-shadow: 0 0 10px #00d4aa55; }
+.dp-cell.trying { background: #2a2a0a; color: #ffaa00; border: 1px solid #ffaa00; }
+.step-info {
+  text-align: center;
+  margin: 12px 0;
+  color: #aaa;
+  font-size: 0.9rem;
+  min-height: 40px;
+}
+.array-display {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.array-item {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #76b900;
+}
+.array-item.highlight-range { background: #2a4a0a; border: 1px solid #00d4aa; }
+@media (max-width: 600px) {
+  .dp-cell { width: 48px; height: 48px; font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="animation-box">
+  <div class="array-display" id="stoneArray"></div>
+  <div class="dp-table" id="dpTable" style="grid-template-columns: repeat(4, 60px);"></div>
+  <div class="step-info" id="stepInfo">点击"下一步"开始填表</div>
+  <div class="controls">
+    <button id="btnPrev" disabled>上一步</button>
+    <button id="btnNext">下一步</button>
+    <button id="btnReset">重置</button>
+    <button id="btnAuto">自动播放</button>
+  </div>
+</div>
+
+<script>
+// === Stone merge animation ===
+const stones = [3, 1, 5, 2];
+const n = 4;
+const prefix = [0];
+for (let i = 0; i < n; i++) prefix.push(prefix[i] + stones[i]);
+function rangeSum(i, j) { return prefix[j+1] - prefix[i]; }
+
+// Compute all steps
+const dp = Array.from({length: n}, () => Array(n).fill(0));
+const steps = [];
+
+// Initial state
+steps.push({ type: 'init', info: '初始化：dp[i][i] = 0（单个石子不需要合并）' });
+
+for (let len = 2; len <= n; len++) {
+  for (let i = 0; i <= n - len; i++) {
+    const j = i + len - 1;
+    dp[i][j] = Infinity;
+    const trySteps = [];
+    for (let k = i; k < j; k++) {
+      const val = dp[i][k] + dp[k+1][j] + rangeSum(i, j);
+      trySteps.push({ k, val, left: dp[i][k], right: dp[k+1][j], cost: rangeSum(i, j) });
+      if (val < dp[i][j]) dp[i][j] = val;
+    }
+    steps.push({
+      type: 'fill',
+      i, j, len,
+      tries: trySteps,
+      result: dp[i][j],
+      info: `长度${len}: dp[${i}][${j}] 枚举分割点 → 最优 = ${dp[i][j]}`
+    });
+  }
+}
+steps.push({ type: 'done', info: `完成！最小合并代价 = dp[0][${n-1}] = ${dp[0][n-1]}` });
+
+let currentStep = -1;
+let autoInterval = null;
+const displayDp = Array.from({length: n}, () => Array(n).fill(null));
+
+function renderArray(highlightI, highlightJ) {
+  const container = document.getElementById('stoneArray');
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'array-item' + (i >= highlightI && i <= highlightJ ? ' highlight-range' : '');
+    el.textContent = stones[i];
+    container.appendChild(el);
+  }
+}
+
+function renderTable(activeI, activeJ, tryingCells) {
+  const container = document.getElementById('dpTable');
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const el = document.createElement('div');
+      if (j < i) {
+        el.className = 'dp-cell empty';
+        el.textContent = '-';
+      } else if (displayDp[i][j] !== null) {
+        let cls = 'dp-cell filled';
+        if (i === activeI && j === activeJ) cls = 'dp-cell active';
+        else if (tryingCells && tryingCells.some(c => (c[0]===i&&c[1]===j))) cls = 'dp-cell trying';
+        el.className = cls;
+        el.textContent = displayDp[i][j];
+      } else {
+        el.className = 'dp-cell empty';
+        el.textContent = '?';
+      }
+      container.appendChild(el);
+    }
+  }
+}
+
+function showStep(idx) {
+  if (idx < 0 || idx >= steps.length) return;
+  currentStep = idx;
+  const step = steps[idx];
+  document.getElementById('stepInfo').textContent = step.info;
+
+  if (step.type === 'init') {
+    for (let i = 0; i < n; i++) displayDp[i][i] = 0;
+    renderArray(-1, -1);
+    renderTable(-1, -1, null);
+  } else if (step.type === 'fill') {
+    displayDp[step.i][step.j] = step.result;
+    const trying = [];
+    for (const t of step.tries) {
+      trying.push([step.i, t.k]);
+      trying.push([t.k+1, step.j]);
+    }
+    renderArray(step.i, step.j);
+    renderTable(step.i, step.j, trying);
+  } else if (step.type === 'done') {
+    renderArray(0, n-1);
+    renderTable(-1, -1, null);
+  }
+
+  document.getElementById('btnPrev').disabled = (idx <= 0);
+  document.getElementById('btnNext').disabled = (idx >= steps.length - 1);
+}
+
+function reset() {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+  currentStep = -1;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) displayDp[i][j] = null;
+  renderArray(-1, -1);
+  renderTable(-1, -1, null);
+  document.getElementById('stepInfo').textContent = '点击"下一步"开始填表';
+  document.getElementById('btnPrev').disabled = true;
+  document.getElementById('btnNext').disabled = false;
+}
+
+document.getElementById('btnNext').onclick = () => showStep(currentStep + 1);
+document.getElementById('btnPrev').onclick = () => {
+  // Rebuild state up to previous step
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) displayDp[i][j] = null;
+  const target = currentStep - 1;
+  for (let s = 0; s <= target; s++) {
+    const st = steps[s];
+    if (st.type === 'init') { for (let i = 0; i < n; i++) displayDp[i][i] = 0; }
+    else if (st.type === 'fill') { displayDp[st.i][st.j] = st.result; }
+  }
+  showStep(target);
+};
+document.getElementById('btnReset').onclick = reset;
+document.getElementById('btnAuto').onclick = () => {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; return; }
+  autoInterval = setInterval(() => {
+    if (currentStep >= steps.length - 1) { clearInterval(autoInterval); autoInterval = null; return; }
+    showStep(currentStep + 1);
+  }, 1200);
+};
+
+renderArray(-1, -1);
+renderTable(-1, -1, null);
+
+// ========== 自动把高度汇报给父页面 ==========
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

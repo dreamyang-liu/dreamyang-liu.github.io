@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFS 动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.7;
+  padding: 4px;
+}
+h3 { color: #00d4aa; margin: 16px 0 8px; font-size: 1.05em; }
+p { margin-bottom: 8px; }
+.grid-container { display: flex; flex-direction: column; align-items: center; margin: 16px 0; }
+.grid { display: inline-grid; gap: 3px; margin: 12px 0; }
+.cell {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; font-size: 0.75em; font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+}
+.cell-empty { background: #1a1a2e; border: 1px solid #2a2a4a; }
+.cell-wall { background: #4a4a4a; }
+.cell-start { background: #76b900; color: #000; }
+.cell-end { background: #ff6b6b; color: #fff; }
+.cell-visited { background: #00d4aa33; border: 1px solid #00d4aa; }
+.cell-path { background: #76b900; color: #000; transform: scale(1.05); }
+.cell-current { background: #ffaa00; color: #000; }
+.cell-fresh { background: #ff8c00; }
+.cell-rotten { background: #8b0000; color: #fff; }
+.cell-rotting { background: #ff4444; color: #fff; }
+.controls { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.btn {
+  background: #1a1a2e; color: #00d4aa; border: 1px solid #00d4aa;
+  padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9em;
+}
+.btn:hover { background: #00d4aa22; }
+.step-info { color: #aaa; font-size: 0.9em; margin: 8px 0; min-height: 1.5em; }
+@media (max-width: 600px) {
+  .cell { width: 40px; height: 40px; font-size: 0.65em; }
+}
+</style>
+</head>
+<body>
+
+<h3>动画 1：网格 BFS（最短路径）</h3>
+<p>5x5 网格，绿色=起点(0,0)，红色=终点(4,4)，灰色=障碍。观察 BFS 逐层扩散，找到最短路径后高亮。</p>
+<div class="grid-container">
+  <div id="grid1" class="grid" style="grid-template-columns: repeat(5, 48px);"></div>
+  <div class="step-info" id="step-info1">点击"开始"观看 BFS 扩散</div>
+  <div class="controls">
+    <button class="btn" id="btn-start1">开始</button>
+    <button class="btn" id="btn-pause1">暂停</button>
+    <button class="btn" id="btn-reset1">重置</button>
+  </div>
+</div>
+
+<h3>动画 2：多源 BFS（腐烂的橘子）</h3>
+<p>深红=腐烂橘子（多个起点），橙色=新鲜橘子。所有腐烂橘子同时向四周扩散。</p>
+<div class="grid-container">
+  <div id="grid2" class="grid" style="grid-template-columns: repeat(4, 48px);"></div>
+  <div class="step-info" id="step-info2">点击"开始"观看多源 BFS 扩散</div>
+  <div class="controls">
+    <button class="btn" id="btn-start2">开始</button>
+    <button class="btn" id="btn-pause2">暂停</button>
+    <button class="btn" id="btn-reset2">重置</button>
+  </div>
+</div>
+
+<script>
+// Animation 1: Grid BFS
+const ROWS = 5, COLS = 5;
+const walls1 = new Set(['1,1','2,1','3,3','1,3','2,3']);
+const layerColors = ['#00d4aa','#00b4d8','#7b68ee','#e040fb','#ff6b6b','#ffaa00','#76b900'];
+
+let grid1State, anim1Timer, anim1Running, anim1Queue, anim1Visited, anim1Parent, anim1Step;
+
+function initGrid1() {
+  clearInterval(anim1Timer);
+  anim1Running = false;
+  const container = document.getElementById('grid1');
+  container.innerHTML = '';
+  grid1State = [];
+  for (let r = 0; r < ROWS; r++) {
+    grid1State[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.id = `g1-${r}-${c}`;
+      if (r === 0 && c === 0) { cell.classList.add('cell-start'); cell.textContent = 'S'; }
+      else if (r === 4 && c === 4) { cell.classList.add('cell-end'); cell.textContent = 'E'; }
+      else if (walls1.has(`${r},${c}`)) { cell.classList.add('cell-wall'); }
+      else { cell.classList.add('cell-empty'); }
+      container.appendChild(cell);
+      grid1State[r][c] = walls1.has(`${r},${c}`) ? 'wall' : 'empty';
+    }
+  }
+  document.getElementById('step-info1').textContent = '点击"开始"观看 BFS 扩散';
+}
+
+function startBFS1() {
+  if (anim1Running) return;
+  initGrid1();
+  anim1Running = true;
+  anim1Queue = [[0, 0]];
+  anim1Visited = new Set(['0,0']);
+  anim1Parent = {};
+  anim1Step = 0;
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+
+  function tick() {
+    if (anim1Queue.length === 0) {
+      document.getElementById('step-info1').textContent = '未找到路径';
+      anim1Running = false; return;
+    }
+    const layerSize = anim1Queue.length;
+    const nextQueue = [];
+    const color = layerColors[anim1Step % layerColors.length];
+    let found = false;
+    for (let i = 0; i < layerSize; i++) {
+      const [r, c] = anim1Queue[i];
+      if (!(r === 0 && c === 0) && !(r === 4 && c === 4)) {
+        const cell = document.getElementById(`g1-${r}-${c}`);
+        cell.className = 'cell cell-visited';
+        cell.style.background = color + '44';
+        cell.style.borderColor = color;
+        cell.textContent = anim1Step;
+      }
+      if (r === 4 && c === 4) { found = true; break; }
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        const key = `${nr},${nc}`;
+        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !anim1Visited.has(key) && grid1State[nr][nc] !== 'wall') {
+          anim1Visited.add(key);
+          anim1Parent[key] = `${r},${c}`;
+          nextQueue.push([nr, nc]);
+        }
+      }
+    }
+    if (found) {
+      highlightPath1();
+      anim1Running = false; return;
+    }
+    anim1Step++;
+    anim1Queue = nextQueue;
+    document.getElementById('step-info1').textContent = `第 ${anim1Step} 层扩散中... 队列大小: ${anim1Queue.length}`;
+    if (anim1Queue.length > 0) {
+      anim1Timer = setTimeout(tick, 600);
+    } else {
+      // Check if end was reached
+      if (anim1Visited.has('4,4')) highlightPath1();
+      else { document.getElementById('step-info1').textContent = '未找到路径'; anim1Running = false; }
+    }
+  }
+  anim1Timer = setTimeout(tick, 300);
+}
+
+function highlightPath1() {
+  let key = '4,4';
+  const path = [];
+  while (key && key !== '0,0') { path.push(key); key = anim1Parent[key]; }
+  path.push('0,0');
+  path.reverse();
+  let i = 0;
+  function showPath() {
+    if (i >= path.length) {
+      document.getElementById('step-info1').textContent = `最短路径长度: ${path.length - 1} 步`;
+      return;
+    }
+    const [r, c] = path[i].split(',').map(Number);
+    const cell = document.getElementById(`g1-${r}-${c}`);
+    cell.className = 'cell cell-path';
+    cell.textContent = i === 0 ? 'S' : (i === path.length - 1 ? 'E' : i);
+    i++;
+    setTimeout(showPath, 200);
+  }
+  showPath();
+}
+
+document.getElementById('btn-start1').addEventListener('click', startBFS1);
+document.getElementById('btn-pause1').addEventListener('click', () => { clearTimeout(anim1Timer); anim1Running = false; });
+document.getElementById('btn-reset1').addEventListener('click', initGrid1);
+initGrid1();
+
+// Animation 2: Multi-source BFS (Rotting Oranges)
+const ROWS2 = 4, COLS2 = 4;
+// 0=empty, 1=fresh, 2=rotten
+const initialGrid2 = [
+  [2, 1, 1, 0],
+  [1, 1, 0, 1],
+  [0, 1, 1, 1],
+  [1, 0, 1, 2],
+];
+
+let anim2Timer, anim2Running;
+
+function renderGrid2(grid, info) {
+  const container = document.getElementById('grid2');
+  container.innerHTML = '';
+  for (let r = 0; r < ROWS2; r++) {
+    for (let c = 0; c < COLS2; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.id = `g2-${r}-${c}`;
+      if (grid[r][c] === 2) { cell.classList.add('cell-rotten'); cell.textContent = '腐'; }
+      else if (grid[r][c] === 1) { cell.classList.add('cell-fresh'); cell.textContent = '鲜'; }
+      else { cell.classList.add('cell-empty'); }
+      container.appendChild(cell);
+    }
+  }
+  if (info) document.getElementById('step-info2').textContent = info;
+}
+
+function startBFS2() {
+  if (anim2Running) return;
+  anim2Running = true;
+  const grid = initialGrid2.map(row => [...row]);
+  renderGrid2(grid, '多源 BFS 开始...');
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  let queue = [];
+  for (let r = 0; r < ROWS2; r++)
+    for (let c = 0; c < COLS2; c++)
+      if (grid[r][c] === 2) queue.push([r, c]);
+
+  let minute = 0;
+  function tick() {
+    const nextQueue = [];
+    for (const [r, c] of queue) {
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < ROWS2 && nc >= 0 && nc < COLS2 && grid[nr][nc] === 1) {
+          grid[nr][nc] = 2;
+          nextQueue.push([nr, nc]);
+        }
+      }
+    }
+    if (nextQueue.length === 0) {
+      const fresh = grid.flat().filter(v => v === 1).length;
+      document.getElementById('step-info2').textContent = fresh > 0 ? `无法全部腐烂，剩余 ${fresh} 个` : `全部腐烂！用时 ${minute} 分钟`;
+      anim2Running = false;
+      return;
+    }
+    minute++;
+    queue = nextQueue;
+    // Animate new rotten
+    for (const [r, c] of nextQueue) {
+      const cell = document.getElementById(`g2-${r}-${c}`);
+      cell.className = 'cell cell-rotting';
+      cell.textContent = minute;
+    }
+    document.getElementById('step-info2').textContent = `第 ${minute} 分钟：${nextQueue.length} 个橘子腐烂`;
+    anim2Timer = setTimeout(() => {
+      for (const [r, c] of nextQueue) {
+        const cell = document.getElementById(`g2-${r}-${c}`);
+        cell.className = 'cell cell-rotten';
+        cell.textContent = '腐';
+      }
+      tick();
+    }, 800);
+  }
+  anim2Timer = setTimeout(tick, 500);
+}
+
+function resetGrid2() {
+  clearTimeout(anim2Timer);
+  anim2Running = false;
+  renderGrid2(initialGrid2, '点击"开始"观看多源 BFS 扩散');
+}
+
+document.getElementById('btn-start2').addEventListener('click', startBFS2);
+document.getElementById('btn-pause2').addEventListener('click', () => { clearTimeout(anim2Timer); anim2Running = false; });
+document.getElementById('btn-reset2').addEventListener('click', resetGrid2);
+resetGrid2();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>

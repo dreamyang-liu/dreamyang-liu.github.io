@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP Token Dispatch</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.diagram { background: #12121f; border-radius: 12px; padding: 20px; margin: 10px 0; overflow-x: auto; border: 1px solid #2a2a4a; }
+.anim-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.anim-btn { background: #667eea; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; transition: background 0.2s; }
+.anim-btn:hover { background: #764ba2; }
+.anim-btn.danger { background: #e85d75; }
+.anim-btn.danger:hover { background: #c94060; }
+.anim-status { text-align: center; margin-top: 12px; font-size: 0.9em; color: #f4a460; min-height: 1.5em; }
+
+.ep-anim-area { position: relative; height: 340px; border: 1px solid #2a2a4a; border-radius: 10px; overflow: hidden; background: #12121f; min-width: 650px; }
+.ep-anim-token { position: absolute; padding: 5px 12px; border-radius: 6px; font-size: 0.8em; font-weight: bold; color: #fff; transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3; }
+.ep-anim-router-box { position: absolute; top: 90px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #667eea, #764ba2); padding: 8px 24px; border-radius: 20px; font-weight: bold; font-size: 0.85em; z-index: 1; }
+.ep-anim-expert-slot { position: absolute; bottom: 20px; width: 90px; padding: 10px 6px; border-radius: 8px; text-align: center; font-size: 0.75em; font-weight: bold; border: 2px solid; transition: box-shadow 0.4s; }
+.ep-anim-expert-slot.glow { box-shadow: 0 0 16px currentColor; }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+    <h3 style="text-align:center; margin-bottom:20px; color:#9b59b6;">交互动画：Token Dispatch（Router → Expert 路由过程）</h3>
+    <div class="ep-anim-area" id="ep-anim-area"></div>
+    <div class="anim-controls">
+        <button class="anim-btn" onclick="epNext()">⏭ 下一步</button>
+        <button class="anim-btn danger" onclick="epReset()">↺ 重置</button>
+    </div>
+    <div class="anim-status" id="ep-status">点击「下一步」观看 Token → Router → Expert 的 dispatch 过程</div>
+</div>
+
+<script>
+(function() {
+    const tokens = [
+        { id:'T1', expert:0, color:'#4a90d9' },
+        { id:'T2', expert:2, color:'#50c878' },
+        { id:'T3', expert:1, color:'#f4a460' },
+        { id:'T4', expert:3, color:'#e85d75' },
+        { id:'T5', expert:0, color:'#9b59b6' },
+        { id:'T6', expert:2, color:'#1abc9c' },
+    ];
+    const expertColors = ['#4a90d9','#50c878','#f4a460','#e85d75'];
+    const expertNames = ['Expert 0<br>GPU 0','Expert 1<br>GPU 1','Expert 2<br>GPU 2','Expert 3<br>GPU 3'];
+    let phase = 0;
+
+    function build() {
+        const el = document.getElementById('ep-anim-area');
+        if (!el) return;
+        let html = '';
+
+        tokens.forEach((t, i) => {
+            const left = 80 + i * 90;
+            html += `<div class="ep-anim-token" id="eptk${i}" style="background:${t.color}; top:20px; left:${left}px;">${t.id}</div>`;
+        });
+
+        html += '<div class="ep-anim-router-box" id="ep-router-box">Router (Gating)</div>';
+
+        const positions = [60, 220, 380, 540];
+        expertNames.forEach((name, i) => {
+            html += `<div class="ep-anim-expert-slot" id="epexp${i}" style="left:${positions[i]}px; border-color:${expertColors[i]}; color:${expertColors[i]};">${name}</div>`;
+        });
+
+        el.innerHTML = html;
+    }
+    build();
+
+    function doPhase() {
+        const area = document.getElementById('ep-anim-area');
+        if (phase === 0) {
+            tokens.forEach((t, i) => {
+                const tk = document.getElementById(`eptk${i}`);
+                tk.style.top = '85px';
+                tk.style.left = `${200 + i * 50}px`;
+                tk.style.transform = 'scale(0.9)';
+            });
+            document.getElementById('ep-status').textContent =
+                '步骤 1/4: Tokens 输入 Router → 计算 gating score（softmax）决定发往哪个 Expert';
+            phase = 1;
+        } else if (phase === 1) {
+            const router = document.getElementById('ep-router-box');
+            router.innerHTML = 'Router: T1→E0, T2→E2, T3→E1, T4→E3, T5→E0, T6→E2';
+            router.style.fontSize = '0.7em';
+            document.getElementById('ep-status').textContent =
+                '步骤 2/4: Router 输出路由表 → 准备 All-to-All 通信（每个 token 发到目标 Expert 的 GPU）';
+            phase = 2;
+        } else if (phase === 2) {
+            const areaRect = area.getBoundingClientRect();
+            tokens.forEach((t, i) => {
+                const tk = document.getElementById(`eptk${i}`);
+                const expSlot = document.getElementById(`epexp${t.expert}`);
+                const slotRect = expSlot.getBoundingClientRect();
+                const targetLeft = slotRect.left - areaRect.left + (slotRect.width/2) - 16;
+                tk.style.top = '210px';
+                tk.style.left = `${targetLeft}px`;
+                tk.style.transform = 'scale(0.85)';
+                expSlot.classList.add('glow');
+            });
+            document.getElementById('ep-status').textContent =
+                '步骤 3/4: All-to-All dispatch! Token 跨 GPU 发送到目标 Expert → Expert 独立计算 FFN';
+            phase = 3;
+        } else if (phase === 3) {
+            tokens.forEach((t, i) => {
+                const tk = document.getElementById(`eptk${i}`);
+                tk.style.top = '15px';
+                tk.style.left = `${80 + i * 90}px`;
+                tk.style.transform = 'scale(1)';
+                tk.style.opacity = '1';
+                tk.textContent = `${t.id}✓`;
+            });
+            document.querySelectorAll('.ep-anim-expert-slot').forEach(e => e.classList.remove('glow'));
+            const router = document.getElementById('ep-router-box');
+            router.innerHTML = 'All-to-All 收回结果';
+            document.getElementById('ep-status').textContent =
+                '步骤 4/4: 计算完毕 → All-to-All 把结果发回原 GPU → 继续下一层（注意: Expert 0,2 比较忙 = 负载不均）';
+            phase = 4;
+        } else {
+            phase = 0;
+            build();
+            document.getElementById('ep-status').textContent = '点击「下一步」重新观看';
+        }
+    }
+
+    window.epNext = function() { doPhase(); };
+    window.epReset = function() {
+        phase = 0;
+        build();
+        document.getElementById('ep-status').textContent = '点击「下一步」观看 Token → Router → Expert 的 dispatch 过程';
+    };
+})();
+
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>
