@@ -260,50 +260,7 @@
         </div>
         
         <div class="post-body vscode-markdown">
-          <pre><code class="language-java">class UnionFind &#123;
-    private int[] parent;
-    private int[] rank;
-    private int count;
-    public UnionFind(int n) &#123;
-        parent = new int[n];
-        rank = new int[n];
-        count = n;
-        for (int i = 0; i &lt; n; i++) &#123;
-            parent[i] = i;
-            rank[i] = 1;
-        &#125;
-    &#125;
-    public int find(int p) &#123;
-        while (p != parent[p]) &#123;
-            parent[p] = parent[parent[p]]; // path compression
-            p = parent[p];
-        &#125;
-        return p;
-    &#125;
-    public void union(int p, int q) &#123;
-        int rootP = find(p);
-        int rootQ = find(q);
-        if (rootP == rootQ) &#123;
-            return;
-        &#125;
-        if (rank[rootP] &gt; rank[rootQ]) &#123;
-            parent[rootQ] = rootP;
-        &#125; else if (rank[rootP] &lt; rank[rootQ]) &#123;
-            parent[rootP] = rootQ;
-        &#125; else &#123;
-            parent[rootQ] = rootP;
-            rank[rootP]++;
-        &#125;
-        count--;
-    &#125;
-    public boolean connected(int p, int q) &#123;
-        return find(p) == find(q);
-    &#125;
-    public int count() &#123;
-        return count;
-    &#125;
-&#125;
-</code></pre>
+          <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">UnionFind</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, n</span>):<br>        <span class="hljs-variable language_">self</span>.parent = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(n))<br>        <span class="hljs-variable language_">self</span>.rank = [<span class="hljs-number">1</span>] * n<br>        <span class="hljs-variable language_">self</span>._count = n<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">find</span>(<span class="hljs-params">self, p</span>):<br>        <span class="hljs-keyword">while</span> p != <span class="hljs-variable language_">self</span>.parent[p]:<br>            <span class="hljs-variable language_">self</span>.parent[p] = <span class="hljs-variable language_">self</span>.parent[<span class="hljs-variable language_">self</span>.parent[p]]  <span class="hljs-comment"># path compression</span><br>            p = <span class="hljs-variable language_">self</span>.parent[p]<br>        <span class="hljs-keyword">return</span> p<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">union</span>(<span class="hljs-params">self, p, q</span>):<br>        root_p = <span class="hljs-variable language_">self</span>.find(p)<br>        root_q = <span class="hljs-variable language_">self</span>.find(q)<br>        <span class="hljs-keyword">if</span> root_p == root_q:<br>            <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.rank[root_p] &gt; <span class="hljs-variable language_">self</span>.rank[root_q]:<br>            <span class="hljs-variable language_">self</span>.parent[root_q] = root_p<br>        <span class="hljs-keyword">elif</span> <span class="hljs-variable language_">self</span>.rank[root_p] &lt; <span class="hljs-variable language_">self</span>.rank[root_q]:<br>            <span class="hljs-variable language_">self</span>.parent[root_p] = root_q<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-variable language_">self</span>.parent[root_q] = root_p<br>            <span class="hljs-variable language_">self</span>.rank[root_p] += <span class="hljs-number">1</span><br>        <span class="hljs-variable language_">self</span>._count -= <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connected</span>(<span class="hljs-params">self, p, q</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.find(p) == <span class="hljs-variable language_">self</span>.find(q)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">count</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>._count<br></code></pre></td></tr></table></figure>
 
         </div>
         

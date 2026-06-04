@@ -270,36 +270,7 @@
 <img src="https://i.stack.imgur.com/bz2VO.png" alt="patience-sorting" width="600"/>
 
 <p>我们可以跳过证明，详细证明请参考<a target="_blank" rel="noopener" href="https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf">文档</a>。我们只需要知道牌堆数等于最长递增序列的长度。</p>
-<pre><code class="language-java">int lengthOfLIS(int[] nums) &#123;
-    int[] top = new int[nums.length];
-    // 牌堆数初始化为 0
-    int piles = 0;
-    for (int i = 0; i &lt; nums.length; i++) &#123;
-    // 要处理的扑克牌
-    int poker = nums[i];
-
-    /***** 搜索左侧边界的二分查找 *****/
-    int left = 0, right = piles;
-    while (left &lt; right) &#123;
-        int mid = (left + right) / 2;
-        if (top[mid] &gt; poker) &#123;
-            right = mid;
-        &#125; else if (top[mid] &lt; poker) &#123;
-            left = mid + 1;
-        &#125; else &#123;
-            right = mid;
-        &#125;
-    &#125;
-
-    // 没找到合适的牌堆，新建一堆
-    if (left == piles) piles++;
-    // 把这张牌放到牌堆顶
-            top[left] = poker;
-        &#125;
-    // 牌堆数就是 LIS 长度
-    return piles;
-&#125;
-</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">length_of_lis</span>(<span class="hljs-params">nums</span>):<br>    top = [<span class="hljs-number">0</span>] * <span class="hljs-built_in">len</span>(nums)<br>    <span class="hljs-comment"># 牌堆数初始化为 0</span><br>    piles = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(nums)):<br>        <span class="hljs-comment"># 要处理的扑克牌</span><br>        poker = nums[i]<br><br>        <span class="hljs-comment"># ***** 搜索左侧边界的二分查找 *****</span><br>        left, right = <span class="hljs-number">0</span>, piles<br>        <span class="hljs-keyword">while</span> left &lt; right:<br>            mid = (left + right) // <span class="hljs-number">2</span><br>            <span class="hljs-keyword">if</span> top[mid] &gt; poker:<br>                right = mid<br>            <span class="hljs-keyword">elif</span> top[mid] &lt; poker:<br>                left = mid + <span class="hljs-number">1</span><br>            <span class="hljs-keyword">else</span>:<br>                right = mid<br><br>        <span class="hljs-comment"># 没找到合适的牌堆，新建一堆</span><br>        <span class="hljs-keyword">if</span> left == piles:<br>            piles += <span class="hljs-number">1</span><br>        <span class="hljs-comment"># 把这张牌放到牌堆顶</span><br>        top[left] = poker<br>    <span class="hljs-comment"># 牌堆数就是 LIS 长度</span><br>    <span class="hljs-keyword">return</span> piles<br></code></pre></td></tr></table></figure>
 
         </div>
         

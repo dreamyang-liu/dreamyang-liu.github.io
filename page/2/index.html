@@ -729,7 +729,7 @@ Partition Tolerance在CAP理论中,Partition Tolerance(分区容忍性)是指系
             <div class="post-excerpt">
               二进制快速幂二进制快速幂（简称BE）是一种可以加速幂运算计算的技术。对于朴素的幂运算 ，时间复杂度是 ，而使用二进制快速幂，时间复杂度降为 。让我们从一个例子开始，
 假设  是一个32位整数，这意味着最多我们只需要计算32次，并检查  是否包含在内。
-123456789101112131415161718public int fastPower(int a, int exp) {    if (e...
+12345678910111213def fast_power(a, exp):    if exp == 0:        return 1  ...
             </div>
             
             <div class="post-footer">
@@ -795,8 +795,7 @@ Partition Tolerance在CAP理论中,Partition Tolerance(分区容忍性)是指系
 
 
 我们可以跳过证明，详细证明请参考文档。我们只需要知道牌堆数等于最长递增序列的长度。
-int lengthOfLIS(int[] nums) &#123;
-    int[] top = new int[n...
+1234567891011121314151617181920212223242526def length_of_lis...
             </div>
             
             <div class="post-footer">
@@ -827,7 +826,7 @@ int lengthOfLIS(int[] nums) &#123;
             
             <div class="post-excerpt">
               二分查找二分查找可用于在有序序列中搜索或确定元素或枢轴。这里我们有三种使用二分查找的场景。
-在唯一元素数组中查找元素1234567891011int basic_binary_search(int[] arr, int target) {    int left = 0;    int right = n;    while(left &lt;=  right) {        int mid ...
+在唯一元素数组中查找元素123456789101112def basic_binary_search(arr, target):    left = 0    right = len(arr) - 1    while left &lt;= right:        mid = left + (right...
             </div>
             
             <div class="post-footer">
