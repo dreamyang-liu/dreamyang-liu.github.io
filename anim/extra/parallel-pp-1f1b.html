@@ -21,7 +21,7 @@ body {
 .anim-btn.danger:hover { background: #c94060; }
 .anim-status { text-align: center; margin-top: 12px; font-size: 0.9em; color: #f4a460; min-height: 1.5em; }
 
-.pp-anim-grid { display: grid; grid-template-columns: 70px repeat(12, 1fr); gap: 3px; min-width: 600px; }
+.pp-anim-grid { display: grid; gap: 3px; min-width: 600px; }
 .pp-anim-cell { height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.72em; font-weight: bold; background: #1e1e2e; color: #555; transition: all 0.4s ease; }
 .pp-anim-cell.active { color: #fff; }
 .pp-anim-cell.fwd-0 { background: #4a90d9; }
@@ -55,13 +55,28 @@ body {
 
 <script>
 (function() {
-    const schedule = [
-        [['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null,null,null],
-        [null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null,null],
-        [null,null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null,null],
-        [null,null,null,['F',1],['F',2],['F',3],['F',4],['B',1],['B',2],['B',3],['B',4],null],
-    ];
-    const totalCols = 12;
+    // True 1F1B schedule: for each stage s, (p-s) warmup forwards, then
+    // alternate B/F until all forwards done, then cooldown of remaining backwards.
+    // Reference: https://arxiv.org/abs/2104.04473 (Megatron-LM PP), Figure 4.
+    // For p=m=4, totalTime = 2*(m+p-1) = 14.
+    function generate1F1B(p, m) {
+        const totalTime = 2 * (m + p - 1);
+        const grid = Array.from({ length: p }, () => Array(totalTime).fill(null));
+        for (let s = 0; s < p; s++) {
+            let t = s, fwd = 0, bwd = 0;
+            const warmup = Math.min(p - s, m);
+            for (let i = 0; i < warmup; i++) { grid[s][t++] = ['F', fwd++ + 1]; }
+            while (fwd < m) {
+                grid[s][t++] = ['B', bwd++ + 1];
+                if (fwd < m) grid[s][t++] = ['F', fwd++ + 1];
+            }
+            while (bwd < m) { grid[s][t++] = ['B', bwd++ + 1]; }
+        }
+        return { grid, totalTime };
+    }
+
+    const P = 4, M = 4;
+    const { grid: schedule, totalTime: totalCols } = generate1F1B(P, M);
     let ppStep = -1;
     let ppRunning = false;
     let ppTimer = null;
@@ -69,9 +84,11 @@ body {
     function buildGrid() {
         const el = document.getElementById('pp-anim-grid');
         if (!el) return;
+        // Set grid template dynamically so it matches the computed totalCols.
+        el.style.gridTemplateColumns = `70px repeat(${totalCols}, 1fr)`;
         let html = '<div class="pp-anim-header"></div>';
         for (let t = 0; t < totalCols; t++) html += `<div class="pp-anim-header">t${t}</div>`;
-        for (let g = 0; g < 4; g++) {
+        for (let g = 0; g < P; g++) {
             html += `<div class="pp-anim-label">GPU ${g}</div>`;
             for (let t = 0; t < totalCols; t++) {
                 const s = schedule[g][t];
@@ -94,7 +111,7 @@ body {
         document.querySelectorAll('.pp-anim-cell.current').forEach(c => c.classList.remove('current'));
 
         let actions = [];
-        for (let g = 0; g < 4; g++) {
+        for (let g = 0; g < P; g++) {
             for (let t = 0; t <= ppStep; t++) {
                 const cell = document.querySelector(`.pp-anim-cell[data-g="${g}"][data-t="${t}"]`);
                 const s = schedule[g][t];
