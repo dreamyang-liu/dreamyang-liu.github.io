@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transformer 一层 activation: Normal vs TP+SP</title>
+<title>Transformer 一层 activation: Normal vs TP vs TP+SP</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -13,7 +13,7 @@ body {
   line-height: 1.55;
   padding: 4px;
 }
-.container { background: #0a0a1a; border-radius: 12px; padding: 14px 18px 18px; border: 1px solid #333; }
+.container { background: #0a0a1a; border-radius: 12px; padding: 14px 18px 18px; border: 1px solid #333; overflow-x: auto; }
 .controls { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
 .btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: transform 0.15s, opacity 0.15s; }
 .btn:hover { transform: scale(1.04); opacity: 0.92; }
@@ -23,7 +23,7 @@ body {
 .btn:disabled, .btn:disabled:hover { opacity: 0.35; cursor: not-allowed; transform: none; }
 .info { color: #76b900; font-size: 0.92rem; margin: 6px 0 4px; min-height: 22px; font-weight: 600; }
 .counter { color: #888; font-size: 0.78rem; margin-bottom: 8px; }
-canvas { display: block; width: 100%; max-width: 920px; height: auto; margin: 0 auto; }
+canvas { display: block; width: 100%; max-width: 1100px; height: auto; margin: 0 auto; }
 </style>
 </head>
 <body>
@@ -37,7 +37,7 @@ canvas { display: block; width: 100%; max-width: 920px; height: auto; margin: 0 
   </div>
   <div class="info" id="sp-info"></div>
   <div class="counter" id="sp-counter"></div>
-  <canvas id="sp-canvas" width="920" height="780"></canvas>
+  <canvas id="sp-canvas" width="1100" height="780"></canvas>
 </div>
 
 <script>
@@ -45,28 +45,26 @@ canvas { display: block; width: 100%; max-width: 920px; height: auto; margin: 0 
   // ============================================================
   // CONSTANTS
   // ============================================================
-  const W_LOGICAL = 920;
+  const W_LOGICAL = 1100;
   const H_LOGICAL = 780;
   const T = 8;        // TP = SP = 8
 
-  // Colors (semantic)
   const COL = {
     text:    '#e0e0e0',
     label:   '#00d4aa',
     caption: '#a0a0b0',
     accent:  '#feca57',
     divider: '#3a3a4e',
+    sepLine: '#444',
 
-    // tensor region colors
-    sp:        '#3b82f6',  // SP 区, 沿 seq 切
-    tp_attn:   '#10b981',  // TP attention, 沿 heads 切
-    tp_score:  '#ef4444',  // O(s²) attention scores, 沿 heads 切 (单独标红 — 体积大头)
-    tp_mlp:    '#a855f7',  // TP MLP, 沿 hidden 切
-    transient: '#71717a',  // TP 区入口/出口的 full (b,s,h) 临时态
-    normal:    '#7c3aed',  // 单卡保留所有 — 单色
-
+    // tensor visual colors (semantic by region)
+    normal:    '#7c3aed',  // unsharded baseline (left column)
+    sp:        '#3b82f6',  // SP region, seq sharded
+    tp_attn:   '#10b981',  // TP attention region (Q/K/V/ctx), sharded by heads/hidden
+    tp_score:  '#ef4444',  // O(s²) attention scores
+    tp_mlp:    '#a855f7',  // TP MLP intermediate (4h)
+    transient: '#71717a',  // TP region transient (full b,s,h briefly)
     barBg:    '#1a1a2e',
-    sepLine:  '#444',
   };
 
   // ============================================================
@@ -91,254 +89,270 @@ canvas { display: block; width: 100%; max-width: 920px; height: auto; margin: 0 
     ctx.fillText(text, x, y);
   }
 
-  // Map size in MB → bar width (sub-linear so 4 MB and 512 MB both visible)
+  // log2-scaled bar width so 4 MB and 512 MB are both visible
+  // (max bar width = BAR_TRACK px, fits the tightest column)
+  const BAR_TRACK = 80;
   function barWidth(mb) {
     if (mb <= 0) return 0;
-    return Math.max(8, Math.round(20 + 12 * Math.log2(mb)));
+    // 4 → ~44, 16 → ~56, 32 → ~62, 64 → ~68, 128 → ~74, 512 → ~80
+    return Math.min(BAR_TRACK, Math.max(8, Math.round(20 + 7 * Math.log2(mb))));
   }
 
   // ============================================================
-  // TENSOR ROWS  (label, normal {shape, mb, color}, tpsp {shape, mb, color, marker})
-  // grouped by `step`
+  // TENSOR ROWS — Normal / TP-only / TP+SP, with shape + MB + color
   // ============================================================
+  // Sizes for 70B (h=8192, n_h=64, d_k=128, b=1, s=2048, FP16):
+  //   (b, s, h)        = 32 MB
+  //   (b, s, h/T)      = 4 MB
+  //   (b, s, 4h)       = 128 MB
+  //   (b, s, 4h/T)     = 16 MB
+  //   (b, n_h, s, s)   = 512 MB
+  //   (b, n_h/T, s, s) = 64 MB
+  //   (b, n_h, s, d_k)   = 32 MB
+  //   (b, n_h/T, s, d_k) = 4 MB
+  //   (b, s/T, h)      = 4 MB
   const rows = [
-    // step 1: x_in entry (SP)
-    { step: 1, kind: 'tensor',
-      label: 'x_in (上层输入)',
+    // step 1: x_in
+    { step: 1, label: 'x_in (上层输入)',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp, note: 'SP 区' } },
+      tp:     { shape: '(b, s, h)',   mb: 32, color: COL.transient, note: 'TP 不切 seq' },
+      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp,        note: 'SP 区' } },
 
-    // step 2: all-gather + LN1 (TP entry, transient full size)
-    { step: 2, kind: 'comm', side: 'right', text: '↓ all-gather (seq) — TP 区入口' },
-    { step: 2, kind: 'tensor',
-      label: 'x1 = LN1(x_in)',
+    // step 2: LN1 (TP区入口 — TP+SP需all-gather, TP不需)
+    { step: 2, label: 'x1 = LN1(x_in)',
       normal: { shape: '(b, s, h)', mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'transient' } },
+      tp:     { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'LN 不能切' },
+      tpsp:   { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'all-gather 后 transient' } },
 
-    // step 3: Q, K, V projection (TP, sharded along hidden)
-    { step: 3, kind: 'tensor',
-      label: 'Q = x1 @ W_Q',
+    // step 3: Q, K, V (hidden 切)
+    { step: 3, label: 'Q = x1 @ W_Q',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn, note: 'TP, hidden 切' } },
-    { step: 3, kind: 'tensor',
-      label: 'K = x1 @ W_K',
-      normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
+      tp:     { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn },
       tpsp:   { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn } },
-    { step: 3, kind: 'tensor',
-      label: 'V = x1 @ W_V',
+    { step: 3, label: 'K = x1 @ W_K',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
+      tp:     { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn },
+      tpsp:   { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn } },
+    { step: 3, label: 'V = x1 @ W_V',
+      normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
+      tp:     { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn },
       tpsp:   { shape: '(b, s, h/T)', mb:  4, color: COL.tp_attn } },
 
-    // step 4: attention scores (BIG O(s²))
-    { step: 4, kind: 'tensor',
-      label: 'scores = Q @ K^T / √d_k  ★',
+    // step 4: scores (O(s²) BIG)
+    { step: 4, label: 'scores = Q @ K^T  ★',
       normal: { shape: '(b, n_h, s, s)',   mb: 512, color: COL.normal,   marker: '★' },
-      tpsp:   { shape: '(b, n_h/T, s, s)', mb:  64, color: COL.tp_score, marker: '★', note: 'heads 切' } },
-
-    // step 5: softmax + ctx + attn_out
-    { step: 5, kind: 'tensor',
-      label: 'attn_w = softmax(scores)  ★',
-      normal: { shape: '(b, n_h, s, s)',   mb: 512, color: COL.normal,   marker: '★' },
+      tp:     { shape: '(b, n_h/T, s, s)', mb:  64, color: COL.tp_score, marker: '★' },
       tpsp:   { shape: '(b, n_h/T, s, s)', mb:  64, color: COL.tp_score, marker: '★' } },
-    { step: 5, kind: 'tensor',
-      label: 'ctx = attn_w @ V',
+
+    // step 5: softmax, ctx, attn_out
+    { step: 5, label: 'attn_w = softmax(scores) ★',
+      normal: { shape: '(b, n_h, s, s)',   mb: 512, color: COL.normal,   marker: '★' },
+      tp:     { shape: '(b, n_h/T, s, s)', mb:  64, color: COL.tp_score, marker: '★' },
+      tpsp:   { shape: '(b, n_h/T, s, s)', mb:  64, color: COL.tp_score, marker: '★' } },
+    { step: 5, label: 'ctx = attn_w @ V',
       normal: { shape: '(b, n_h, s, d_k)',   mb: 32, color: COL.normal },
+      tp:     { shape: '(b, n_h/T, s, d_k)', mb:  4, color: COL.tp_attn },
       tpsp:   { shape: '(b, n_h/T, s, d_k)', mb:  4, color: COL.tp_attn } },
-    { step: 5, kind: 'tensor',
-      label: 'attn_out = ctx @ W_O',
+    { step: 5, label: 'attn_out = ctx @ W_O',
       normal: { shape: '(b, s, h)', mb: 32, color: COL.normal },
+      tp:     { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'all-reduce 后' },
       tpsp:   { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'partial sum' } },
 
-    // step 6: reduce-scatter + x_attn (back to SP)
-    { step: 6, kind: 'comm', side: 'right', text: '↓ reduce-scatter (seq) — 回到 SP 区' },
-    { step: 6, kind: 'tensor',
-      label: 'x_attn = x_in + attn_out',
+    // step 6: x_attn (residual — TP can't help, TP+SP can via SP)
+    { step: 6, label: 'x_attn = x_in + attn_out',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp, note: 'SP 区' } },
+      tp:     { shape: '(b, s, h)',   mb: 32, color: COL.transient, note: 'TP 不省' },
+      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp,        note: 'SP 救场!' } },
 
-    // step 7: LN2 (SP)
-    { step: 7, kind: 'tensor',
-      label: 'x2 = LN2(x_attn)',
+    // step 7: LN2 (also residual region)
+    { step: 7, label: 'x2 = LN2(x_attn)',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp } },
+      tp:     { shape: '(b, s, h)',   mb: 32, color: COL.transient, note: 'TP 不省' },
+      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp,        note: 'SP 救场!' } },
 
-    // step 8: all-gather + MLP up (BIG 4h)
-    { step: 8, kind: 'comm', side: 'right', text: '↓ all-gather (seq) — 再次进入 TP 区' },
-    { step: 8, kind: 'tensor',
-      label: 'up = x2 @ W_up  ★',
+    // step 8: MLP up (BIG 4h)
+    { step: 8, label: 'up = x2 @ W_up  ★',
       normal: { shape: '(b, s, 4h)',   mb: 128, color: COL.normal, marker: '★' },
-      tpsp:   { shape: '(b, s, 4h/T)', mb:  16, color: COL.tp_mlp, marker: '★', note: 'hidden 切' } },
-
-    // step 9: GeLU
-    { step: 9, kind: 'tensor',
-      label: 'act = GeLU(up)  ★',
-      normal: { shape: '(b, s, 4h)',   mb: 128, color: COL.normal, marker: '★' },
+      tp:     { shape: '(b, s, 4h/T)', mb:  16, color: COL.tp_mlp, marker: '★' },
       tpsp:   { shape: '(b, s, 4h/T)', mb:  16, color: COL.tp_mlp, marker: '★' } },
 
-    // step 10: down (partial)
-    { step: 10, kind: 'tensor',
-      label: 'down = act @ W_down',
+    // step 9: GeLU
+    { step: 9, label: 'act = GeLU(up)  ★',
+      normal: { shape: '(b, s, 4h)',   mb: 128, color: COL.normal, marker: '★' },
+      tp:     { shape: '(b, s, 4h/T)', mb:  16, color: COL.tp_mlp, marker: '★' },
+      tpsp:   { shape: '(b, s, 4h/T)', mb:  16, color: COL.tp_mlp, marker: '★' } },
+
+    // step 10: down (partial sum)
+    { step: 10, label: 'down = act @ W_down',
       normal: { shape: '(b, s, h)', mb: 32, color: COL.normal },
+      tp:     { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'all-reduce 后' },
       tpsp:   { shape: '(b, s, h)', mb: 32, color: COL.transient, note: 'partial sum' } },
 
-    // step 11: reduce-scatter + x_out (final SP)
-    { step: 11, kind: 'comm', side: 'right', text: '↓ reduce-scatter (seq) — 回到 SP 区' },
-    { step: 11, kind: 'tensor',
-      label: 'x_out = x_attn + down  (下一层输入)',
+    // step 11: x_out (final residual — again, TP can't help, SP can)
+    { step: 11, label: 'x_out = x_attn + down',
       normal: { shape: '(b, s, h)',   mb: 32, color: COL.normal },
-      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp } },
+      tp:     { shape: '(b, s, h)',   mb: 32, color: COL.transient, note: 'TP 不省' },
+      tpsp:   { shape: '(b, s/T, h)', mb:  4, color: COL.sp,        note: 'SP 救场!' } },
   ];
 
-  // Step info captions
+  // Step info captions (12 main steps + totals)
   const stepInfo = [
-    'Step 0: 起点 — 接下来一行行加入一个 transformer block 内部的 activation, 两边形状对比',
-    'Step 1: x_in 进入 — 上一层的输出, 在 SP 区每卡只持有 s/T 段的 seq',
-    'Step 2: TP 区入口需要完整 seq — all-gather 把 seq 维拼回来, LN1 在 (b, s, h) 上算',
-    'Step 3: Q, K, V 三个线性投影 — 沿 hidden 维切 1/T, 每卡只算自己负责的 head',
-    'Step 4: ★ attention scores — O(s²) 大户, TP 把 heads 切成 1/T, 单层从 512 MB → 64 MB',
-    'Step 5: softmax + ctx + attn_out — attn_out 是 partial sum, 需要跨卡归约',
-    'Step 6: reduce-scatter 把 partial sum 一边归约一边沿 seq 切, 回到 SP 区',
-    'Step 7: LN2 在 SP 区, 还是 (b, s/T, h) — LN 不能跨 hidden 切, 但可以跨 seq 切',
-    'Step 8: 又一次 all-gather 拼回 seq, MLP up 把 hidden 撑到 4h, 同样沿 hidden 切',
-    'Step 9: ★ GeLU 把 4h 的中间结果再存一份 — MLP 在每层 activation 里贡献最多',
-    'Step 10: down projection 又是 partial sum',
-    'Step 11: 最后 reduce-scatter 回 SP 区, x_out 是下一层的 x_in, 又是 (b, s/T, h) 4 MB',
-    'Step 12: 一层总和 — 1.85 GB → 224 MB / 卡, 节省 ~8.3×; 配 selective recompute 再砍 80% 的 O(s²)',
+    'Step 0: 起点 — 一行行加入 transformer block 内每个 activation, 三栏对比形状/大小',
+    'Step 1: x_in — TP 不切 seq, SP 把 seq 维切 T 份, 立省 8×',
+    'Step 2: LN1 — LN 本身不能切, TP 与 TP+SP 都暂时变回 (b, s, h) (TP+SP 经 all-gather, TP 本来就是)',
+    'Step 3: Q, K, V 投影 — 沿 hidden 切, TP 与 TP+SP 同等省 8×',
+    'Step 4: ★ scores = Q·K^T (O(s²) 大头) — heads 切 1/T, 单层从 512 MB 砍到 64 MB',
+    'Step 5: softmax + ctx + attn_out — attn_out 是 partial sum, TP 用 all-reduce 归约, TP+SP 用 reduce-scatter',
+    'Step 6: x_attn 残差 — 看这里! TP 留 (b,s,h) 32MB 不动, TP+SP 把 seq 切回去只剩 4MB',
+    'Step 7: LN2 同上, 这两行就是 SP 比 TP 多省 8× 的地方',
+    'Step 8: ★ MLP up (b, s, 4h) — TP 把 4h 切, 大胖子从 128 MB → 16 MB',
+    'Step 9: ★ GeLU(up) — MLP 中间又存一份 4h 大胖子',
+    'Step 10: down — 又一个 partial sum, comm 同 attn_out',
+    'Step 11: x_out 残差 — 又是 SP 救场, TP+SP 比 TP 再省 28 MB',
+    'Step 12: 一层总和 — Normal 1850 MB → TP 373 MB (5×) → TP+SP 224 MB (8.3×). SP 多拿的 ~1.7× 全来自残差/LN 区',
   ];
 
-  const TOTAL_STEPS = 13; // 0..12
+  const TOTAL_STEPS = 13;
 
   // ============================================================
-  // LAYOUT CONSTANTS
+  // LAYOUT
   // ============================================================
-  const HEADER_Y = 38;
-  const COLS_Y = 70;        // headers "NORMAL" / "TP+SP"
-  const ROWS_START_Y = 110;
-  const ROW_H = 28;         // tighter to fit ~17 rows
-  const TOTALS_Y = 620;
+  const HEADER_Y = 32;
+  const COLS_Y = 70;
+  const ROWS_START_Y = 105;
+  const ROW_H = 26;
+  const TOTALS_Y = 530;
 
-  const LEFT_X = 32;
-  const MID_X = 470;
-  const RIGHT_X = 488;
-  const RIGHT_W = 412;
+  const PAD = 24;
+  const LABEL_W = 180;
+  const COL_W = (W_LOGICAL - 2 * PAD - LABEL_W) / 3;  // ≈ 284
+  const COL_X = [
+    PAD + LABEL_W,                 // Normal col start
+    PAD + LABEL_W + COL_W,         // TP col start
+    PAD + LABEL_W + 2 * COL_W,     // TP+SP col start
+  ];
 
-  const LABEL_W = 200;
-  const SHAPE_W = 140;
-  const BAR_X = LABEL_W + SHAPE_W + 8;
-  const SIZE_TEXT_OFFSET = 8;
+  // Inside a column: shape text, then bar, then size text, then optional note
+  const COL_SHAPE_W = 130;
+  const COL_BAR_W = BAR_TRACK + 4;   // track + padding
+  const COL_SIZE_W = 60;
 
   // ============================================================
   // DRAW PRIMITIVES
   // ============================================================
-
   function drawTitle() {
-    drawText('Transformer 一层 activation: Normal vs TP+SP (T=8)',
+    drawText('Transformer 一层 activation: Normal vs TP vs TP+SP (T=8)',
       W_LOGICAL / 2, HEADER_Y,
       { color: COL.label, font: 'bold 14px JetBrains Mono' });
-
     drawText('70B 配置 · h=8192, n_h=64, d_k=128, b=1, s=2048, FP16',
       W_LOGICAL / 2, HEADER_Y + 18,
       { color: COL.caption, font: '11px JetBrains Mono' });
   }
 
   function drawColumnHeaders() {
-    drawText('NORMAL (单卡保留所有)', LEFT_X + 200, COLS_Y,
-      { color: COL.label, font: 'bold 13px JetBrains Mono', align: 'left' });
-    drawText('TP + SP (每卡, T = 8)', RIGHT_X + 8, COLS_Y,
-      { color: COL.label, font: 'bold 13px JetBrains Mono', align: 'left' });
+    const headers = [
+      ['NORMAL (单卡保留所有)', COL_X[0]],
+      ['TP only (每卡, T=8)',   COL_X[1]],
+      ['TP + SP (每卡, T=8)',   COL_X[2]],
+    ];
+    for (const [text, x] of headers) {
+      drawText(text, x + 6, COLS_Y,
+        { color: COL.label, font: 'bold 12px JetBrains Mono', align: 'left' });
+    }
 
-    // Vertical divider
+    // Vertical dividers between columns
     ctx.strokeStyle = COL.divider;
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(MID_X, COLS_Y - 16);
-    ctx.lineTo(MID_X, TOTALS_Y - 12);
-    ctx.stroke();
+    const yTop = COLS_Y - 14;
+    const yBot = TOTALS_Y - 8;
+    [COL_X[1], COL_X[2]].forEach(x => {
+      ctx.beginPath();
+      ctx.moveTo(x - 4, yTop);
+      ctx.lineTo(x - 4, yBot);
+      ctx.stroke();
+    });
   }
 
-  // Draw one half-row (label + shape + colored bar + size text + optional note)
-  function drawHalfRow(x, y, label, spec, opts = {}) {
-    // label (only for left side; right side reuses left's label)
-    if (label) {
-      drawText(label, x + 4, y + ROW_H / 2,
-        { color: COL.text, font: '11px JetBrains Mono', align: 'left' });
-    }
-    // shape text
-    drawText(spec.shape, x + LABEL_W + 4, y + ROW_H / 2,
-      { color: COL.caption, font: '11px JetBrains Mono', align: 'left' });
+  // Render a single column cell at (x, y) — shape text, bar, size, note
+  function drawCell(x, y, spec) {
+    if (!spec) return;
+    // shape
+    drawText(spec.shape, x + 4, y + ROW_H / 2,
+      { color: COL.caption, font: '10.5px JetBrains Mono', align: 'left' });
     // bar
     const bw = barWidth(spec.mb);
-    const bh = 14;
-    const bx = x + LABEL_W + SHAPE_W;
+    const bh = 12;
+    const bx = x + COL_SHAPE_W;
     const by = y + (ROW_H - bh) / 2;
     ctx.fillStyle = COL.barBg;
-    ctx.fillRect(bx, by, 130, bh);  // bg track
+    ctx.fillRect(bx, by, BAR_TRACK, bh);
     ctx.fillStyle = spec.color;
-    ctx.fillRect(bx, by, Math.min(bw, 130), bh);
+    ctx.fillRect(bx, by, bw, bh);
     if (spec.marker === '★') {
-      drawText('★', bx + Math.min(bw, 130) - 8, y + ROW_H / 2,
-        { color: '#fff', font: 'bold 10px sans-serif' });
+      drawText('★', bx + bw - 7, y + ROW_H / 2,
+        { color: '#fff', font: 'bold 9px sans-serif' });
     }
     // size text
     const sizeText = spec.mb >= 1024
       ? `${(spec.mb / 1024).toFixed(2)} GB`
       : `${spec.mb} MB`;
-    drawText(sizeText, bx + 134, y + ROW_H / 2,
-      { color: COL.text, font: 'bold 11px JetBrains Mono', align: 'left' });
-    // note (e.g. "SP 区", "transient", "partial sum")
+    drawText(sizeText, bx + BAR_TRACK + 6, y + ROW_H / 2,
+      { color: COL.text, font: 'bold 10.5px JetBrains Mono', align: 'left' });
+    // optional note
     if (spec.note) {
-      drawText(spec.note, bx + 134 + 60, y + ROW_H / 2,
-        { color: COL.accent, font: 'italic 10px JetBrains Mono', align: 'left' });
+      drawText(spec.note, bx + BAR_TRACK + 6 + COL_SIZE_W - 8, y + ROW_H / 2,
+        { color: COL.accent, font: 'italic 9.5px JetBrains Mono', align: 'left' });
     }
   }
 
-  function drawCommArrow(x, y, text) {
-    drawText(text, x + LABEL_W + 4, y + ROW_H / 2,
-      { color: COL.accent, font: 'italic 11px JetBrains Mono', align: 'left' });
+  function drawRow(y, row) {
+    // label on far left
+    drawText(row.label, PAD + 4, y + ROW_H / 2,
+      { color: COL.text, font: '11px JetBrains Mono', align: 'left' });
+    drawCell(COL_X[0], y, row.normal);
+    drawCell(COL_X[1], y, row.tp);
+    drawCell(COL_X[2], y, row.tpsp);
   }
 
-  // Cumulative totals at the bottom
-  function drawTotals(normalMB, tpspMB) {
+  function drawTotals(normalMB, tpMB, tpspMB) {
     const y = TOTALS_Y;
-
-    // Divider line above totals
+    // Divider above totals
     ctx.strokeStyle = COL.sepLine;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(LEFT_X, y - 8);
-    ctx.lineTo(W_LOGICAL - LEFT_X, y - 8);
+    ctx.moveTo(PAD, y - 8);
+    ctx.lineTo(W_LOGICAL - PAD, y - 8);
     ctx.stroke();
 
     drawText('累计 (一层 activation 总和):',
       W_LOGICAL / 2, y + 14,
       { color: COL.label, font: 'bold 13px JetBrains Mono' });
 
-    const norm = normalMB >= 1024 ? `${(normalMB / 1024).toFixed(2)} GB` : `${normalMB} MB`;
-    const tpsp = tpspMB   >= 1024 ? `${(tpspMB   / 1024).toFixed(2)} GB` : `${tpspMB} MB`;
-
-    // Big number under each column
-    drawText('NORMAL', LEFT_X + 220, y + 48,
-      { color: COL.caption, font: '11px JetBrains Mono' });
-    drawText(norm, LEFT_X + 220, y + 72,
-      { color: COL.normal, font: 'bold 24px JetBrains Mono' });
-
-    drawText('TP+SP / 卡', RIGHT_X + 200, y + 48,
-      { color: COL.caption, font: '11px JetBrains Mono' });
-    drawText(tpsp, RIGHT_X + 200, y + 72,
-      { color: '#10b981', font: 'bold 24px JetBrains Mono' });
-
-    // Ratio
-    if (normalMB > 0 && tpspMB > 0) {
-      const ratio = (normalMB / tpspMB).toFixed(1);
-      drawText(`节省 ${ratio} ×`,
-        W_LOGICAL / 2, y + 110,
-        { color: COL.accent, font: 'bold 16px JetBrains Mono' });
+    const fmt = (mb) => mb >= 1024 ? `${(mb / 1024).toFixed(2)} GB` : `${mb} MB`;
+    const totals = [
+      ['NORMAL',         normalMB, COL.normal,  COL_X[0] + 110],
+      ['TP only / 卡',   tpMB,     '#10b981',   COL_X[1] + 110],
+      ['TP+SP / 卡',     tpspMB,   '#3b82f6',   COL_X[2] + 110],
+    ];
+    for (const [lbl, mb, color, x] of totals) {
+      drawText(lbl, x, y + 48,
+        { color: COL.caption, font: '11px JetBrains Mono' });
+      drawText(fmt(mb), x, y + 76,
+        { color, font: 'bold 22px JetBrains Mono' });
     }
 
-    // Final-step extra explanation
+    // Saving ratios
+    if (normalMB > 0 && tpMB > 0) {
+      const rTP = (normalMB / tpMB).toFixed(1);
+      const rSP = (normalMB / tpspMB).toFixed(1);
+      const rTPtoSP = (tpMB / tpspMB).toFixed(2);
+      drawText(`TP: ${rTP}× ↓        TP+SP: ${rSP}× ↓       (SP 在 TP 之上再省 ${rTPtoSP}×)`,
+        W_LOGICAL / 2, y + 116,
+        { color: COL.accent, font: 'bold 14px JetBrains Mono' });
+    }
     if (normalMB >= 1800) {
-      drawText('上面是无 FlashAttention 的情况;加 FA 后 O(s²) 直接不存,activation 再砍掉一大块',
-        W_LOGICAL / 2, y + 134,
+      drawText('上面是无 FlashAttention; 加 FA 后 O(s²) 不存,activation 再砍掉一大块',
+        W_LOGICAL / 2, y + 142,
         { color: COL.caption, font: '11px JetBrains Mono' });
     }
   }
@@ -351,42 +365,28 @@ canvas { display: block; width: 100%; max-width: 920px; height: auto; margin: 0 
     drawTitle();
     drawColumnHeaders();
 
-    // Walk the rows up to currentStep, drawing each on the canvas
     let yOff = ROWS_START_Y;
-    let normalTotal = 0;
-    let tpspTotal = 0;
-    let prevLabel = null;
-
+    let normalSum = 0, tpSum = 0, tpspSum = 0;
     for (const row of rows) {
       if (row.step > currentStep) break;
-      if (row.kind === 'comm') {
-        // Comm arrow shown ONLY on the right (TP+SP) side
-        drawCommArrow(RIGHT_X, yOff, row.text);
-        yOff += ROW_H;
-      } else if (row.kind === 'tensor') {
-        // Left side
-        drawHalfRow(LEFT_X, yOff, row.label, row.normal);
-        // Right side (no label, just shape/bar)
-        drawHalfRow(RIGHT_X, yOff, null, row.tpsp);
-        yOff += ROW_H;
-        normalTotal += row.normal.mb;
-        tpspTotal += row.tpsp.mb;
-      }
+      drawRow(yOff, row);
+      yOff += ROW_H;
+      normalSum += row.normal.mb;
+      tpSum     += row.tp.mb;
+      tpspSum   += row.tpsp.mb;
     }
 
-    // If currentStep >= 12 (last step), show full Korthikanti formula totals
-    // instead of just summed-of-rendered-rows (so totals account for ALL
-    // intermediates that the Megatron paper counts, not just the ones we drew)
+    // On the final step, swap to the Korthikanti formal per-layer totals
+    // so the savings numbers reflect ALL intermediates (not just the rows shown).
+    //   Normal: 34·s·b·h + 5·a·s²·b              = 544 + 1280 = 1824 ≈ 1850 MB
+    //   TP   : (10 + 24/T)·s·b·h + 5·a·s²·b/T   = 167 + 50  + 156  ≈ 373 MB
+    //   TP+SP: (34/T)·s·b·h + (5·a·s²·b)/T       = 68  + 156         ≈ 224 MB
     if (currentStep >= 12) {
-      // Korthikanti per-layer (FP16, 70B, b=1, s=2048):
-      //   linear: 34·s·b·h        = 544 MB
-      //   attn:    5·a·s²·b        = 1280 MB
-      // total: ~1850 MB
-      normalTotal = 1850;
-      tpspTotal = Math.round(1850 / T);
+      normalSum = 1850;
+      tpSum     = 373;
+      tpspSum   = 224;
     }
-
-    drawTotals(normalTotal, tpspTotal);
+    drawTotals(normalSum, tpSum, tpspSum);
   }
 
   // ============================================================
