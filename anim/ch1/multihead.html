@@ -3,136 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Head 拆分与并行计算</title>
+<title>Multi-Head Attention 拆分与并行</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; padding: 4px; }
-.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
-.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
-.btn:hover { transform: scale(1.05); opacity: 0.9; }
-.btn:active { transform: scale(0.95); }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow-x: auto; }
+.controls { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.15s, opacity 0.15s; }
+.btn:hover { transform: scale(1.04); opacity: 0.92; }
+.btn:active { transform: scale(0.96); }
 .btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
 .btn-secondary:hover { background: #444; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.btn:disabled:hover { transform: none; opacity: 0.4; }
-.controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
-.step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
-.step-counter { color: #888; font-size: 0.9rem; margin: 6px 0; }
-.head-block { display: inline-block; padding: 10px 15px; margin: 5px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; text-align: center; transition: all 0.5s ease; }
-.tensor-full { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; min-width: 200px; }
-.tensor-head { min-width: 60px; color: #000; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes fadeScale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+.btn:disabled, .btn:disabled:hover { opacity: 0.35; cursor: not-allowed; transform: none; }
+.step-info { color: #76b900; font-size: 0.92rem; margin: 8px 0; min-height: 22px; font-weight: 600; }
+.step-counter { color: #888; font-size: 0.82rem; margin-bottom: 12px; }
+
+/* Tensor display */
+.tensor { display: inline-block; margin: 6px 8px; vertical-align: top; }
+.tensor-label { text-align: center; font-size: 0.78rem; font-weight: bold; color: #00d4aa; margin-bottom: 4px; }
+.tensor-grid { display: inline-grid; gap: 1px; padding: 2px; background: #060611; border-radius: 4px; border: 1px solid #2a2a3e; }
+.tensor-cell { width: 16px; height: 16px; border-radius: 2px; transition: background 0.4s ease, transform 0.3s ease; }
+.scene-arrow { display: inline-flex; align-items: center; justify-content: center; color: #76b900; font-size: 0.85rem; vertical-align: middle; margin: 0 4px; min-width: 56px; height: 70px; text-align: center; }
+.scene-arrow-down { display: block; color: #76b900; font-size: 0.85rem; text-align: center; margin: 6px 0; }
+
+/* Color scheme: head membership is encoded as cell background */
+.c-neutral { background: #404060; }
+.c-head1 { background: #4a90d9; }   /* blue = head 1 */
+.c-head2 { background: #e85d75; }   /* red  = head 2 */
+.c-output { background: linear-gradient(135deg, #76b900, #00d4aa); }
+.c-input { background: #6c5ce7; }   /* purple = input X */
+.c-weight { background: #999; }     /* gray = weight matrix (not a tensor, just labeled) */
+
+/* Layout helpers for the scenes */
+.scene { padding: 8px 0; }
+.row-center { display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
+.head-panel { padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid #2a2a3e; }
+.head-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; text-align: center; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 12px; font-size: 0.78rem; color: #ccc; }
+.legend-sq { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+.note { font-size: 0.78rem; color: #888; text-align: center; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div class="animation-container" id="multihead-animation">
+<div class="animation-container">
   <div class="controls">
-    <button class="btn btn-secondary" id="mh-prev" onclick="multiHeadDemo.prev()">&larr; 上一步</button>
-    <button class="btn btn-secondary" id="mh-next" onclick="multiHeadDemo.next()">下一步 &rarr;</button>
-    <button class="btn" id="mh-auto" onclick="multiHeadDemo.auto()">&#9654; 自动播放</button>
-    <button class="btn btn-secondary" id="mh-reset" onclick="multiHeadDemo.reset()">&#8634; 重置</button>
+    <button class="btn btn-secondary" id="mh-prev">&larr; 上一步</button>
+    <button class="btn btn-secondary" id="mh-next">下一步 &rarr;</button>
+    <button class="btn" id="mh-auto">&#9654; 自动播放</button>
+    <button class="btn btn-secondary" id="mh-reset">&#8634; 重置</button>
   </div>
-  <div class="step-info" id="multihead-step-info">展示 tensor 如何被拆分成多个 head 并行处理</div>
-  <div class="step-counter" id="multihead-step-counter">Step 0 / 3</div>
-  <div id="multihead-visual" style="text-align: center; padding: 20px;">
-    <div id="mh-input" style="margin-bottom: 20px;"></div>
-    <div id="mh-heads" style="margin-bottom: 20px; min-height: 80px;"></div>
-    <div id="mh-output" style="margin-bottom: 10px;"></div>
-  </div>
+  <div class="step-info" id="mh-step-info"></div>
+  <div class="step-counter" id="mh-step-counter"></div>
+  <div id="mh-scene" class="scene"></div>
 </div>
 
 <script>
-// ========== Multi-Head Split Animation（从 ch1 原文件抽取）==========
-const multiHeadDemo = (() => {
-  const N = 4;            // 4 个阶段: 输入 → 拆分 8 head → 并行 Attention → Concat+W_O
+const multihead = (() => {
+  // Concrete shapes — small enough to be cell-by-cell visible, big enough to show splitting.
+  const N = 4;            // tokens
+  const D = 8;            // d_model
+  const H = 2;            // heads
+  const DK = D / H;       // d_k per head = 4
+
   let step = 0;
   let autoTimer = null;
 
-  function render(phase) {
-    const input = document.getElementById('mh-input');
-    const heads = document.getElementById('mh-heads');
-    const output = document.getElementById('mh-output');
-    const info = document.getElementById('multihead-step-info');
-
-    if (phase === 0) {
-      info.textContent = '输入 tensor: shape (batch, seq_len, d_model=512)';
-      input.innerHTML = `<div class="head-block tensor-full" style="animation: fadeScale 0.5s ease;">Input: (B, N, 512)</div>`;
-      heads.innerHTML = '';
-      output.innerHTML = '';
-    } else if (phase === 1) {
-      info.textContent = 'Step 1: 线性投影后拆分为 8 个 head，每个 head 维度 = 64';
-      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
-      const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0'];
-      let headHtml = '';
-      for (let i = 0; i < 8; i++) {
-        headHtml += `<div class="head-block tensor-head" style="background:${colors[i]}; animation: slideIn 0.3s ease ${i * 0.1}s both;">Head ${i}<br><span style="font-size:0.7rem;">(B,N,64)</span></div>`;
+  // ---- Tensor render helpers ---------------------------------------------
+  function grid(rows, cols, cellClassFn) {
+    let html = `<div class="tensor-grid" style="grid-template-columns: repeat(${cols}, 16px);">`;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        const cls = cellClassFn(i, j);
+        html += `<div class="tensor-cell ${cls}"></div>`;
       }
-      heads.innerHTML = headHtml;
-      output.innerHTML = '';
-    } else if (phase === 2) {
-      info.textContent = 'Step 2: 每个 head 独立计算 Attention（可并行）';
-      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
-      const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0'];
-      let headHtml = '';
-      for (let i = 0; i < 8; i++) {
-        headHtml += `<div class="head-block tensor-head" style="background:${colors[i]}; border: 2px solid #fff; animation: pulse 0.5s ease infinite ${i * 0.1}s;">Attn ${i}<br><span style="font-size:0.7rem;">QK<sup>T</sup>V</span></div>`;
-      }
-      heads.innerHTML = headHtml;
-      output.innerHTML = '';
-    } else if (phase === 3) {
-      info.textContent = 'Step 3: Concat 所有 head 输出，通过 W_O 投影回 d_model 维度';
-      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
-      heads.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap;">
-        <span style="color:#888;">Concat →</span>
-        <div class="head-block" style="background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #01a3a4, #f368e0); color:#000; min-width:200px; animation: fadeScale 0.5s ease;">(B, N, 512)</div>
-        <span style="color:#888;">→ W<sup>O</sup></span>
-      </div>`;
-      output.innerHTML = `<div class="head-block tensor-full" style="animation: fadeScale 0.5s ease 0.3s both;">Output: (B, N, 512)</div>`;
     }
+    html += `</div>`;
+    return html;
+  }
+  function tensor(label, rows, cols, cellClassFn) {
+    return `<div class="tensor"><div class="tensor-label">${label}</div>${grid(rows, cols, cellClassFn)}</div>`;
+  }
+  function arrow(top, sym = '→') {
+    return `<span class="scene-arrow"><span>${top || ''}<br><span style="color:#76b900;font-size:1.1rem;">${sym}</span></span></span>`;
   }
 
-  function update() {
-    if (step < 0) step = 0;
-    if (step > N - 1) step = N - 1;
-    render(step);
-    document.getElementById('multihead-step-counter').textContent = `Step ${step} / ${N - 1}`;
-    const prevBtn = document.getElementById('mh-prev');
-    const nextBtn = document.getElementById('mh-next');
-    const autoBtn = document.getElementById('mh-auto');
-    if (prevBtn) prevBtn.disabled = (step === 0);
-    if (nextBtn) nextBtn.disabled = (step === N - 1);
-    if (autoBtn) autoBtn.disabled = (step === N - 1);
-  }
+  // Cell color rules
+  const C = {
+    input:  () => 'c-input',
+    qkv:    () => 'c-neutral',                                  // pre-split, neutral
+    split:  (i, j) => j < DK ? 'c-head1' : 'c-head2',          // post-split, halves tinted
+    head1:  () => 'c-head1',
+    head2:  () => 'c-head2',
+    output: () => 'c-output',
+  };
 
-  function stopAuto() {
-    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  const LEGEND = `
+    <div class="legend">
+      <div><span class="legend-sq c-input"></span>输入 X / 投影后的 Q,K,V</div>
+      <div><span class="legend-sq c-head1"></span>Head 1 (列 0..${DK-1})</div>
+      <div><span class="legend-sq c-head2"></span>Head 2 (列 ${DK}..${D-1})</div>
+      <div><span class="legend-sq c-output"></span>最终 Output</div>
+    </div>`;
+
+  // ---- Scene definitions --------------------------------------------------
+  const steps = [
+    {
+      info: `输入 X 是 N=${N} 个 token 的隐藏状态序列, 每个 token 是 d_model=${D} 维向量`,
+      build: () => `
+        <div class="row-center">
+          ${tensor(`X (${N}×${D})`, N, D, C.input)}
+        </div>
+        <div class="note">每一行 = 一个 token 的 hidden state, 每一列 = 一个 feature 维度</div>
+      `
+    },
+    {
+      info: `Step 1: 三个独立的线性投影 — Q = X·W^Q, K = X·W^K, V = X·W^V (各自 ${N}×${D})`,
+      build: () => `
+        <div class="row-center">
+          ${tensor(`X (${N}×${D})`, N, D, C.input)}
+          ${arrow('×W<sup>Q</sup>')}
+          ${tensor(`Q (${N}×${D})`, N, D, C.qkv)}
+          ${arrow('×W<sup>K</sup>')}
+          ${tensor(`K (${N}×${D})`, N, D, C.qkv)}
+          ${arrow('×W<sup>V</sup>')}
+          ${tensor(`V (${N}×${D})`, N, D, C.qkv)}
+        </div>
+        <div class="note">所有 W 矩阵都是 ${D}×${D}, 输出 shape 不变 — Q/K/V 仍是 ${N}×${D}</div>
+      `
+    },
+    {
+      info: `Step 2: 沿最后一维(d_model)把 Q/K/V 切成 h=${H} 个 head — 每个 head 拿连续的 d_k=${DK} 维`,
+      build: () => `
+        <div class="row-center">
+          ${tensor(`Q (${N}×${D})`, N, D, C.split)}
+          ${tensor(`K (${N}×${D})`, N, D, C.split)}
+          ${tensor(`V (${N}×${D})`, N, D, C.split)}
+        </div>
+        <div class="note">注意没有真正的"复制"或"重排" — 实现里就是 reshape 成 (${N}, ${H}, ${DK}). 不同颜色只是标出哪些列归哪个 head</div>
+        ${LEGEND}
+      `
+    },
+    {
+      info: `Step 3: 两个 head 各自在自己的 (Q_i, K_i, V_i) 上独立跑 attention — 完全并行, 互不影响`,
+      build: () => `
+        <div class="row-center" style="gap: 36px;">
+          <div class="head-panel">
+            <div class="head-title" style="color:#4a90d9;">Head 1</div>
+            <div class="row-center">
+              ${tensor(`Q_1 (${N}×${DK})`, N, DK, C.head1)}
+              ${tensor(`K_1`, N, DK, C.head1)}
+              ${tensor(`V_1`, N, DK, C.head1)}
+            </div>
+            <div class="scene-arrow-down">↓ Attention(Q_1, K_1, V_1) ↓</div>
+            <div class="row-center">
+              ${tensor(`Out_1 (${N}×${DK})`, N, DK, C.head1)}
+            </div>
+          </div>
+          <div class="head-panel">
+            <div class="head-title" style="color:#e85d75;">Head 2</div>
+            <div class="row-center">
+              ${tensor(`Q_2 (${N}×${DK})`, N, DK, C.head2)}
+              ${tensor(`K_2`, N, DK, C.head2)}
+              ${tensor(`V_2`, N, DK, C.head2)}
+            </div>
+            <div class="scene-arrow-down">↓ Attention(Q_2, K_2, V_2) ↓</div>
+            <div class="row-center">
+              ${tensor(`Out_2 (${N}×${DK})`, N, DK, C.head2)}
+            </div>
+          </div>
+        </div>
+        <div class="note">每个 head 学到不同的 attention pattern — 一个可能看相邻 token, 另一个可能看长距离依赖</div>
+      `
+    },
+    {
+      info: `Step 4: 沿最后一维 concat 两个 head 的输出 → 通过 W^O 投影回 d_model — 得到最终 Output (${N}×${D})`,
+      build: () => `
+        <div class="row-center">
+          ${tensor(`Out_1 (${N}×${DK})`, N, DK, C.head1)}
+          ${tensor(`Out_2 (${N}×${DK})`, N, DK, C.head2)}
+          ${arrow('Concat<br>(最后一维)')}
+          ${tensor(`Concat (${N}×${D})`, N, D, C.split)}
+        </div>
+        <div class="row-center" style="margin-top: 12px;">
+          ${tensor(`Concat (${N}×${D})`, N, D, C.split)}
+          ${arrow('×W<sup>O</sup>')}
+          ${tensor(`Output (${N}×${D})`, N, D, C.output)}
+        </div>
+        <div class="note">W^O 是 ${D}×${D}, 让不同 head 的信息互相"混合" — 最终 Output 不再有 head 边界</div>
+      `
+    }
+  ];
+
+  // ---- Render + step control ----------------------------------------------
+  function render() {
+    document.getElementById('mh-step-info').innerHTML = steps[step].info;
+    document.getElementById('mh-step-counter').textContent = `Step ${step} / ${steps.length - 1}`;
+    document.getElementById('mh-scene').innerHTML = steps[step].build();
+    document.getElementById('mh-prev').disabled = step === 0;
+    document.getElementById('mh-next').disabled = step === steps.length - 1;
+    document.getElementById('mh-auto').disabled = step === steps.length - 1;
   }
+  function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
 
   return {
-    next() { stopAuto(); if (step < N - 1) { step++; update(); } },
-    prev() { stopAuto(); if (step > 0) { step--; update(); } },
-    reset() { stopAuto(); step = 0; update(); },
+    next() { stopAuto(); if (step < steps.length - 1) { step++; render(); } },
+    prev() { stopAuto(); if (step > 0) { step--; render(); } },
+    reset() { stopAuto(); step = 0; render(); },
     auto() {
       stopAuto();
-      if (step >= N - 1) { step = 0; update(); }
+      if (step >= steps.length - 1) { step = 0; render(); }
       autoTimer = setInterval(() => {
-        if (step >= N - 1) { stopAuto(); update(); return; }
-        step++;
-        update();
-      }, 1500);
+        if (step >= steps.length - 1) { stopAuto(); render(); return; }
+        step++; render();
+      }, 2000);
     }
   };
 })();
-multiHeadDemo.reset();
 
-// ========== 自动把高度汇报给父页面 ==========
+document.getElementById('mh-prev').onclick = () => multihead.prev();
+document.getElementById('mh-next').onclick = () => multihead.next();
+document.getElementById('mh-auto').onclick = () => multihead.auto();
+document.getElementById('mh-reset').onclick = () => multihead.reset();
+multihead.reset();
+
+// ========== 自动把高度汇报给父页面（让 iframe 自适应高度）==========
 (function () {
-  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  function reportHeight() {
+    parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*');
+  }
   window.addEventListener('load', reportHeight);
-  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+  if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.body);
+  else setInterval(reportHeight, 500);
 })();
 </script>
 </body>
