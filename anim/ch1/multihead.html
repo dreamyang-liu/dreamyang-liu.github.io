@@ -3,238 +3,617 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Head Attention 拆分与并行</title>
+<title>Multi-Head Attention 完整流程</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   background: transparent;
   color: #e0e0e0;
   font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  line-height: 1.6;
+  line-height: 1.55;
   padding: 4px;
 }
-.animation-container { background: #0a0a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; position: relative; overflow-x: auto; }
-.controls { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.15s, opacity 0.15s; }
+.container { background: #0a0a1a; border-radius: 12px; padding: 14px 18px 18px; border: 1px solid #333; }
+.controls { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: transform 0.15s, opacity 0.15s; }
 .btn:hover { transform: scale(1.04); opacity: 0.92; }
 .btn:active { transform: scale(0.96); }
-.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
-.btn-secondary:hover { background: #444; }
+.btn-secondary { background: #2a2a3e; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #3a3a4e; }
 .btn:disabled, .btn:disabled:hover { opacity: 0.35; cursor: not-allowed; transform: none; }
-.step-info { color: #76b900; font-size: 0.92rem; margin: 8px 0; min-height: 22px; font-weight: 600; }
-.step-counter { color: #888; font-size: 0.82rem; margin-bottom: 12px; }
-
-/* Tensor display */
-.tensor { display: inline-block; margin: 6px 8px; vertical-align: top; }
-.tensor-label { text-align: center; font-size: 0.78rem; font-weight: bold; color: #00d4aa; margin-bottom: 4px; }
-.tensor-grid { display: inline-grid; gap: 1px; padding: 2px; background: #060611; border-radius: 4px; border: 1px solid #2a2a3e; }
-.tensor-cell { width: 16px; height: 16px; border-radius: 2px; transition: background 0.4s ease, transform 0.3s ease; }
-.scene-arrow { display: inline-flex; align-items: center; justify-content: center; color: #76b900; font-size: 0.85rem; vertical-align: middle; margin: 0 4px; min-width: 56px; height: 70px; text-align: center; }
-.scene-arrow-down { display: block; color: #76b900; font-size: 0.85rem; text-align: center; margin: 6px 0; }
-
-/* Color scheme: head membership is encoded as cell background */
-.c-neutral { background: #404060; }
-.c-head1 { background: #4a90d9; }   /* blue = head 1 */
-.c-head2 { background: #e85d75; }   /* red  = head 2 */
-.c-output { background: linear-gradient(135deg, #76b900, #00d4aa); }
-.c-input { background: #6c5ce7; }   /* purple = input X */
-.c-weight { background: #999; }     /* gray = weight matrix (not a tensor, just labeled) */
-
-/* Layout helpers for the scenes */
-.scene { padding: 8px 0; }
-.row-center { display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
-.head-panel { padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid #2a2a3e; }
-.head-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; text-align: center; }
-.legend { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 12px; font-size: 0.78rem; color: #ccc; }
-.legend-sq { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
-.note { font-size: 0.78rem; color: #888; text-align: center; margin-top: 10px; }
+.info { color: #76b900; font-size: 0.92rem; margin: 6px 0 4px; min-height: 22px; font-weight: 600; }
+.counter { color: #888; font-size: 0.78rem; margin-bottom: 8px; }
+canvas { display: block; width: 100%; max-width: 880px; height: auto; margin: 0 auto; }
 </style>
 </head>
 <body>
 
-<div class="animation-container">
+<div class="container">
   <div class="controls">
     <button class="btn btn-secondary" id="mh-prev">&larr; 上一步</button>
     <button class="btn btn-secondary" id="mh-next">下一步 &rarr;</button>
     <button class="btn" id="mh-auto">&#9654; 自动播放</button>
     <button class="btn btn-secondary" id="mh-reset">&#8634; 重置</button>
   </div>
-  <div class="step-info" id="mh-step-info"></div>
-  <div class="step-counter" id="mh-step-counter"></div>
-  <div id="mh-scene" class="scene"></div>
+  <div class="info" id="mh-info"></div>
+  <div class="counter" id="mh-counter"></div>
+  <canvas id="mh-canvas" width="880" height="540"></canvas>
 </div>
 
 <script>
-const multihead = (() => {
-  // Concrete shapes — small enough to be cell-by-cell visible, big enough to show splitting.
-  const N = 4;            // tokens
-  const D = 8;            // d_model
-  const H = 2;            // heads
-  const DK = D / H;       // d_k per head = 4
+(() => {
+  // ============================================================
+  // CONSTANTS
+  // ============================================================
+  const N = 4;       // 4 个 token (seq_len)
+  const D = 6;       // d_model = 6
+  const H = 2;       // 2 个 head
+  const DK = D / H;  // d_k = 3
 
-  let step = 0;
-  let autoTimer = null;
+  const CELL = 22;
+  const W_LOGICAL = 880;
+  const H_LOGICAL = 540;
 
-  // ---- Tensor render helpers ---------------------------------------------
-  function grid(rows, cols, cellClassFn) {
-    let html = `<div class="tensor-grid" style="grid-template-columns: repeat(${cols}, 16px);">`;
+  const COL = {
+    text:    '#e0e0e0',
+    label:   '#00d4aa',
+    caption: '#a0a0b0',
+    arrow:   '#76b900',
+    accent:  '#feca57',
+    empty:   '#1a1a2e',
+    border:  '#0a0a1a',
+    input:   '#6c5ce7',   // 紫 — X
+    weight:  '#7d8597',   // 灰 — 权重矩阵
+    q:       '#3b82f6',   // 蓝 — Q (& head 1)
+    k:       '#10b981',   // 绿 — K
+    v:       '#f59e0b',   // 黄/橙 — V
+    head1:   '#3b82f6',   // 蓝 — head 1
+    head2:   '#ef4444',   // 红 — head 2
+    output:  '#76b900',   // 主色 — 最终 Output
+    concat:  '#9ca3af',
+  };
+
+  // ============================================================
+  // CANVAS SETUP (retina-aware)
+  // ============================================================
+  const canvas = document.getElementById('mh-canvas');
+  const ctx = canvas.getContext('2d');
+  (function setupHiDPI() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W_LOGICAL * dpr;
+    canvas.height = H_LOGICAL * dpr;
+    canvas.style.aspectRatio = `${W_LOGICAL} / ${H_LOGICAL}`;
+    ctx.scale(dpr, dpr);
+  })();
+
+  // ============================================================
+  // DRAWING PRIMITIVES
+  // ============================================================
+  function clear() {
+    ctx.clearRect(0, 0, W_LOGICAL, H_LOGICAL);
+  }
+
+  function drawText(text, x, y, opts = {}) {
+    ctx.fillStyle = opts.color || COL.text;
+    ctx.font = opts.font || '12px JetBrains Mono, monospace';
+    ctx.textAlign = opts.align || 'center';
+    ctx.textBaseline = opts.baseline || 'middle';
+    ctx.fillText(text, x, y);
+  }
+
+  function drawTensor(x, y, rows, cols, label, opts = {}) {
+    const cs = opts.cellSize || CELL;
+    const colorFn = opts.colorFn || (() => COL.empty);
+    const filledMask = opts.filledMask;
+    const highlightRow = opts.highlightRow;
+    const highlightCol = opts.highlightCol;
+    const highlightCell = opts.highlightCell; // {i, j}
+    const splitAfterCol = opts.splitAfterCol; // draws a thicker vertical divider
+
+    // Label above
+    if (label) {
+      drawText(label, x + cols * cs / 2, y - 10,
+        { color: COL.label, font: 'bold 12px JetBrains Mono', baseline: 'bottom' });
+    }
+
+    // Cells
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        const cls = cellClassFn(i, j);
-        html += `<div class="tensor-cell ${cls}"></div>`;
+        const cx = x + j * cs;
+        const cy = y + i * cs;
+        const isFilled = !filledMask || (filledMask[i] && filledMask[i][j]);
+        ctx.fillStyle = isFilled ? colorFn(i, j) : COL.empty;
+        ctx.fillRect(cx + 0.5, cy + 0.5, cs - 1, cs - 1);
       }
     }
-    html += `</div>`;
-    return html;
-  }
-  function tensor(label, rows, cols, cellClassFn) {
-    return `<div class="tensor"><div class="tensor-label">${label}</div>${grid(rows, cols, cellClassFn)}</div>`;
-  }
-  function arrow(top, sym = '→') {
-    return `<span class="scene-arrow"><span>${top || ''}<br><span style="color:#76b900;font-size:1.1rem;">${sym}</span></span></span>`;
-  }
 
-  // Cell color rules
-  const C = {
-    input:  () => 'c-input',
-    qkv:    () => 'c-neutral',                                  // pre-split, neutral
-    split:  (i, j) => j < DK ? 'c-head1' : 'c-head2',          // post-split, halves tinted
-    head1:  () => 'c-head1',
-    head2:  () => 'c-head2',
-    output: () => 'c-output',
-  };
-
-  const LEGEND = `
-    <div class="legend">
-      <div><span class="legend-sq c-input"></span>输入 X / 投影后的 Q,K,V</div>
-      <div><span class="legend-sq c-head1"></span>Head 1 (列 0..${DK-1})</div>
-      <div><span class="legend-sq c-head2"></span>Head 2 (列 ${DK}..${D-1})</div>
-      <div><span class="legend-sq c-output"></span>最终 Output</div>
-    </div>`;
-
-  // ---- Scene definitions --------------------------------------------------
-  const steps = [
-    {
-      info: `输入 X 是 N=${N} 个 token 的隐藏状态序列, 每个 token 是 d_model=${D} 维向量`,
-      build: () => `
-        <div class="row-center">
-          ${tensor(`X (${N}×${D})`, N, D, C.input)}
-        </div>
-        <div class="note">每一行 = 一个 token 的 hidden state, 每一列 = 一个 feature 维度</div>
-      `
-    },
-    {
-      info: `Step 1: 三个独立的线性投影 — Q = X·W^Q, K = X·W^K, V = X·W^V (各自 ${N}×${D})`,
-      build: () => `
-        <div class="row-center">
-          ${tensor(`X (${N}×${D})`, N, D, C.input)}
-          ${arrow('×W<sup>Q</sup>')}
-          ${tensor(`Q (${N}×${D})`, N, D, C.qkv)}
-          ${arrow('×W<sup>K</sup>')}
-          ${tensor(`K (${N}×${D})`, N, D, C.qkv)}
-          ${arrow('×W<sup>V</sup>')}
-          ${tensor(`V (${N}×${D})`, N, D, C.qkv)}
-        </div>
-        <div class="note">所有 W 矩阵都是 ${D}×${D}, 输出 shape 不变 — Q/K/V 仍是 ${N}×${D}</div>
-      `
-    },
-    {
-      info: `Step 2: 沿最后一维(d_model)把 Q/K/V 切成 h=${H} 个 head — 每个 head 拿连续的 d_k=${DK} 维`,
-      build: () => `
-        <div class="row-center">
-          ${tensor(`Q (${N}×${D})`, N, D, C.split)}
-          ${tensor(`K (${N}×${D})`, N, D, C.split)}
-          ${tensor(`V (${N}×${D})`, N, D, C.split)}
-        </div>
-        <div class="note">注意没有真正的"复制"或"重排" — 实现里就是 reshape 成 (${N}, ${H}, ${DK}). 不同颜色只是标出哪些列归哪个 head</div>
-        ${LEGEND}
-      `
-    },
-    {
-      info: `Step 3: 两个 head 各自在自己的 (Q_i, K_i, V_i) 上独立跑 attention — 完全并行, 互不影响`,
-      build: () => `
-        <div class="row-center" style="gap: 36px;">
-          <div class="head-panel">
-            <div class="head-title" style="color:#4a90d9;">Head 1</div>
-            <div class="row-center">
-              ${tensor(`Q_1 (${N}×${DK})`, N, DK, C.head1)}
-              ${tensor(`K_1`, N, DK, C.head1)}
-              ${tensor(`V_1`, N, DK, C.head1)}
-            </div>
-            <div class="scene-arrow-down">↓ Attention(Q_1, K_1, V_1) ↓</div>
-            <div class="row-center">
-              ${tensor(`Out_1 (${N}×${DK})`, N, DK, C.head1)}
-            </div>
-          </div>
-          <div class="head-panel">
-            <div class="head-title" style="color:#e85d75;">Head 2</div>
-            <div class="row-center">
-              ${tensor(`Q_2 (${N}×${DK})`, N, DK, C.head2)}
-              ${tensor(`K_2`, N, DK, C.head2)}
-              ${tensor(`V_2`, N, DK, C.head2)}
-            </div>
-            <div class="scene-arrow-down">↓ Attention(Q_2, K_2, V_2) ↓</div>
-            <div class="row-center">
-              ${tensor(`Out_2 (${N}×${DK})`, N, DK, C.head2)}
-            </div>
-          </div>
-        </div>
-        <div class="note">每个 head 学到不同的 attention pattern — 一个可能看相邻 token, 另一个可能看长距离依赖</div>
-      `
-    },
-    {
-      info: `Step 4: 沿最后一维 concat 两个 head 的输出 → 通过 W^O 投影回 d_model — 得到最终 Output (${N}×${D})`,
-      build: () => `
-        <div class="row-center">
-          ${tensor(`Out_1 (${N}×${DK})`, N, DK, C.head1)}
-          ${tensor(`Out_2 (${N}×${DK})`, N, DK, C.head2)}
-          ${arrow('Concat<br>(最后一维)')}
-          ${tensor(`Concat (${N}×${D})`, N, D, C.split)}
-        </div>
-        <div class="row-center" style="margin-top: 12px;">
-          ${tensor(`Concat (${N}×${D})`, N, D, C.split)}
-          ${arrow('×W<sup>O</sup>')}
-          ${tensor(`Output (${N}×${D})`, N, D, C.output)}
-        </div>
-        <div class="note">W^O 是 ${D}×${D}, 让不同 head 的信息互相"混合" — 最终 Output 不再有 head 边界</div>
-      `
+    // Highlights
+    if (highlightRow !== undefined && highlightRow >= 0) {
+      ctx.strokeStyle = COL.accent;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 0.5, y + highlightRow * cs - 0.5, cols * cs + 1, cs + 1);
     }
+    if (highlightCol !== undefined && highlightCol >= 0) {
+      ctx.strokeStyle = COL.accent;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + highlightCol * cs - 0.5, y - 0.5, cs + 1, rows * cs + 1);
+    }
+    if (highlightCell) {
+      const {i, j} = highlightCell;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + j * cs - 0.5, y + i * cs - 0.5, cs + 1, cs + 1);
+    }
+    if (splitAfterCol !== undefined) {
+      ctx.strokeStyle = COL.accent;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + splitAfterCol * cs + 0.5, y - 4);
+      ctx.lineTo(x + splitAfterCol * cs + 0.5, y + rows * cs + 4);
+      ctx.stroke();
+    }
+
+    return { x, y, w: cols * cs, h: rows * cs, label };
+  }
+
+  function drawArrow(x1, y1, x2, y2, label, opts = {}) {
+    const color = opts.color || COL.arrow;
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = opts.lineWidth || 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const headLen = 9;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+    if (label) {
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      // Label background to avoid overlap with arrow line
+      ctx.fillStyle = 'rgba(10,10,26,0.85)';
+      const padding = 4;
+      ctx.font = 'bold 11px JetBrains Mono, monospace';
+      const metrics = ctx.measureText(label);
+      ctx.fillRect(mx - metrics.width / 2 - padding, my - 9, metrics.width + 2 * padding, 18);
+      drawText(label, mx, my, { color, font: 'bold 11px JetBrains Mono' });
+    }
+  }
+
+  // build a 2D mask of (rows × cols) filled with `true` for the first `count` cells (row-major)
+  function maskUpTo(rows, cols, count) {
+    const m = Array.from({ length: rows }, () => Array(cols).fill(false));
+    let c = 0;
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+      if (c++ < count) m[i][j] = true;
+    }
+    return m;
+  }
+
+  // ============================================================
+  // STEP RENDERERS
+  // each takes (subProgress) where 0 = no sub-animation, otherwise a 0..1 value
+  // ============================================================
+
+  // ----- Step 0 — Input X --------------------------------------
+  function renderStep0() {
+    clear();
+    const tx = (W_LOGICAL - D * CELL) / 2;
+    const ty = 130;
+    drawTensor(tx, ty, N, D, `X — input embedding (N=${N} tokens × d_model=${D})`,
+      { colorFn: () => COL.input });
+
+    // Token labels on left
+    for (let i = 0; i < N; i++) {
+      drawText(`token ${i}`, tx - 12, ty + i * CELL + CELL / 2,
+        { color: COL.caption, font: '11px JetBrains Mono', align: 'right' });
+    }
+    // Feature label
+    drawText('feature dim →', tx + D * CELL / 2, ty + N * CELL + 22,
+      { color: COL.caption, font: '11px JetBrains Mono' });
+    drawText('每行 = 一个 token 的隐藏向量；每列 = 一个 feature 维度',
+      W_LOGICAL / 2, ty + N * CELL + 60,
+      { color: COL.text, font: '12px JetBrains Mono' });
+  }
+
+  // ----- Step 1, 2, 3 — Projection (X × W_? = Q/K/V) ----------
+  // sub = 0..(N*D), how many cells of the result are filled
+  function renderProjection(name, outColor, sub) {
+    clear();
+    const cs = CELL;
+    const gap = 80;
+    const xWidth = D * cs;
+    const wWidth = D * cs;
+    const rWidth = D * cs;
+    const totalW = xWidth + wWidth + rWidth + 2 * gap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 100;
+
+    const xPos = { x: startX, y: ty };
+    const wPos = { x: startX + xWidth + gap, y: ty };
+    const rPos = { x: startX + xWidth + wWidth + 2 * gap, y: ty };
+
+    const filledCount = Math.min(sub, N * D);
+    const inProgress = filledCount < N * D;
+    const curI = Math.floor(filledCount / D);
+    const curJ = filledCount % D;
+
+    drawTensor(xPos.x, xPos.y, N, D, 'X', {
+      colorFn: () => COL.input,
+      highlightRow: inProgress ? curI : undefined
+    });
+    drawTensor(wPos.x, wPos.y, D, D, `W^${name}`, {
+      colorFn: () => COL.weight,
+      highlightCol: inProgress ? curJ : undefined
+    });
+    drawTensor(rPos.x, rPos.y, N, D, name, {
+      colorFn: () => outColor,
+      filledMask: maskUpTo(N, D, filledCount),
+      highlightCell: inProgress ? { i: curI, j: curJ } : undefined
+    });
+
+    const midY = ty + (N * cs) / 2;
+    drawArrow(xPos.x + xWidth + 6, midY, wPos.x - 6, midY, '×');
+    drawArrow(wPos.x + wWidth + 6, midY, rPos.x - 6, midY, '=');
+
+    // Caption
+    const captionY = ty + Math.max(N, D) * cs + 36;
+    if (inProgress) {
+      drawText(
+        `计算 ${name}[${curI}][${curJ}] = X[行 ${curI}] · W^${name}[列 ${curJ}] (内积 ${D} 项)`,
+        W_LOGICAL / 2, captionY,
+        { color: COL.accent, font: 'bold 12px JetBrains Mono' });
+    } else {
+      drawText(
+        `完成 — ${name} 是 X 投影到 ${name === 'Q' ? 'query' : name === 'K' ? 'key' : 'value'} 子空间, shape 仍是 (${N}, ${D})`,
+        W_LOGICAL / 2, captionY,
+        { color: COL.label, font: 'bold 12px JetBrains Mono' });
+    }
+
+    // Explainer at bottom
+    const noteY = captionY + 26;
+    const note = name === 'Q'
+      ? `Q 的每一行 = 一个 token "想问什么"`
+      : name === 'K'
+      ? `K 的每一行 = 一个 token "可以被怎样查询"`
+      : `V 的每一行 = 一个 token "真正要传递出去的内容"`;
+    drawText(note, W_LOGICAL / 2, noteY, { color: COL.caption, font: '11px JetBrains Mono' });
+  }
+
+  // ----- Step 4 — Q, K, V 一起呈现 -----------------------------
+  function renderStep4() {
+    clear();
+    const gap = 50;
+    const tWidth = D * CELL;
+    const totalW = 3 * tWidth + 2 * gap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 110;
+    drawTensor(startX, ty, N, D, 'Q', { colorFn: () => COL.q });
+    drawTensor(startX + tWidth + gap, ty, N, D, 'K', { colorFn: () => COL.k });
+    drawTensor(startX + 2 * (tWidth + gap), ty, N, D, 'V', { colorFn: () => COL.v });
+
+    drawText('三个独立投影做完 — Q, K, V 都是 (N, d_model) = (4, 6) 形状',
+      W_LOGICAL / 2, ty + N * CELL + 40,
+      { color: COL.label, font: 'bold 12px JetBrains Mono' });
+    drawText('它们扮演不同角色, 但 shape 一致. 接下来同样地拆分这三个张量.',
+      W_LOGICAL / 2, ty + N * CELL + 64,
+      { color: COL.caption, font: '11px JetBrains Mono' });
+  }
+
+  // ----- Step 5 — Split into heads -----------------------------
+  // sub = 0 (before), 1 (after split visualized)
+  function renderStep5(sub) {
+    clear();
+    const gap = 50;
+    const tWidth = D * CELL;
+    const totalW = 3 * tWidth + 2 * gap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 110;
+
+    const splitColorFn = (i, j) => j < DK ? COL.head1 : COL.head2;
+    const drawIt = (xOff, label, colorFn) =>
+      drawTensor(startX + xOff, ty, N, D, label, {
+        colorFn,
+        splitAfterCol: sub >= 1 ? DK : undefined,
+      });
+
+    if (sub === 0) {
+      drawIt(0, 'Q', () => COL.q);
+      drawIt(tWidth + gap, 'K', () => COL.k);
+      drawIt(2 * (tWidth + gap), 'V', () => COL.v);
+      drawText('沿最后一维 (d_model=6) 等分成 h=2 段',
+        W_LOGICAL / 2, ty + N * CELL + 40,
+        { color: COL.accent, font: 'bold 12px JetBrains Mono' });
+    } else {
+      drawIt(0, 'Q (按 head 着色)', splitColorFn);
+      drawIt(tWidth + gap, 'K (按 head 着色)', splitColorFn);
+      drawIt(2 * (tWidth + gap), 'V (按 head 着色)', splitColorFn);
+      drawText('左半 (列 0..2) → Head 1, 右半 (列 3..5) → Head 2 — 每个 head 拿 d_k = 3 维',
+        W_LOGICAL / 2, ty + N * CELL + 40,
+        { color: COL.label, font: 'bold 12px JetBrains Mono' });
+      drawText('实现上只是 reshape (N, D) → (N, H, D_k), 不需要复制数据',
+        W_LOGICAL / 2, ty + N * CELL + 64,
+        { color: COL.caption, font: '11px JetBrains Mono' });
+    }
+    // Legend
+    const lgY = ty + N * CELL + 96;
+    ctx.fillStyle = COL.head1; ctx.fillRect(W_LOGICAL/2 - 90, lgY - 6, 12, 12);
+    drawText('Head 1', W_LOGICAL/2 - 50, lgY, { color: COL.text, font: '11px JetBrains Mono' });
+    ctx.fillStyle = COL.head2; ctx.fillRect(W_LOGICAL/2 + 10, lgY - 6, 12, 12);
+    drawText('Head 2', W_LOGICAL/2 + 50, lgY, { color: COL.text, font: '11px JetBrains Mono' });
+  }
+
+  // ----- Step 6 — Parallel attention per head ------------------
+  function renderStep6() {
+    clear();
+    const panelGap = 60;
+    const panelW = 3 * (DK * CELL) + 2 * 16 + 24; // Q + K + V + arrows + out fits roughly
+    const totalW = 2 * panelW + panelGap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 90;
+
+    const drawHead = (px, color, prefix) => {
+      // Panel header
+      drawText(`${prefix}`, px + panelW / 2, ty - 24,
+        { color, font: 'bold 13px JetBrains Mono', baseline: 'bottom' });
+
+      // Q_i, K_i, V_i
+      const innerGap = 14;
+      let xx = px + 8;
+      drawTensor(xx, ty, N, DK, `Q_${prefix.split(' ')[1]}`, { colorFn: () => color });
+      xx += DK * CELL + innerGap;
+      drawTensor(xx, ty, N, DK, `K_${prefix.split(' ')[1]}`, { colorFn: () => color });
+      xx += DK * CELL + innerGap;
+      drawTensor(xx, ty, N, DK, `V_${prefix.split(' ')[1]}`, { colorFn: () => color });
+
+      // Down arrow + "Attention(Q,K,V)"
+      const attnY = ty + N * CELL + 14;
+      const cx = px + panelW / 2;
+      drawArrow(cx, attnY, cx, attnY + 38, '', { color });
+      drawText(`Attention(Q,K,V)`, cx, attnY + 56,
+        { color, font: 'bold 11px JetBrains Mono' });
+
+      // Output_i
+      const oy = attnY + 80;
+      drawTensor(cx - (DK * CELL) / 2, oy, N, DK, `Out_${prefix.split(' ')[1]}`,
+        { colorFn: () => color });
+    };
+
+    drawHead(startX, COL.head1, 'Head 1');
+    drawHead(startX + panelW + panelGap, COL.head2, 'Head 2');
+
+    drawText('两个 head 各自跑一次完整的 Attention(Q, K, V) — 完全独立, 完全并行',
+      W_LOGICAL / 2, H_LOGICAL - 36,
+      { color: COL.label, font: 'bold 12px JetBrains Mono' });
+    drawText('每个 head 学到不同的关注模式 — 一个看相邻 token, 另一个可能看长距离关系',
+      W_LOGICAL / 2, H_LOGICAL - 14,
+      { color: COL.caption, font: '11px JetBrains Mono' });
+  }
+
+  // ----- Step 7 — Concat ---------------------------------------
+  function renderStep7(sub) {
+    clear();
+    const cs = CELL;
+    const ty = 130;
+
+    if (sub === 0) {
+      // Side-by-side, separate
+      const gap = 60;
+      const totalW = 2 * (DK * cs) + gap;
+      const sx = (W_LOGICAL - totalW) / 2;
+      drawTensor(sx, ty, N, DK, 'Out_1', { colorFn: () => COL.head1 });
+      drawTensor(sx + DK * cs + gap, ty, N, DK, 'Out_2', { colorFn: () => COL.head2 });
+      drawText('两个 head 各产出 (N, d_k) = (4, 3) — 现在要把它们拼回去',
+        W_LOGICAL / 2, ty + N * cs + 36,
+        { color: COL.text, font: '12px JetBrains Mono' });
+    } else {
+      // After concat: glue them
+      const totalW = D * cs;
+      const sx = (W_LOGICAL - totalW) / 2;
+      drawTensor(sx, ty, N, D, 'Concat (N, d_model) = (4, 6)', {
+        colorFn: (i, j) => j < DK ? COL.head1 : COL.head2,
+        splitAfterCol: DK,
+      });
+      drawText('沿最后一维 concat — shape 恢复成 (4, 6), 但 head 1 / head 2 的"领地"还分得清',
+        W_LOGICAL / 2, ty + N * cs + 36,
+        { color: COL.label, font: 'bold 12px JetBrains Mono' });
+      drawText('每个 token 现在有两组特征: 前半是 head 1 关注得到的, 后半是 head 2',
+        W_LOGICAL / 2, ty + N * cs + 60,
+        { color: COL.caption, font: '11px JetBrains Mono' });
+    }
+  }
+
+  // ----- Step 8 — Output = Concat × W_O ------------------------
+  function renderStep8(sub) {
+    clear();
+    const cs = CELL;
+    const gap = 80;
+    const xWidth = D * cs;
+    const wWidth = D * cs;
+    const rWidth = D * cs;
+    const totalW = xWidth + wWidth + rWidth + 2 * gap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 100;
+
+    const xPos = { x: startX, y: ty };
+    const wPos = { x: startX + xWidth + gap, y: ty };
+    const rPos = { x: startX + xWidth + wWidth + 2 * gap, y: ty };
+
+    const filledCount = Math.min(sub, N * D);
+    const inProgress = filledCount < N * D;
+    const curI = Math.floor(filledCount / D);
+    const curJ = filledCount % D;
+
+    drawTensor(xPos.x, xPos.y, N, D, 'Concat', {
+      colorFn: (i, j) => j < DK ? COL.head1 : COL.head2,
+      splitAfterCol: DK,
+      highlightRow: inProgress ? curI : undefined
+    });
+    drawTensor(wPos.x, wPos.y, D, D, 'W^O', {
+      colorFn: () => COL.weight,
+      highlightCol: inProgress ? curJ : undefined
+    });
+    drawTensor(rPos.x, rPos.y, N, D, 'Output', {
+      colorFn: () => COL.output,
+      filledMask: maskUpTo(N, D, filledCount),
+      highlightCell: inProgress ? { i: curI, j: curJ } : undefined
+    });
+
+    const midY = ty + (N * cs) / 2;
+    drawArrow(xPos.x + xWidth + 6, midY, wPos.x - 6, midY, '×');
+    drawArrow(wPos.x + wWidth + 6, midY, rPos.x - 6, midY, '=');
+
+    const capY = ty + D * cs + 36;
+    if (inProgress) {
+      drawText(`Output[${curI}][${curJ}] = Concat[行 ${curI}] · W^O[列 ${curJ}] — 跨 head 混合`,
+        W_LOGICAL / 2, capY, { color: COL.accent, font: 'bold 12px JetBrains Mono' });
+    } else {
+      drawText('完成 — W^O 把两个 head 的特征 mixing 起来, 让信息互相流通',
+        W_LOGICAL / 2, capY, { color: COL.label, font: 'bold 12px JetBrains Mono' });
+    }
+    drawText('最终 Output 不再有 head 边界 (所以画成单一颜色)',
+      W_LOGICAL / 2, capY + 24, { color: COL.caption, font: '11px JetBrains Mono' });
+  }
+
+  // ----- Step 9 — Summary --------------------------------------
+  function renderStep9() {
+    clear();
+    const gap = 110;
+    const tWidth = D * CELL;
+    const totalW = 2 * tWidth + gap;
+    const startX = (W_LOGICAL - totalW) / 2;
+    const ty = 140;
+    drawTensor(startX, ty, N, D, 'X (输入)', { colorFn: () => COL.input });
+    drawTensor(startX + tWidth + gap, ty, N, D, 'Output', { colorFn: () => COL.output });
+    const midY = ty + (N * CELL) / 2;
+    drawArrow(startX + tWidth + 6, midY, startX + tWidth + gap - 6, midY, 'MHA');
+
+    drawText('Multi-Head Attention: 输入 (4, 6) → 输出 (4, 6), shape 不变',
+      W_LOGICAL / 2, ty + N * CELL + 50,
+      { color: COL.label, font: 'bold 13px JetBrains Mono' });
+    drawText('每个 token 在输出中已经吸收了序列其它位置的信息 (按 h=2 个不同视角)',
+      W_LOGICAL / 2, ty + N * CELL + 78,
+      { color: COL.text, font: '12px JetBrains Mono' });
+
+    // Recap
+    const recap = [
+      '• 投影:  Q = X·W^Q,  K = X·W^K,  V = X·W^V          (3 个 (D, D) 参数矩阵)',
+      '• 拆头:  Q/K/V 沿最后一维切成 h 段 — reshape 而非复制',
+      '• 并行:  h 个 head 各跑一次 Attention(Q_i, K_i, V_i) → Out_i',
+      '• 合头:  concat 沿最后一维 → 通过 W^O 投影 → 最终 Output',
+    ];
+    let ry = ty + N * CELL + 110;
+    for (const line of recap) {
+      drawText(line, W_LOGICAL / 2, ry,
+        { color: COL.caption, font: '11.5px JetBrains Mono' });
+      ry += 18;
+    }
+  }
+
+  // ============================================================
+  // STEPS — info + render + (optional) sub-animation length
+  // ============================================================
+  const steps = [
+    { info: 'Step 0: 输入 X 是 (N=4, d_model=6) — 4 个 token 的 hidden state',
+      sub: 0, render: () => renderStep0() },
+    { info: 'Step 1: Q = X × W^Q  — 把每个 token 投影到 query 子空间',
+      sub: N * D + 4, render: (s) => renderProjection('Q', COL.q, s) },
+    { info: 'Step 2: K = X × W^K  — 同时投影到 key 子空间 (用不同的权重)',
+      sub: N * D + 4, render: (s) => renderProjection('K', COL.k, s) },
+    { info: 'Step 3: V = X × W^V  — 再投影一次到 value 子空间',
+      sub: N * D + 4, render: (s) => renderProjection('V', COL.v, s) },
+    { info: 'Step 4: 三个 (N, d_model) 张量 Q, K, V 都准备好了',
+      sub: 0, render: () => renderStep4() },
+    { info: 'Step 5: 沿最后一维把 Q, K, V 三个都切成 h=2 个 head',
+      sub: 1, render: (s) => renderStep5(s) },
+    { info: 'Step 6: 每个 head 在自己的 (Q_i, K_i, V_i) 上独立跑 attention',
+      sub: 0, render: () => renderStep6() },
+    { info: 'Step 7: 沿最后一维把所有 head 的输出 concat 起来',
+      sub: 1, render: (s) => renderStep7(s) },
+    { info: 'Step 8: Output = Concat × W^O  — 让不同 head 的信息互相 mixing',
+      sub: N * D + 4, render: (s) => renderStep8(s) },
+    { info: 'Step 9: 回顾 — 输入输出 shape 一致, 但每个 token 已经吸收了序列信息',
+      sub: 0, render: () => renderStep9() },
   ];
 
-  // ---- Render + step control ----------------------------------------------
-  function render() {
-    document.getElementById('mh-step-info').innerHTML = steps[step].info;
-    document.getElementById('mh-step-counter').textContent = `Step ${step} / ${steps.length - 1}`;
-    document.getElementById('mh-scene').innerHTML = steps[step].build();
-    document.getElementById('mh-prev').disabled = step === 0;
-    document.getElementById('mh-next').disabled = step === steps.length - 1;
-    document.getElementById('mh-auto').disabled = step === steps.length - 1;
+  // ============================================================
+  // STATE + CONTROL
+  // ============================================================
+  let stepIdx = 0;
+  let subProgress = 0;          // counter within current step
+  let subTimer = null;
+  let autoTimer = null;
+
+  function renderCurrent() {
+    document.getElementById('mh-info').textContent = steps[stepIdx].info;
+    document.getElementById('mh-counter').textContent =
+      `Step ${stepIdx} / ${steps.length - 1}`;
+    steps[stepIdx].render(subProgress);
+    document.getElementById('mh-prev').disabled = stepIdx === 0;
+    document.getElementById('mh-next').disabled = stepIdx === steps.length - 1;
   }
+
+  function stopSub() { if (subTimer) { clearInterval(subTimer); subTimer = null; } }
   function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
 
-  return {
-    next() { stopAuto(); if (step < steps.length - 1) { step++; render(); } },
-    prev() { stopAuto(); if (step > 0) { step--; render(); } },
-    reset() { stopAuto(); step = 0; render(); },
-    auto() {
-      stopAuto();
-      if (step >= steps.length - 1) { step = 0; render(); }
-      autoTimer = setInterval(() => {
-        if (step >= steps.length - 1) { stopAuto(); render(); return; }
-        step++; render();
-      }, 2000);
-    }
-  };
-})();
+  function startSubAnimation() {
+    stopSub();
+    const total = steps[stepIdx].sub;
+    if (total <= 0) return;
+    // Pace: total cells in ~1.6s for matmul, 600ms for 1-step transition
+    const delay = total > 4 ? 1600 / total : 600;
+    subTimer = setInterval(() => {
+      subProgress++;
+      if (subProgress >= total) {
+        stopSub();
+        subProgress = total;
+      }
+      renderCurrent();
+    }, delay);
+  }
 
-document.getElementById('mh-prev').onclick = () => multihead.prev();
-document.getElementById('mh-next').onclick = () => multihead.next();
-document.getElementById('mh-auto').onclick = () => multihead.auto();
-document.getElementById('mh-reset').onclick = () => multihead.reset();
-multihead.reset();
+  function goto(idx) {
+    stopSub();
+    stepIdx = Math.max(0, Math.min(steps.length - 1, idx));
+    subProgress = 0;
+    renderCurrent();
+    startSubAnimation();
+  }
 
-// ========== 自动把高度汇报给父页面（让 iframe 自适应高度）==========
-(function () {
+  function next() { stopAuto(); goto(stepIdx + 1); }
+  function prev() { stopAuto(); goto(stepIdx - 1); }
+  function reset() { stopAuto(); goto(0); }
+  function auto() {
+    stopAuto();
+    if (stepIdx >= steps.length - 1) goto(0);
+    const advance = () => {
+      if (stepIdx >= steps.length - 1) { stopAuto(); return; }
+      goto(stepIdx + 1);
+    };
+    // Wait long enough for the sub-animation of the current step before advancing
+    const subTotal = steps[stepIdx].sub;
+    const waitMs = subTotal > 4 ? 2400 : subTotal > 0 ? 1400 : 1800;
+    autoTimer = setInterval(advance, waitMs);
+  }
+
+  document.getElementById('mh-prev').onclick = prev;
+  document.getElementById('mh-next').onclick = next;
+  document.getElementById('mh-auto').onclick = auto;
+  document.getElementById('mh-reset').onclick = reset;
+
+  // Initial render
+  renderCurrent();
+  startSubAnimation();
+
+  // ============================================================
+  // Auto-report iframe height to parent (for VSC4T anim tag)
+  // ============================================================
   function reportHeight() {
     parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*');
   }
