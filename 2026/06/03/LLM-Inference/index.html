@@ -265,7 +265,7 @@ mjx-container[display="true"] + br {
         <span>TABLE OF CONTENTS</span>
       </div>
       <div class="section-content">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E8%AF%B7%E6%B1%82%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-Request-Lifecycle"><span class="toc-text">4.1 请求生命周期 (Request Lifecycle)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%84%E9%98%B6%E6%AE%B5%E8%AF%A6%E8%A7%A3"><span class="toc-text">各阶段详解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-vs-Decode-%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB"><span class="toc-text">Prefill vs Decode 的本质区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87-TTFT-%E4%B8%8E-TPOT"><span class="toc-text">性能指标: TTFT 与 TPOT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-%E9%80%9F%E5%BA%A6%E6%8E%A8%E5%AF%BC-%E4%BB%8E-GPU-FLOPS-%E5%88%B0-tokens-sec"><span class="toc-text">Prefill 速度推导: 从 GPU FLOPS 到 tokens&#x2F;sec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Decode-%E9%80%9F%E5%BA%A6%E6%8E%A8%E5%AF%BC-Memory-Bandwidth-Bound"><span class="toc-text">Decode 速度推导: Memory-Bandwidth Bound</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KV-Cache-%E5%A4%A7%E5%B0%8F%E4%BC%B0%E7%AE%97"><span class="toc-text">KV Cache 大小估算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-Continuous-Batching-vs-Static-Batching"><span class="toc-text">4.2 Continuous Batching vs Static Batching</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Continuous-Batching-%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0"><span class="toc-text">Continuous Batching 核心实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-text">性能对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-KV-Cache-%E7%AE%A1%E7%90%86"><span class="toc-text">4.3 KV Cache 管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PageAttention-KV-Cache-%E7%9A%84%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-text">PageAttention: KV Cache 的虚拟内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-%E5%89%8D%E7%BC%80%E5%85%B1%E4%BA%AB%E6%A0%91"><span class="toc-text">Radix Cache: 前缀共享树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">Radix Cache 实现原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-Scheduler-%E8%AE%BE%E8%AE%A1"><span class="toc-text">4.4 Scheduler 设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-%E4%B8%8E-Decode-%E7%9A%84%E8%B0%83%E5%BA%A6%E7%9F%9B%E7%9B%BE"><span class="toc-text">Prefill 与 Decode 的调度矛盾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chunked-Prefill-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97-chunk-size"><span class="toc-text">Chunked Prefill: 为什么需要 &amp; 如何计算 chunk size</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Preemption-%E6%8A%A2%E5%8D%A0-%E5%86%85%E5%AD%98%E4%B8%8D%E5%A4%9F%E6%97%B6%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="toc-text">Preemption (抢占): 内存不够时怎么办</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Quantization-%E6%A6%82%E8%BF%B0"><span class="toc-text">4.5 Quantization 概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%87%8F%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-text">常见量化策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Speculative-Decoding"><span class="toc-text">4.6 Speculative Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%AE%97%E6%B3%95"><span class="toc-text">验证算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E9%80%9F%E6%AF%94%E5%88%86%E6%9E%90"><span class="toc-text">加速比分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-Constraint-Decoding"><span class="toc-text">4.7 Constraint Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA%E7%94%9F%E6%88%90"><span class="toc-text">结构化输出生成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-8-Model-Loading-Pipeline"><span class="toc-text">4.8 Model Loading Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E7%A3%81%E7%9B%98%E5%88%B0-GPU-%E7%9A%84%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B"><span class="toc-text">从磁盘到 GPU 的完整流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98"><span class="toc-text">练习题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#System-Design-%E9%9D%A2%E8%AF%95%E9%A2%98-Anthropic-OpenAI-%E9%A3%8E%E6%A0%BC"><span class="toc-text">System Design 面试题 (Anthropic&#x2F;OpenAI 风格)</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E8%AF%B7%E6%B1%82%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-Request-Lifecycle"><span class="toc-text">4.1 请求生命周期 (Request Lifecycle)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%84%E9%98%B6%E6%AE%B5%E8%AF%A6%E8%A7%A3"><span class="toc-text">各阶段详解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-vs-Decode-%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB"><span class="toc-text">Prefill vs Decode 的本质区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87-TTFT-%E4%B8%8E-TPOT"><span class="toc-text">性能指标: TTFT 与 TPOT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-%E9%80%9F%E5%BA%A6%E6%8E%A8%E5%AF%BC-%E4%BB%8E-GPU-FLOPS-%E5%88%B0-tokens-sec"><span class="toc-text">Prefill 速度推导: 从 GPU FLOPS 到 tokens&#x2F;sec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Decode-%E9%80%9F%E5%BA%A6%E6%8E%A8%E5%AF%BC-Memory-Bandwidth-Bound"><span class="toc-text">Decode 速度推导: Memory-Bandwidth Bound</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KV-Cache-%E5%A4%A7%E5%B0%8F%E4%BC%B0%E7%AE%97"><span class="toc-text">KV Cache 大小估算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GPU-%E6%98%BE%E5%AD%98%E5%88%B0%E5%BA%95%E5%88%86%E7%BB%99%E4%BA%86%E8%B0%81"><span class="toc-text">GPU 显存到底分给了谁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%84%E9%A1%B9%E7%9A%84%E5%85%B3%E9%94%AE-caveat"><span class="toc-text">各项的关键 caveat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E6%98%BE%E5%AD%98%E8%B4%A6-70B-%E5%9C%A8-8-%C3%97-80GB-H100-%E4%B8%8A"><span class="toc-text">实际显存账: 70B 在 8 × 80GB H100 上</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A6%81%E8%B0%83%E5%B0%8F-gpu-memory-utilization"><span class="toc-text">什么时候要调小 gpu_memory_utilization?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%9B%B4%E8%A7%89"><span class="toc-text">一句话直觉</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-Continuous-Batching-vs-Static-Batching"><span class="toc-text">4.2 Continuous Batching vs Static Batching</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Continuous-Batching-%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0"><span class="toc-text">Continuous Batching 核心实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-text">性能对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-KV-Cache-%E7%AE%A1%E7%90%86"><span class="toc-text">4.3 KV Cache 管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PageAttention-KV-Cache-%E7%9A%84%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-text">PageAttention: KV Cache 的虚拟内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-%E5%89%8D%E7%BC%80%E5%85%B1%E4%BA%AB%E6%A0%91"><span class="toc-text">Radix Cache: 前缀共享树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">Radix Cache 实现原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-Scheduler-%E8%AE%BE%E8%AE%A1"><span class="toc-text">4.4 Scheduler 设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-%E4%B8%8E-Decode-%E7%9A%84%E8%B0%83%E5%BA%A6%E7%9F%9B%E7%9B%BE"><span class="toc-text">Prefill 与 Decode 的调度矛盾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chunked-Prefill-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97-chunk-size"><span class="toc-text">Chunked Prefill: 为什么需要 &amp; 如何计算 chunk size</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Preemption-%E6%8A%A2%E5%8D%A0-%E5%86%85%E5%AD%98%E4%B8%8D%E5%A4%9F%E6%97%B6%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="toc-text">Preemption (抢占): 内存不够时怎么办</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Quantization-%E6%A6%82%E8%BF%B0"><span class="toc-text">4.5 Quantization 概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%87%8F%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-text">常见量化策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Speculative-Decoding"><span class="toc-text">4.6 Speculative Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%AE%97%E6%B3%95"><span class="toc-text">验证算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E9%80%9F%E6%AF%94%E5%88%86%E6%9E%90"><span class="toc-text">加速比分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-Constraint-Decoding"><span class="toc-text">4.7 Constraint Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA%E7%94%9F%E6%88%90"><span class="toc-text">结构化输出生成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-8-Model-Loading-Pipeline"><span class="toc-text">4.8 Model Loading Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E7%A3%81%E7%9B%98%E5%88%B0-GPU-%E7%9A%84%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B"><span class="toc-text">从磁盘到 GPU 的完整流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98"><span class="toc-text">练习题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#System-Design-%E9%9D%A2%E8%AF%95%E9%A2%98-Anthropic-OpenAI-%E9%A3%8E%E6%A0%BC"><span class="toc-text">System Design 面试题 (Anthropic&#x2F;OpenAI 风格)</span></a></li></ol></li></ol>
       </div>
     </div>
     
@@ -664,6 +664,109 @@ mjx-container[display="true"] + br {
 <p>Serving 容量估算：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 70B on 2×H100 (TP=2), 模型占 70GB/卡, 剩余 10GB 给 KV cache</span><br>available_kv = <span class="hljs-number">10</span> * <span class="hljs-number">1024</span>  <span class="hljs-comment"># 10240 MB</span><br>kv_per_token = <span class="hljs-number">0.32</span>       <span class="hljs-comment"># MB (320 KB, LLaMA-70B GQA)</span><br><br><span class="hljs-comment"># 如果平均 seq_len = 4096:</span><br>max_concurrent = available_kv / (kv_per_token * <span class="hljs-number">4096</span>)<br><span class="hljs-comment"># = 10240 / 1310 ≈ 7-8 个并发请求 (单卡很紧张!)</span><br><span class="hljs-comment"># 这就是为什么 PagedAttention 和内存管理如此重要</span><br></code></pre></td></tr></table></figure>
 
+<h3 id="GPU-显存到底分给了谁"><a href="#GPU-显存到底分给了谁" class="headerlink" title="GPU 显存到底分给了谁"></a>GPU 显存到底分给了谁</h3><p>KV cache 不是孤零零一项 — 推理时一张卡的显存被切给好几个”住户”。vLLM 那个 <code>gpu_memory_utilization=0.9</code> 留出来的 10%, 到底在给谁? 把每一项列清楚, 才能算明白能塞多少并发, 以及什么情况下会 OOM。</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>作用</th>
+<th>大小 (70B, TP=8, FP16, 单卡)</th>
+<th>随并发 / seq 增长?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Weights</strong></td>
+<td>模型参数 — Linear/Embedding/LayerNorm</td>
+<td>140 GB / 8 = <strong>17.5 GB</strong></td>
+<td>✗ 固定</td>
+</tr>
+<tr>
+<td><strong>KV cache</strong></td>
+<td>每个历史 token 的 K, V tensor, 解码时必读</td>
+<td>0 — 几十 GB</td>
+<td>✓ <strong>唯一线性涨的项</strong></td>
+</tr>
+<tr>
+<td><strong>Activations</strong> (单层峰值)</td>
+<td>当前 forward 层的中间结果 (QKV / attn out / MLP)</td>
+<td><strong>~100 MB</strong> (decode) — <strong>~1 GB</strong> (长 prefill)</td>
+<td>✓ 仅 prefill 时</td>
+</tr>
+<tr>
+<td><strong>cuBLAS / cuDNN workspace</strong></td>
+<td>GEMM kernel 的 split-K / reduce 临时缓冲</td>
+<td>每 stream 几百 MB</td>
+<td>✗ 启动时申请</td>
+</tr>
+<tr>
+<td><strong>NCCL / RCCL 通信 buffer</strong></td>
+<td>TP all-reduce / all-gather 的收发 staging</td>
+<td>100 MB - 1 GB</td>
+<td>✗ 启动时申请</td>
+</tr>
+<tr>
+<td><strong>CUDA graph 内存</strong></td>
+<td>vLLM 默认按 batch size 各 capture 一份 graph</td>
+<td>数百 MB - 1+ GB</td>
+<td>✗ 启动时申请</td>
+</tr>
+<tr>
+<td><strong>PyTorch caching allocator 碎片</strong></td>
+<td>历史分配未归还、未合并的 block 余量</td>
+<td>0.5 - 2 GB</td>
+<td>✗ 随时间累积</td>
+</tr>
+<tr>
+<td><strong>CUDA driver / runtime baseline</strong></td>
+<td>进程一启动 <code>nvidia-smi</code> 就能看见的底噪</td>
+<td>~500 MB</td>
+<td>✗ 固定</td>
+</tr>
+</tbody></table>
+<p>70B 单卡的非-KV-cache 总开销 ≈ <code>17.5 (weights) + 2-3 (workspaces/graph/碎片) + 0.5 (driver)</code> ≈ <strong>20 GB</strong>. 80 GB 卡剩下 <strong>~60 GB</strong> 给 KV cache + prefill spike — 这就是为什么 <code>gpu_memory_utilization=0.9</code> 要留 8 GB 余量。</p>
+<h4 id="各项的关键-caveat"><a href="#各项的关键-caveat" class="headerlink" title="各项的关键 caveat"></a>各项的关键 caveat</h4><p><strong>Weights</strong> — TP 切完每卡只有 <code>1/TP</code>, 但 <strong>embedding 通常不切</strong> (词表小, 切完反而要 all-gather 更贵). 70B vocab 32k × hidden 8192 × 2 bytes ≈ 0.5 GB, 不切问题不大。</p>
+<p><strong>Activations</strong> — 训练里是大头 (上一篇里 70B 训练光 activation 就 145 GB), 推理里只占 100 MB 级别。原因: 推理<strong>不存反向</strong>, 一层算完就丢; <strong>FlashAttention</strong> 让 O(s²) 的 attention score 不物化。唯一会爆的两种场景:</p>
+<ul>
+<li>超长 prefill: <code>s=128k</code> 的 prompt 单层就 <code>10·128k·8192/8 ≈ 1.3 GB</code></li>
+<li>大 prefill batch: 同时 prefill 多条请求, batch 翻倍 activation 也翻倍</li>
+</ul>
+<p>vLLM 的 <code>--max-num-batched-tokens</code> 就是在限这个 prefill 峰值的上限。</p>
+<p><strong>cuBLAS workspace</strong> — 跑 <code>torch.cuda.memory_summary()</code> 经常能看到几百 MB 的 <em>Allocated by CUDA libs</em>. 主要是 cuBLAS 的 <strong>GEMM split-K reduction buffer</strong> — 大矩阵乘把 K 维切成多个部分各算各的, 最后做归约, 中间结果需要 staging. 每个 CUDA stream 独立申请, 多 stream 时翻倍。</p>
+<p><strong>NCCL buffer</strong> — TP=8 时每卡为 all-reduce 准备的 staging ≈ <code>hidden × bs × seq × 2 bytes × 2 (recv+send)</code>. NCCL 默认按需扩, 大 batch 时膨胀更明显。可以用 <code>NCCL_BUFFSIZE=8388608</code> 等环境变量限制上限。</p>
+<p><strong>CUDA graph</strong> — vLLM 为常见 batch size (<code>1, 2, 4, 8, 16, 32, ...</code>) 各 capture 一份 graph 避开 kernel launch overhead. 每份 graph 自己 ~几十 MB workspace, 累计可观。<code>--enforce-eager</code> 关掉能省 1-2 GB 但 decode 性能跌 10-20%。</p>
+<p><strong>Allocator 碎片</strong> — PyTorch caching allocator 切大 block 给小请求后, free 时块不一定能合并。Long-running serving 进程通常会比刚启动多 1-2 GB “看不见”的占用。<code>PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True</code> 可以显著缓解。</p>
+<h4 id="实际显存账-70B-在-8-×-80GB-H100-上"><a href="#实际显存账-70B-在-8-×-80GB-H100-上" class="headerlink" title="实际显存账: 70B 在 8 × 80GB H100 上"></a>实际显存账: 70B 在 8 × 80GB H100 上</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text">每卡 80 GB 怎么分:<br>  Weights (TP=8, FP16):                17.5 GB<br>  CUDA driver / runtime:                0.5 GB<br>  cuBLAS + cuDNN workspaces:            0.6 GB<br>  NCCL TP buffers:                      0.8 GB<br>  CUDA graphs (vLLM default):           0.6 GB<br>  PyTorch allocator 碎片余量:           1.0 GB<br>  ─────────────────────────────────────────────<br>  非 KV cache 总开销:                   ~21 GB<br>  剩余 KV cache + prefill spike:        ~59 GB<br><br>gpu_memory_utilization=0.9 配置:<br>  vLLM 总预算 = 80 × 0.9 = 72 GB<br>  扣掉 weights 17.5 → 划给 KV cache pool: 54.5 GB<br>  (driver/workspaces 等从 72 之外吃, 留 8 GB 余量就是给它们)<br><br>70B GQA, kv/token = 320 KB:<br>  KV cache pool: 54.5 GB / 320 KB ≈ 170k tokens 总容量<br>  平均 seq=4k 时 ≈ 40 并发请求 / 卡<br></code></pre></td></tr></table></figure>
+
+<h4 id="什么时候要调小-gpu-memory-utilization"><a href="#什么时候要调小-gpu-memory-utilization" class="headerlink" title="什么时候要调小 gpu_memory_utilization?"></a>什么时候要调小 <code>gpu_memory_utilization</code>?</h4><table>
+<thead>
+<tr>
+<th>症状</th>
+<th>真正原因</th>
+<th>不是因为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动就 OOM</td>
+<td>weights + workspaces 已超 90%</td>
+<td>activation 涨</td>
+</tr>
+<tr>
+<td>Prefill burst 时 OOM</td>
+<td>长 prompt / 大 prefill batch 让 activation 临时膨胀到 GB 级</td>
+<td>KV cache 涨 (KV cache 是渐增, 不会瞬间爆)</td>
+</tr>
+<tr>
+<td>Long-running 之后 OOM</td>
+<td>allocator 碎片累积</td>
+<td>weights / KV cache</td>
+</tr>
+</tbody></table>
+<p>调小 <code>gpu_memory_utilization</code> (例如 0.9 → 0.85) 主要在帮 <strong>workspace + prefill 峰值</strong> 留缓冲, 跟常态 activation 关系不大。</p>
+<h4 id="一句话直觉"><a href="#一句话直觉" class="headerlink" title="一句话直觉"></a>一句话直觉</h4><blockquote>
+<p><strong>训练</strong>显存 = <code>(weights + grads + optim) (能 ZeRO 切)</code> + <strong>activation (随 batch×s² 长, 必须 checkpointing + TP + SP 压)</strong></p>
+<p><strong>推理</strong>显存 = <code>weights (静态)</code> + <strong>KV cache (随并发线性涨, 唯一可调的池子)</strong> + <code>workspace (启动时申请)</code> + <code>activation spike (prefill 才出现)</code></p>
+<p><code>gpu_memory_utilization</code> 真正在留位置给的是 <strong>workspace + spike</strong>, 不是常态 activation。这个数字越小 → KV cache 池越小 → <strong>能塞的并发越少</strong>; 越大 → <strong>越容易在 prefill burst 时 OOM</strong>。</p>
+</blockquote>
 <h2 id="4-2-Continuous-Batching-vs-Static-Batching"><a href="#4-2-Continuous-Batching-vs-Static-Batching" class="headerlink" title="4.2 Continuous Batching vs Static Batching"></a>4.2 Continuous Batching vs Static Batching</h2><p>传统的 Static Batching 会等待一个 batch 内所有请求都生成完毕后才开始处理下一个 batch，造成严重的 GPU 资源浪费。Continuous Batching 通过动态地添加和移除请求，让 GPU 始终保持高利用率。</p>
 <p>下面动画对比两种 batching 方式的 GPU 利用率（红色为浪费的 slot）：</p>
 
