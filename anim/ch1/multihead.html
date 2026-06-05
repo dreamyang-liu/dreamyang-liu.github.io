@@ -13,8 +13,11 @@ body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -
 .btn:active { transform: scale(0.95); }
 .btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
 .btn-secondary:hover { background: #444; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn:disabled:hover { transform: none; opacity: 0.4; }
 .controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
 .step-info { color: #76b900; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+.step-counter { color: #888; font-size: 0.9rem; margin: 6px 0; }
 .head-block { display: inline-block; padding: 10px 15px; margin: 5px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; text-align: center; transition: all 0.5s ease; }
 .tensor-full { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; min-width: 200px; }
 .tensor-head { min-width: 60px; color: #000; }
@@ -27,10 +30,13 @@ body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -
 
 <div class="animation-container" id="multihead-animation">
   <div class="controls">
-    <button class="btn" onclick="multiHeadDemo.start()">开始演示</button>
-    <button class="btn btn-secondary" onclick="multiHeadDemo.reset()">重置</button>
+    <button class="btn btn-secondary" id="mh-prev" onclick="multiHeadDemo.prev()">&larr; 上一步</button>
+    <button class="btn btn-secondary" id="mh-next" onclick="multiHeadDemo.next()">下一步 &rarr;</button>
+    <button class="btn" id="mh-auto" onclick="multiHeadDemo.auto()">&#9654; 自动播放</button>
+    <button class="btn btn-secondary" id="mh-reset" onclick="multiHeadDemo.reset()">&#8634; 重置</button>
   </div>
   <div class="step-info" id="multihead-step-info">展示 tensor 如何被拆分成多个 head 并行处理</div>
+  <div class="step-counter" id="multihead-step-counter">Step 0 / 3</div>
   <div id="multihead-visual" style="text-align: center; padding: 20px;">
     <div id="mh-input" style="margin-bottom: 20px;"></div>
     <div id="mh-heads" style="margin-bottom: 20px; min-height: 80px;"></div>
@@ -41,7 +47,9 @@ body { background: transparent; color: #e0e0e0; font-family: 'JetBrains Mono', -
 <script>
 // ========== Multi-Head Split Animation（从 ch1 原文件抽取）==========
 const multiHeadDemo = (() => {
-  let animating = false;
+  const N = 4;            // 4 个阶段: 输入 → 拆分 8 head → 并行 Attention → Concat+W_O
+  let step = 0;
+  let autoTimer = null;
 
   function render(phase) {
     const input = document.getElementById('mh-input');
@@ -56,22 +64,27 @@ const multiHeadDemo = (() => {
       output.innerHTML = '';
     } else if (phase === 1) {
       info.textContent = 'Step 1: 线性投影后拆分为 8 个 head，每个 head 维度 = 64';
+      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
       const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0'];
       let headHtml = '';
       for (let i = 0; i < 8; i++) {
         headHtml += `<div class="head-block tensor-head" style="background:${colors[i]}; animation: slideIn 0.3s ease ${i * 0.1}s both;">Head ${i}<br><span style="font-size:0.7rem;">(B,N,64)</span></div>`;
       }
       heads.innerHTML = headHtml;
+      output.innerHTML = '';
     } else if (phase === 2) {
       info.textContent = 'Step 2: 每个 head 独立计算 Attention（可并行）';
+      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
       const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0'];
       let headHtml = '';
       for (let i = 0; i < 8; i++) {
         headHtml += `<div class="head-block tensor-head" style="background:${colors[i]}; border: 2px solid #fff; animation: pulse 0.5s ease infinite ${i * 0.1}s;">Attn ${i}<br><span style="font-size:0.7rem;">QK<sup>T</sup>V</span></div>`;
       }
       heads.innerHTML = headHtml;
+      output.innerHTML = '';
     } else if (phase === 3) {
       info.textContent = 'Step 3: Concat 所有 head 输出，通过 W_O 投影回 d_model 维度';
+      input.innerHTML = `<div class="head-block tensor-full">Input: (B, N, 512)</div>`;
       heads.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap;">
         <span style="color:#888;">Concat →</span>
         <div class="head-block" style="background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #01a3a4, #f368e0); color:#000; min-width:200px; animation: fadeScale 0.5s ease;">(B, N, 512)</div>
@@ -81,19 +94,36 @@ const multiHeadDemo = (() => {
     }
   }
 
+  function update() {
+    if (step < 0) step = 0;
+    if (step > N - 1) step = N - 1;
+    render(step);
+    document.getElementById('multihead-step-counter').textContent = `Step ${step} / ${N - 1}`;
+    const prevBtn = document.getElementById('mh-prev');
+    const nextBtn = document.getElementById('mh-next');
+    const autoBtn = document.getElementById('mh-auto');
+    if (prevBtn) prevBtn.disabled = (step === 0);
+    if (nextBtn) nextBtn.disabled = (step === N - 1);
+    if (autoBtn) autoBtn.disabled = (step === N - 1);
+  }
+
+  function stopAuto() {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  }
+
   return {
-    start() {
-      if (animating) return;
-      animating = true;
-      let phase = 0;
-      render(phase);
-      const iv = setInterval(() => {
-        phase++;
-        if (phase > 3) { clearInterval(iv); animating = false; return; }
-        render(phase);
+    next() { stopAuto(); if (step < N - 1) { step++; update(); } },
+    prev() { stopAuto(); if (step > 0) { step--; update(); } },
+    reset() { stopAuto(); step = 0; update(); },
+    auto() {
+      stopAuto();
+      if (step >= N - 1) { step = 0; update(); }
+      autoTimer = setInterval(() => {
+        if (step >= N - 1) { stopAuto(); update(); return; }
+        step++;
+        update();
       }, 1500);
-    },
-    reset() { animating = false; render(0); }
+    }
   };
 })();
 multiHeadDemo.reset();

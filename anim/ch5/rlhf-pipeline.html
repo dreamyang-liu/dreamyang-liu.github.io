@@ -17,8 +17,11 @@ body {
 h3 { font-size: 1.4em; color: #ff9800; margin: 0 0 15px; }
 p { margin: 12px 0; color: #ccc; }
 .pipeline-container { position: relative; width: 100%; height: 200px; margin: 30px 0; overflow: hidden; }
-.pipeline-stage { position: absolute; top: 50%; transform: translateY(-50%); width: 140px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; text-align: center; transition: all 0.3s; }
-.pipeline-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: #ff9800; font-size: 1.5em; }
+.pipeline-stage { position: absolute; top: 50%; transform: translateY(-50%); width: 140px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; text-align: center; transition: all 0.3s; opacity: 0.35; }
+.pipeline-stage.active { opacity: 1; box-shadow: 0 0 20px rgba(255,152,0,0.6); transform: translateY(-50%) scale(1.08); }
+.pipeline-stage.done { opacity: 0.7; }
+.pipeline-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: #ff9800; font-size: 1.5em; opacity: 0.35; transition: all 0.3s; }
+.pipeline-arrow.lit { opacity: 1; }
 .pipeline-data { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; }
 .stage-sft { left: 5%; background: linear-gradient(135deg, #1a5276, #2e86c1); }
 .stage-rm { left: 35%; background: linear-gradient(135deg, #6c3483, #a569bd); }
@@ -27,9 +30,13 @@ p { margin: 12px 0; color: #ccc; }
 .arrow1 { left: 22%; }
 .arrow2 { left: 52%; }
 .arrow3 { left: 82%; }
-.btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; }
+.btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; transition: transform 0.2s, opacity 0.2s; }
 .btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .btn-secondary { background: linear-gradient(135deg, #4488ff, #66aaff); }
+.controls { text-align: center; margin: 15px 0; }
+.step-info { color: #ff9800; font-size: 0.95em; min-height: 44px; margin: 10px 0; padding: 10px; background: #12121f; border-radius: 6px; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.9em; text-align: center; }
 </style>
 </head>
 <body>
@@ -39,67 +46,118 @@ p { margin: 12px 0; color: #ccc; }
 <p>标准 RLHF pipeline 分为三个训练阶段：</p>
 
 <div class="pipeline-container" id="pipeline-anim">
-<div class="pipeline-stage stage-sft">SFT<br><small>监督微调</small></div>
+<div class="pipeline-stage stage-sft" data-stage="0">SFT<br><small>监督微调</small></div>
 <div class="pipeline-arrow arrow1">→</div>
-<div class="pipeline-stage stage-rm">Reward<br>Model</div>
+<div class="pipeline-stage stage-rm" data-stage="1">Reward<br>Model</div>
 <div class="pipeline-arrow arrow2">→</div>
-<div class="pipeline-stage stage-ppo">PPO<br>Training</div>
+<div class="pipeline-stage stage-ppo" data-stage="2">PPO<br>Training</div>
 <div class="pipeline-arrow arrow3">→</div>
-<div class="pipeline-stage stage-output">Aligned<br>Model</div>
+<div class="pipeline-stage stage-output" data-stage="3">Aligned<br>Model</div>
 </div>
-<button class="btn" id="btn-pipeline-play">▶ 播放动画</button>
-<button class="btn btn-secondary" id="btn-pipeline-reset">重置</button>
+
+<div class="step-info" id="pipeline-step-info"></div>
+
+<div class="controls">
+  <button class="btn btn-secondary" id="btn-pipeline-prev" onclick="prev()">&larr; 上一步</button>
+  <button class="btn btn-secondary" id="btn-pipeline-next" onclick="next()">下一步 &rarr;</button>
+  <button class="btn btn-secondary" id="btn-pipeline-reset" onclick="reset()">&#8634; 重置</button>
+  <button class="btn" id="btn-pipeline-auto" onclick="auto()">&#9654; 自动播放</button>
+</div>
+<div class="step-indicator" id="pipeline-step-counter">Step 0 / 3</div>
 </div>
 
 <script>
-// === RLHF Pipeline Animation ===
+// === RLHF Pipeline Animation (manual step-through + auto-play) ===
 (function() {
     const container = document.getElementById('pipeline-anim');
-    const playBtn = document.getElementById('btn-pipeline-play');
-    const resetBtn = document.getElementById('btn-pipeline-reset');
+    const prevBtn = document.getElementById('btn-pipeline-prev');
+    const nextBtn = document.getElementById('btn-pipeline-next');
+    const autoBtn = document.getElementById('btn-pipeline-auto');
+    const stepInfo = document.getElementById('pipeline-step-info');
+    const stepCounter = document.getElementById('pipeline-step-counter');
+    const stages = Array.from(container.querySelectorAll('.pipeline-stage'));
+    const arrows = Array.from(container.querySelectorAll('.pipeline-arrow'));
+
+    // One discrete step per pipeline stage.
+    const steps = [
+        { desc: 'Step 0 - SFT 监督微调: 用人工标注的高质量问答对微调基础模型, 得到初始策略模型。' },
+        { desc: 'Step 1 - Reward Model 奖励模型: 收集人类对多个回答的偏好排序, 训练一个打分模型来评估回答质量。' },
+        { desc: 'Step 2 - PPO 强化学习训练: 以奖励模型的打分为信号, 用 PPO 算法优化 SFT 模型, 使其生成更符合人类偏好的回答。' },
+        { desc: 'Step 3 - Aligned Model 对齐模型: 输出经过 RLHF 对齐的最终模型, 兼顾有用性与安全性。' }
+    ];
+    const N = steps.length; // N = 4 (Step 0..3)
+
+    let step = 0;
     let particles = [];
-    let animId = null;
+    let autoTimer = null;
 
-    function createParticle(startX, endX, startY, duration, delay) {
-        const p = document.createElement('div');
-        p.className = 'pipeline-data';
-        p.style.left = startX + '%';
-        p.style.top = startY + '%';
-        p.style.opacity = '0';
-        container.appendChild(p);
-        particles.push(p);
-
-        setTimeout(() => {
-            p.style.transition = `left ${duration}ms linear, opacity 0.3s`;
-            p.style.opacity = '1';
-            p.style.left = endX + '%';
-            setTimeout(() => { p.style.opacity = '0'; }, duration - 300);
-        }, delay);
-    }
-
-    function playAnimation() {
-        resetAnimation();
-        const stages = [
-            { startX: 2, endX: 18, startY: 48, duration: 1000, delay: 0 },
-            { startX: 22, endX: 48, startY: 48, duration: 1000, delay: 1200 },
-            { startX: 52, endX: 78, startY: 48, duration: 1000, delay: 2400 },
-            { startX: 82, endX: 95, startY: 48, duration: 800, delay: 3600 },
-        ];
-        stages.forEach(s => createParticle(s.startX, s.endX, s.startY, s.duration, s.delay));
-
-        // Second wave
-        setTimeout(() => {
-            stages.forEach(s => createParticle(s.startX, s.endX, s.startY - 8, s.duration, s.delay));
-        }, 800);
-    }
-
-    function resetAnimation() {
+    function clearParticles() {
         particles.forEach(p => p.remove());
         particles = [];
     }
 
-    playBtn.addEventListener('click', playAnimation);
-    resetBtn.addEventListener('click', resetAnimation);
+    // Render a settled still frame for a given step: highlight the active
+    // stage, mark completed stages, light arrows up to the active stage.
+    function render(s) {
+        clearParticles();
+        stages.forEach((el, i) => {
+            el.classList.remove('active', 'done');
+            if (i < s) el.classList.add('done');
+            else if (i === s) el.classList.add('active');
+        });
+        arrows.forEach((el, i) => {
+            el.classList.toggle('lit', i < s);
+        });
+        stepInfo.textContent = steps[s].desc;
+        stepCounter.textContent = `Step ${s} / ${N - 1}`;
+        prevBtn.disabled = (s === 0);
+        nextBtn.disabled = (s === N - 1);
+        autoBtn.disabled = (s === N - 1);
+    }
+
+    function stopAuto() {
+        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    }
+
+    function prev() {
+        stopAuto();
+        if (step > 0) { step--; render(step); }
+    }
+
+    function next() {
+        stopAuto();
+        if (step < N - 1) { step++; render(step); }
+    }
+
+    function reset() {
+        stopAuto();
+        step = 0;
+        render(step);
+    }
+
+    function auto() {
+        stopAuto();
+        // Walk step -> step until the last step, then stop.
+        function tick() {
+            if (step >= N - 1) { autoTimer = null; return; }
+            step++;
+            render(step);
+            if (step < N - 1) {
+                autoTimer = setTimeout(tick, 1500);
+            } else {
+                autoTimer = null;
+            }
+        }
+        autoTimer = setTimeout(tick, 1500);
+    }
+
+    // Expose handlers for inline onclick.
+    window.prev = prev;
+    window.next = next;
+    window.reset = reset;
+    window.auto = auto;
+
+    render(step);
 })();
 
 // === 自动把高度汇报给父页面（让 iframe 自适应高度）===

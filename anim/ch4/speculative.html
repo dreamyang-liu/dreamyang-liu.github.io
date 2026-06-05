@@ -28,6 +28,9 @@ body {
 .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
 .btn:active { transform: translateY(0); }
 .btn.secondary { background: linear-gradient(135deg, #555, #444); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.spec-step-text { color: #ffb74d; font-size: 0.9em; min-height: 24px; margin: 12px 0 4px; padding: 10px; background: #1a1a2e; border-radius: 6px; }
+.spec-step-counter { color: #888; margin: 8px 0; font-size: 0.9em; text-align: center; }
 </style>
 </head>
 <body>
@@ -61,75 +64,36 @@ body {
 </div>
 <div id="spec-summary" style="margin-top:15px; font-size:0.9em; color:#aaa;"></div>
 </div>
+<div class="spec-step-text" id="spec-step-text"></div>
 <div style="text-align:center;">
-<button class="btn" onclick="startSpecAnim()">播放动画</button>
-<button class="btn secondary" onclick="resetSpecAnim()">重置</button>
+<button class="btn secondary" id="spec-prev" onclick="prev()">&larr; 上一步</button>
+<button class="btn secondary" id="spec-next" onclick="next()">下一步 &rarr;</button>
+<button class="btn" id="spec-auto" onclick="auto()">&#9654; 自动播放</button>
+<button class="btn secondary" onclick="reset()">&#8634; 重置</button>
 </div>
+<div class="spec-step-counter" id="spec-step-counter">Step 0 / 3</div>
 </div>
 
 <script>
 // ==================== Speculative Decoding Animation ====================
-let specTimeout = null;
-function startSpecAnim() {
-    resetSpecAnim();
-    const draftTokens = ['The', 'cat', 'sat', 'on', 'the'];
-    const verifyResults = ['accepted', 'accepted', 'accepted', 'rejected', ''];
-    const verifyTokens = ['The', 'cat', 'sat', 'upon', ''];
-    const finalResults = ['accepted', 'accepted', 'accepted', 'rejected', 'skipped'];
-    const finalTokens = ['The', 'cat', 'sat', 'upon', ''];
+const draftTokens   = ['The', 'cat', 'sat', 'on', 'the'];
+const verifyTokens  = ['The', 'cat', 'sat', 'upon', ''];
+const verifyResults = ['accepted', 'accepted', 'accepted', 'rejected', ''];
+const finalResults  = ['accepted', 'accepted', 'accepted', 'rejected', 'skipped'];
 
-    let step = 0;
-    function animStep() {
-        if (step < 5) {
-            // Show draft tokens appearing
-            const dEl = document.getElementById(`spec-d${step}`);
-            dEl.classList.add('visible');
-            step++;
-            specTimeout = setTimeout(animStep, 400);
-        } else if (step < 10) {
-            // Show verification
-            const i = step - 5;
-            const vEl = document.getElementById(`spec-v${i}`);
-            vEl.textContent = verifyTokens[i] || '-';
-            if (verifyResults[i] === 'accepted') {
-                vEl.className = 'spec-token accepted visible';
-            } else if (verifyResults[i] === 'rejected') {
-                vEl.className = 'spec-token rejected visible';
-            } else {
-                vEl.className = 'spec-token visible';
-                vEl.style.opacity = '0.3';
-            }
-            step++;
-            specTimeout = setTimeout(animStep, 500);
-        } else if (step < 15) {
-            // Show final result
-            const i = step - 10;
-            const rEl = document.getElementById(`spec-r${i}`);
-            if (finalResults[i] === 'accepted') {
-                rEl.textContent = '✓ Accept';
-                rEl.className = 'spec-token accepted visible';
-            } else if (finalResults[i] === 'rejected') {
-                rEl.textContent = '✗ Reject → "upon"';
-                rEl.className = 'spec-token rejected visible';
-            } else {
-                rEl.textContent = '- Skip';
-                rEl.className = 'spec-token visible';
-                rEl.style.opacity = '0.4';
-            }
-            step++;
-            specTimeout = setTimeout(animStep, 400);
-        } else {
-            document.getElementById('spec-summary').innerHTML =
-                'Result: 接受了 3/5 个 draft tokens + 1 个修正 token = <strong style="color:#ffd700;">4 tokens in 1 verification pass</strong><br>' +
-                'Acceptance rate: 60% | 加速效果: 从 4 次 target forward 降到 1 次';
-        }
-    }
-    animStep();
-}
+const specSteps = [
+  { desc: 'Step 0 - Draft 阶段: 轻量级 draft model 一次性自回归生成 K=5 个候选 token。' },
+  { desc: 'Step 1 - Verify 阶段: target model 对 5 个 draft token 做一次并行前向, 给出各位置的真实预测 (位置 3 处 target 想要 "upon" 而非 "on")。' },
+  { desc: 'Step 2 - Accept/Reject: 从左到右逐位比对, 连续匹配则接受; 第一个不匹配处用 target 的修正 token 替换, 其后的 draft token 全部丢弃。' },
+  { desc: 'Step 3 - 汇总: 一次验证 pass 产出 4 个有效 token (3 接受 + 1 修正), 把 4 次 target forward 压缩成 1 次。' }
+];
+const N = specSteps.length; // 4 steps: 0..3
+let specStep = 0;
+let specAuto = null;
 
-function resetSpecAnim() {
-    if (specTimeout) clearTimeout(specTimeout);
-    specTimeout = null;
+// Render a settled still frame for the given step.
+function renderSpec(step) {
+    // Reset all tokens to base state first.
     for (let i = 0; i < 5; i++) {
         const dEl = document.getElementById(`spec-d${i}`);
         dEl.className = 'spec-token draft';
@@ -143,7 +107,97 @@ function resetSpecAnim() {
         rEl.style.opacity = '';
     }
     document.getElementById('spec-summary').innerHTML = '';
+
+    // Phase 0+: draft tokens visible.
+    if (step >= 0) {
+        for (let i = 0; i < 5; i++) {
+            document.getElementById(`spec-d${i}`).classList.add('visible');
+        }
+    }
+    // Phase 1+: verification row.
+    if (step >= 1) {
+        for (let i = 0; i < 5; i++) {
+            const vEl = document.getElementById(`spec-v${i}`);
+            vEl.textContent = verifyTokens[i] || '-';
+            if (verifyResults[i] === 'accepted') {
+                vEl.className = 'spec-token accepted visible';
+            } else if (verifyResults[i] === 'rejected') {
+                vEl.className = 'spec-token rejected visible';
+            } else {
+                vEl.className = 'spec-token visible';
+                vEl.style.opacity = '0.3';
+            }
+        }
+    }
+    // Phase 2+: accept/reject result row.
+    if (step >= 2) {
+        for (let i = 0; i < 5; i++) {
+            const rEl = document.getElementById(`spec-r${i}`);
+            if (finalResults[i] === 'accepted') {
+                rEl.textContent = '✓ Accept';
+                rEl.className = 'spec-token accepted visible';
+            } else if (finalResults[i] === 'rejected') {
+                rEl.textContent = '✗ Reject → "upon"';
+                rEl.className = 'spec-token rejected visible';
+            } else {
+                rEl.textContent = '- Skip';
+                rEl.className = 'spec-token visible';
+                rEl.style.opacity = '0.4';
+            }
+        }
+    }
+    // Phase 3: summary.
+    if (step >= 3) {
+        document.getElementById('spec-summary').innerHTML =
+            'Result: 接受了 3/5 个 draft tokens + 1 个修正 token = <strong style="color:#ffd700;">4 tokens in 1 verification pass</strong><br>' +
+            'Acceptance rate: 60% | 加速效果: 从 4 次 target forward 降到 1 次';
+    }
+
+    document.getElementById('spec-step-text').textContent = specSteps[step].desc;
+    document.getElementById('spec-step-counter').textContent = `Step ${step} / ${N - 1}`;
+    document.getElementById('spec-prev').disabled = (step === 0);
+    document.getElementById('spec-next').disabled = (step === N - 1);
+    document.getElementById('spec-auto').disabled = (step === N - 1);
 }
+
+function stopAuto() {
+    if (specAuto) { clearTimeout(specAuto); specAuto = null; }
+}
+
+function prev() {
+    stopAuto();
+    if (specStep > 0) { specStep--; renderSpec(specStep); }
+}
+
+function next() {
+    stopAuto();
+    if (specStep < N - 1) { specStep++; renderSpec(specStep); }
+}
+
+function reset() {
+    stopAuto();
+    specStep = 0;
+    renderSpec(specStep);
+}
+
+function auto() {
+    stopAuto();
+    function tick() {
+        if (specStep >= N - 1) { specAuto = null; return; }
+        specStep++;
+        renderSpec(specStep);
+        if (specStep < N - 1) {
+            specAuto = setTimeout(tick, 1400);
+        } else {
+            specAuto = null;
+        }
+    }
+    if (specStep >= N - 1) { specStep = 0; renderSpec(specStep); }
+    specAuto = setTimeout(tick, 700);
+}
+
+// Initialize on first render.
+renderSpec(specStep);
 </script>
 
 <script>

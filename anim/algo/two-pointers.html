@@ -106,10 +106,13 @@ code {
   <h3>Floyd 环检测动画</h3>
   <p>绿色 = slow（每次 1 步），红色 = fast（每次 2 步）</p>
   <canvas class="floyd-canvas" id="floyd-canvas"></canvas>
-  <div class="status-line" id="floyd-status">正在运行...</div>
+  <div class="status-line" id="floyd-status">第 0 步：slow=0, fast=0</div>
   <div class="controls">
-    <button class="btn" id="floyd-pause">暂停</button>
-    <button class="btn btn-secondary" id="floyd-reset">重置</button>
+    <button class="btn" id="floyd-prev" onclick="floydStepNav(-1)">&#8592; 上一步</button>
+    <span id="floyd-indicator" style="color:#888;font-size:0.85em;min-width:80px;display:inline-block;text-align:center;">0 / 4</span>
+    <button class="btn" id="floyd-next" onclick="floydStepNav(1)">下一步 &#8594;</button>
+    <button class="btn btn-secondary" id="floyd-auto" onclick="floydAuto()">&#9654; 自动播放</button>
+    <button class="btn btn-secondary" id="floyd-reset" onclick="floydReset()">&#8635; 重置</button>
   </div>
 </div>
 
@@ -181,8 +184,6 @@ renderCollision();
 // === Floyd cycle detection animation ===
 const floydCanvas = document.getElementById('floyd-canvas');
 const ctx = floydCanvas.getContext('2d');
-let floydRunning = true;
-let floydAnimId = null;
 
 // Linked list: 0->1->2->3->4->5->6->3 (cycle at node 3)
 const TAIL_LEN = 3; // nodes 0,1,2 are tail
@@ -190,8 +191,6 @@ const CYCLE_LEN = 4; // nodes 3,4,5,6 form cycle
 const TOTAL_NODES = TAIL_LEN + CYCLE_LEN;
 
 let slowPos = 0, fastPos = 0, floydStep = 0, floydMet = false, floydDone = false;
-let floydTimer = 0;
-const FLOYD_INTERVAL = 60; // frames between steps
 
 function getNodePosition(index, w, h) {
   const cx = w / 2, cy = h / 2;
@@ -291,49 +290,86 @@ function nextNode(pos) {
   return pos < TOTAL_NODES - 1 ? pos + 1 : TAIL_LEN;
 }
 
-function floydAnimate() {
-  floydTimer++;
-  if (floydTimer >= FLOYD_INTERVAL && !floydDone) {
-    floydTimer = 0;
-    if (!floydMet) {
-      slowPos = nextNode(slowPos);
-      fastPos = nextNode(nextNode(fastPos));
-      floydStep++;
-      if (slowPos === fastPos) {
-        floydMet = true;
-        document.getElementById('floyd-status').innerHTML = `第 ${floydStep} 步：slow 和 fast 在节点 ${slowPos} 相遇！<strong style="color:#76b900">检测到环！</strong>`;
-        floydDone = true;
-      } else {
-        document.getElementById('floyd-status').textContent = `第 ${floydStep} 步：slow=${slowPos}, fast=${fastPos}`;
-      }
-    }
+// Precompute the exact frame sequence so each step is a pure function of
+// floydStepIdx (0..FLOYD_N). Frame k holds the (slow, fast) positions after k
+// Floyd iterations; the final frame is where the pointers meet.
+const floydFrames = (function () {
+  const frames = [{ slow: 0, fast: 0, met: false }];
+  let s = 0, f = 0;
+  while (true) {
+    s = nextNode(s);
+    f = nextNode(nextNode(f));
+    const met = s === f;
+    frames.push({ slow: s, fast: f, met });
+    if (met) break;
   }
+  return frames;
+})();
+const FLOYD_N = floydFrames.length - 1; // number of iterations until they meet
+
+let floydStepIdx = 0;
+let floydAutoTimer = null;
+
+function floydRenderStep() {
+  const frame = floydFrames[floydStepIdx];
+  slowPos = frame.slow;
+  fastPos = frame.fast;
+  floydStep = floydStepIdx;
+  floydMet = frame.met;
+  floydDone = frame.met;
+
+  const status = document.getElementById('floyd-status');
+  if (frame.met) {
+    status.innerHTML = `第 ${floydStepIdx} 步：slow 和 fast 在节点 ${frame.slow} 相遇！<strong style="color:#76b900">相遇！检测到环！</strong>`;
+  } else {
+    status.textContent = `第 ${floydStepIdx} 步：slow=${frame.slow}, fast=${frame.fast}`;
+  }
+
+  document.getElementById('floyd-indicator').textContent = `${floydStepIdx} / ${FLOYD_N}`;
+  document.getElementById('floyd-prev').disabled = (floydStepIdx === 0);
+  document.getElementById('floyd-next').disabled = (floydStepIdx === FLOYD_N);
+  document.getElementById('floyd-auto').disabled = (floydStepIdx === FLOYD_N);
+
   drawFloyd();
-  if (floydRunning) {
-    floydAnimId = requestAnimationFrame(floydAnimate);
+}
+
+function floydStopAuto() {
+  if (floydAutoTimer !== null) {
+    clearInterval(floydAutoTimer);
+    floydAutoTimer = null;
+    document.getElementById('floyd-auto').textContent = '▶ 自动播放';
   }
+}
+
+function floydStepNav(direction) {
+  floydStopAuto();
+  const target = floydStepIdx + direction;
+  if (target < 0 || target > FLOYD_N) return;
+  floydStepIdx = target;
+  floydRenderStep();
+}
+
+function floydAuto() {
+  if (floydAutoTimer !== null) { floydStopAuto(); return; }
+  if (floydStepIdx >= FLOYD_N) return;
+  document.getElementById('floyd-auto').textContent = '⏸ 暂停';
+  floydAutoTimer = setInterval(function () {
+    if (floydStepIdx >= FLOYD_N) { floydStopAuto(); return; }
+    floydStepIdx++;
+    floydRenderStep();
+    if (floydStepIdx >= FLOYD_N) floydStopAuto();
+  }, 700);
 }
 
 function floydReset() {
-  slowPos = 0; fastPos = 0; floydStep = 0; floydMet = false; floydDone = false; floydTimer = 0;
-  document.getElementById('floyd-status').textContent = '正在运行...';
-  if (!floydRunning) {
-    floydRunning = true;
-    document.getElementById('floyd-pause').textContent = '暂停';
-    floydAnimate();
-  }
+  floydStopAuto();
+  floydStepIdx = 0;
+  floydRenderStep();
 }
-
-document.getElementById('floyd-pause').addEventListener('click', function() {
-  floydRunning = !floydRunning;
-  this.textContent = floydRunning ? '暂停' : '继续';
-  if (floydRunning) floydAnimate();
-});
-document.getElementById('floyd-reset').addEventListener('click', floydReset);
 
 resizeFloydCanvas();
 window.addEventListener('resize', () => { resizeFloydCanvas(); drawFloyd(); });
-floydAnimate();
+floydRenderStep();
 </script>
 
 <script>

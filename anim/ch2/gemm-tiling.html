@@ -48,10 +48,13 @@ body {
     </div>
   </div>
   <div class="gemm-controls">
-    <button id="gemmStartBtn" onclick="startGemmAnimation()">开始 Tiling 动画</button>
-    <button id="gemmResetBtn" onclick="resetGemmAnimation()">重置</button>
+    <button id="gemmPrevBtn" onclick="prev()">&larr; 上一步</button>
+    <button id="gemmNextBtn" onclick="next()">下一步 &rarr;</button>
+    <button id="gemmAutoBtn" onclick="auto()">&#9654; 自动播放</button>
+    <button id="gemmResetBtn" onclick="reset()">&#8634; 重置</button>
   </div>
-  <div class="gemm-info" id="gemmInfo">点击 "开始" 观察 4×4 tile 如何逐步计算 8×8 矩阵乘法</div>
+  <div class="gemm-info" id="gemmInfo">点击 "下一步" 观察 4×4 tile 如何逐步计算 8×8 矩阵乘法</div>
+  <div class="gemm-info" id="gemmCounter" style="color:#7b2ff7;font-weight:bold;margin-top:4px;">Step 0 / 7</div>
 </div>
 
 <script>
@@ -60,8 +63,20 @@ body {
 // ========================
 const MATRIX_SIZE = 8;
 const TILE_SIZE = 4;
-let gemmAnimationRunning = false;
-let gemmTimeouts = [];
+
+// Precompute the discrete tile-iteration steps (one per (bm, bn, bk) block).
+// Loop bounds: bm in {0,4}, bn in {0,4}, bk in {0,4} => 2*2*2 = 8 steps.
+const steps = [];
+for (let bm = 0; bm < MATRIX_SIZE; bm += TILE_SIZE) {
+  for (let bn = 0; bn < MATRIX_SIZE; bn += TILE_SIZE) {
+    for (let bk = 0; bk < MATRIX_SIZE; bk += TILE_SIZE) {
+      steps.push({ bm, bn, bk });
+    }
+  }
+}
+
+let step = 0;            // discrete integer 0..steps.length-1
+let autoTimer = null;
 
 function initMatrices() {
   ['matrixA', 'matrixB', 'matrixC'].forEach(id => {
@@ -74,7 +89,6 @@ function initMatrices() {
     }
   });
 }
-initMatrices();
 
 function highlightTile(matrixId, startRow, startCol, tileRows, tileCols, className) {
   const container = document.getElementById(matrixId);
@@ -94,61 +108,60 @@ function clearHighlights() {
   });
 }
 
-function startGemmAnimation() {
-  if (gemmAnimationRunning) return;
-  gemmAnimationRunning = true;
-  document.getElementById('gemmStartBtn').disabled = true;
+// Render the settled still frame for a given step index (state after that tile iteration).
+function render() {
   clearHighlights();
+  const { bm, bn, bk } = steps[step];
 
-  const steps = [];
-  // For each output tile (TILE_SIZE x TILE_SIZE block of C)
-  for (let bm = 0; bm < MATRIX_SIZE; bm += TILE_SIZE) {
-    for (let bn = 0; bn < MATRIX_SIZE; bn += TILE_SIZE) {
-      // For each K tile
-      for (let bk = 0; bk < MATRIX_SIZE; bk += TILE_SIZE) {
-        steps.push({ bm, bn, bk });
-      }
-    }
-  }
+  // Highlight A tile: rows [bm, bm+TILE), cols [bk, bk+TILE)
+  highlightTile('matrixA', bm, bk, TILE_SIZE, TILE_SIZE, 'highlight-a');
+  // Highlight B tile: rows [bk, bk+TILE), cols [bn, bn+TILE)
+  highlightTile('matrixB', bk, bn, TILE_SIZE, TILE_SIZE, 'highlight-b');
+  // Highlight C tile: rows [bm, bm+TILE), cols [bn, bn+TILE)
+  highlightTile('matrixC', bm, bn, TILE_SIZE, TILE_SIZE, 'highlight-c');
 
-  let stepIdx = 0;
-  function doStep() {
-    if (stepIdx >= steps.length) {
-      document.getElementById('gemmInfo').textContent = '动画完成！共 ' + steps.length + ' 个 tile 计算步骤';
-      gemmAnimationRunning = false;
-      document.getElementById('gemmStartBtn').disabled = false;
-      return;
-    }
+  document.getElementById('gemmInfo').textContent =
+    `C[${bm}:${bm+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}] += A[${bm}:${bm+TILE_SIZE}, ${bk}:${bk+TILE_SIZE}] × B[${bk}:${bk+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}]`;
+  document.getElementById('gemmCounter').textContent = `Step ${step} / ${steps.length - 1}`;
 
-    clearHighlights();
-    const { bm, bn, bk } = steps[stepIdx];
-
-    // Highlight A tile: rows [bm, bm+TILE), cols [bk, bk+TILE)
-    highlightTile('matrixA', bm, bk, TILE_SIZE, TILE_SIZE, 'highlight-a');
-    // Highlight B tile: rows [bk, bk+TILE), cols [bn, bn+TILE)
-    highlightTile('matrixB', bk, bn, TILE_SIZE, TILE_SIZE, 'highlight-b');
-    // Highlight C tile: rows [bm, bm+TILE), cols [bn, bn+TILE)
-    highlightTile('matrixC', bm, bn, TILE_SIZE, TILE_SIZE, 'highlight-c');
-
-    document.getElementById('gemmInfo').textContent =
-      `Step ${stepIdx + 1}/${steps.length}: C[${bm}:${bm+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}] += A[${bm}:${bm+TILE_SIZE}, ${bk}:${bk+TILE_SIZE}] × B[${bk}:${bk+TILE_SIZE}, ${bn}:${bn+TILE_SIZE}]`;
-
-    stepIdx++;
-    const t = setTimeout(doStep, 600);
-    gemmTimeouts.push(t);
-  }
-
-  doStep();
+  document.getElementById('gemmPrevBtn').disabled = (step === 0);
+  document.getElementById('gemmNextBtn').disabled = (step === steps.length - 1);
+  document.getElementById('gemmAutoBtn').disabled = (step === steps.length - 1);
 }
 
-function resetGemmAnimation() {
-  gemmTimeouts.forEach(t => clearTimeout(t));
-  gemmTimeouts = [];
-  gemmAnimationRunning = false;
-  document.getElementById('gemmStartBtn').disabled = false;
-  clearHighlights();
-  document.getElementById('gemmInfo').textContent = '点击 "开始" 观察 4×4 tile 如何逐步计算 8×8 矩阵乘法';
+function stopAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
 }
+
+function prev() {
+  stopAuto();
+  if (step > 0) { step--; render(); }
+}
+
+function next() {
+  if (step < steps.length - 1) { step++; render(); }
+  else { stopAuto(); }
+}
+
+function auto() {
+  stopAuto();
+  if (step >= steps.length - 1) return;
+  autoTimer = setInterval(() => {
+    if (step >= steps.length - 1) { stopAuto(); render(); return; }
+    step++;
+    render();
+  }, 700);
+}
+
+function reset() {
+  stopAuto();
+  step = 0;
+  render();
+}
+
+// Initialize: build matrices and render the first settled still frame.
+initMatrices();
+render();
 </script>
 
 <script>

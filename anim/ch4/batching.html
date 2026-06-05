@@ -29,6 +29,9 @@ body {
 .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
 .btn:active { transform: translateY(0); }
 .btn.secondary { background: linear-gradient(135deg, #555, #444); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.step-indicator { color: #888; margin: 10px 0 0; font-size: 0.9em; }
+.step-info { color: #ffd54f; font-size: 0.9em; min-height: 22px; margin: 10px 0 0; }
 </style>
 </head>
 <body>
@@ -47,15 +50,18 @@ body {
 <div class="utilization-bar" id="continuous-util">利用率: <span>0%</span></div>
 </div>
 </div>
+<div class="step-info" id="batch-step-info"></div>
 <div style="text-align:center; margin-top:15px;">
-<button class="btn" onclick="startBatchingAnim()">开始对比</button>
-<button class="btn secondary" onclick="resetBatchingAnim()">重置</button>
+<button class="btn secondary" id="batch-prev" onclick="prev()">&larr; 上一步</button>
+<button class="btn secondary" id="batch-next" onclick="next()">下一步 &rarr;</button>
+<button class="btn" id="batch-auto" onclick="auto()">&#9654; 自动播放</button>
+<button class="btn secondary" onclick="reset()">&#8634; 重置</button>
 </div>
+<div class="step-indicator" id="batch-step-counter">Step 0 / 0</div>
 </div>
 
 <script>
-// ==================== Batching Animation ====================
-let batchingInterval = null;
+// ==================== Batching Animation (step-driven) ====================
 const BATCH_SIZE = 6;
 
 function createBatchSlots() {
@@ -70,85 +76,160 @@ function createBatchSlots() {
 }
 createBatchSlots();
 
-function startBatchingAnim() {
-    resetBatchingAnim();
-    createBatchSlots();
+// --- Precompute the deterministic simulation into per-tick frames ---
+// Each frame = { static:[{w,cls}], cont:[{w,cls}], staticUtil, contUtil }
+// This mirrors the original setInterval logic exactly, but with the
+// queue-refill (originally a ~1-tick setTimeout) applied at the next tick.
+function buildFrames() {
+    const initialLengths = [80, 50, 95, 30, 70, 60]; // percent of max
+    const initialQueue = [40, 90, 55, 75];           // additional requests
 
-    // Simulate different request lengths
-    const requestLengths = [80, 50, 95, 30, 70, 60]; // percent of max
-    let staticProgress = [0, 0, 0, 0, 0, 0];
-    let contProgress = [0, 0, 0, 0, 0, 0];
-    let contFinished = [false, false, false, false, false, false];
-    let contQueue = [40, 90, 55, 75]; // additional requests
-    let step = 0;
+    const reqLen = initialLengths.slice();
+    const staticProgress = [0, 0, 0, 0, 0, 0];
+    const contProgress = [0, 0, 0, 0, 0, 0];
+    const contFinished = [false, false, false, false, false, false];
+    const queue = initialQueue.slice();
+    // pendingRefill[i] = true means slot i finished last tick and a queued
+    // request should be loaded at the start of this tick (the original
+    // setTimeout(...,200) ~= one tick delay).
+    const pendingRefill = [false, false, false, false, false, false];
 
-    batchingInterval = setInterval(() => {
-        step++;
+    const frames = [];
+
+    // Frame 0: settled initial state (everything idle, 0% util).
+    frames.push({
+        static: Array.from({ length: BATCH_SIZE }, () => ({ w: 0, cls: 'idle' })),
+        cont:   Array.from({ length: BATCH_SIZE }, () => ({ w: 0, cls: 'idle' })),
+        staticUtil: 0,
+        contUtil: 0,
+    });
+
+    const MAX_TICKS = 60; // matches the original step cap
+    for (let tick = 1; tick <= MAX_TICKS; tick++) {
+        // Apply queued refills scheduled by the previous tick.
+        for (let i = 0; i < BATCH_SIZE; i++) {
+            if (pendingRefill[i]) {
+                pendingRefill[i] = false;
+                if (queue.length > 0) {
+                    reqLen[i] = queue.shift();
+                    contProgress[i] = 0;
+                    contFinished[i] = false;
+                }
+            }
+        }
+
         let staticActive = 0;
         let contActive = 0;
+        const staticFrame = [];
+        const contFrame = [];
 
-        // Static batching: all slots advance together, wait for longest
-        const allDoneStatic = staticProgress.every((p, i) => p >= requestLengths[i]);
-        if (!allDoneStatic) {
-            for (let i = 0; i < BATCH_SIZE; i++) {
-                if (staticProgress[i] < requestLengths[i]) {
-                    staticProgress[i] = Math.min(staticProgress[i] + 5, requestLengths[i]);
-                    const fill = document.getElementById(`static-fill-${i}`);
-                    fill.style.width = staticProgress[i] + '%';
-                    fill.className = 'fill active';
-                    staticActive++;
-                } else {
-                    const fill = document.getElementById(`static-fill-${i}`);
-                    fill.className = 'fill wasted';
-                    fill.style.width = requestLengths[i] + '%';
-                }
+        // Static batching: all slots advance together, wait for the longest.
+        const allDoneStatic = staticProgress.every((p, i) => p >= initialLengths[i]);
+        for (let i = 0; i < BATCH_SIZE; i++) {
+            if (!allDoneStatic && staticProgress[i] < initialLengths[i]) {
+                staticProgress[i] = Math.min(staticProgress[i] + 5, initialLengths[i]);
+                staticFrame.push({ w: staticProgress[i], cls: 'active' });
+                staticActive++;
+            } else {
+                // Finished (or whole batch done): slot is wasted capacity.
+                staticFrame.push({ w: initialLengths[i], cls: 'wasted' });
             }
         }
 
-        // Continuous batching: finished slots get new requests
+        // Continuous batching: finished slots free up and pull from the queue.
         for (let i = 0; i < BATCH_SIZE; i++) {
             if (!contFinished[i]) {
-                contProgress[i] = Math.min(contProgress[i] + 5, requestLengths[i]);
-                const fill = document.getElementById(`cont-fill-${i}`);
-                fill.style.width = contProgress[i] + '%';
-                fill.className = 'fill active';
+                contProgress[i] = Math.min(contProgress[i] + 5, reqLen[i]);
+                contFrame.push({ w: contProgress[i], cls: 'active' });
                 contActive++;
-
-                if (contProgress[i] >= requestLengths[i]) {
+                if (contProgress[i] >= reqLen[i]) {
                     contFinished[i] = true;
-                    // Immediately assign new request from queue
-                    if (contQueue.length > 0) {
-                        setTimeout(() => {
-                            requestLengths[i] = contQueue.shift();
-                            contProgress[i] = 0;
-                            contFinished[i] = false;
-                        }, 200);
-                    }
+                    if (queue.length > 0) pendingRefill[i] = true;
                 }
             } else {
-                const fill = document.getElementById(`cont-fill-${i}`);
-                fill.className = 'fill idle';
-                fill.style.width = '0%';
+                contFrame.push({ w: 0, cls: 'idle' });
             }
         }
 
-        // Update utilization
-        document.getElementById('static-util').querySelector('span').textContent =
-            Math.round(staticActive / BATCH_SIZE * 100) + '%';
-        document.getElementById('continuous-util').querySelector('span').textContent =
-            Math.round(contActive / BATCH_SIZE * 100) + '%';
+        frames.push({
+            static: staticFrame,
+            cont: contFrame,
+            staticUtil: Math.round(staticActive / BATCH_SIZE * 100),
+            contUtil: Math.round(contActive / BATCH_SIZE * 100),
+        });
 
-        if (step > 60) clearInterval(batchingInterval);
+        // Stop once both panels are fully settled (nothing active, queue drained).
+        const staticSettled = staticProgress.every((p, i) => p >= initialLengths[i]);
+        const contSettled = contFinished.every(Boolean) && queue.length === 0 &&
+            !pendingRefill.some(Boolean);
+        if (staticSettled && contSettled) break;
+    }
+
+    return frames;
+}
+
+const FRAMES = buildFrames();
+const N = FRAMES.length - 1; // last step index
+
+let currentStep = 0;
+let autoTimer = null;
+
+function renderTick(step) {
+    const f = FRAMES[step];
+    for (let i = 0; i < BATCH_SIZE; i++) {
+        const sFill = document.getElementById(`static-fill-${i}`);
+        sFill.className = 'fill ' + f.static[i].cls;
+        sFill.style.width = f.static[i].w + '%';
+        const cFill = document.getElementById(`cont-fill-${i}`);
+        cFill.className = 'fill ' + f.cont[i].cls;
+        cFill.style.width = f.cont[i].w + '%';
+    }
+    document.getElementById('static-util').querySelector('span').textContent = f.staticUtil + '%';
+    document.getElementById('continuous-util').querySelector('span').textContent = f.contUtil + '%';
+
+    document.getElementById('batch-step-info').textContent =
+        `Tick ${step} — Static 利用率 ${f.staticUtil}% (整批等待最长请求)，Continuous 利用率 ${f.contUtil}% (空槽即时补入新请求)`;
+    document.getElementById('batch-step-counter').textContent = `Step ${step} / ${N}`;
+    document.getElementById('batch-prev').disabled = (step === 0);
+    document.getElementById('batch-next').disabled = (step === N);
+    document.getElementById('batch-auto').disabled = (step === N);
+}
+
+function stopAuto() {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    const btn = document.getElementById('batch-auto');
+    btn.innerHTML = '&#9654; 自动播放';
+}
+
+function prev() {
+    stopAuto();
+    if (currentStep > 0) { currentStep--; renderTick(currentStep); }
+}
+
+function next() {
+    stopAuto();
+    if (currentStep < N) { currentStep++; renderTick(currentStep); }
+}
+
+function reset() {
+    stopAuto();
+    currentStep = 0;
+    renderTick(currentStep);
+}
+
+function auto() {
+    if (autoTimer) { stopAuto(); return; }
+    if (currentStep >= N) return;
+    document.getElementById('batch-auto').innerHTML = '&#10074;&#10074; 暂停';
+    autoTimer = setInterval(() => {
+        if (currentStep >= N) { stopAuto(); return; }
+        currentStep++;
+        renderTick(currentStep);
+        if (currentStep >= N) stopAuto();
     }, 200);
 }
 
-function resetBatchingAnim() {
-    if (batchingInterval) clearInterval(batchingInterval);
-    batchingInterval = null;
-    createBatchSlots();
-    document.getElementById('static-util').querySelector('span').textContent = '0%';
-    document.getElementById('continuous-util').querySelector('span').textContent = '0%';
-}
+reset();
 </script>
 
 <script>

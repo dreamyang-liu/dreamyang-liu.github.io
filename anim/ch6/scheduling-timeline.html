@@ -17,18 +17,38 @@ body {
 .interactive-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #00d4aa, #0088ff); }
 .interactive-title { font-size: 1.1rem; color: #00d4aa; margin-bottom: 15px; font-weight: 600; }
 .timeline-canvas { width: 100%; height: 200px; border-radius: 8px; background: #0f0f23; border: 1px solid #333; }
+.anim-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #00d4aa, #0088ff);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4); }
+.anim-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.anim-btn.secondary { background: #16213e; border: 1px solid #444; color: #ccc; }
+.step-label { color: #ffcc00; font-size: 0.9rem; margin-top: 12px; min-height: 1.4em; text-align: center; }
+.step-count { color: #888; font-size: 0.8rem; margin-top: 4px; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="interactive-container">
 <div class="interactive-title">Interactive: Zero-Overhead Scheduling Timeline</div>
-<p style="font-size:0.85rem; color:#888; margin-bottom:10px;">观察 CPU-S、CPU-L 与 GPU 的流水线重叠。点击 "Play" 启动动画。</p>
+<p style="font-size:0.85rem; color:#888; margin-bottom:10px;">观察 CPU-S、CPU-L 与 GPU 的流水线重叠。点击 "下一步" 单步推进，或 "自动播放" 连续演示。</p>
 <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
-<div style="display:flex; gap:10px; margin-top:12px; justify-content:center;">
-  <button onclick="playTimeline()" style="background:linear-gradient(135deg,#00d4aa,#0088ff); border:none; border-radius:6px; padding:8px 16px; color:#fff; cursor:pointer; font-weight:600;">Play</button>
-  <button onclick="resetTimeline()" style="background:#16213e; border:1px solid #444; border-radius:6px; padding:8px 16px; color:#ccc; cursor:pointer;">Reset</button>
+<div style="display:flex; gap:10px; margin-top:12px; justify-content:center; flex-wrap:wrap;">
+  <button class="anim-btn secondary" id="tlReset" onclick="timeline.reset()">↺ 重置</button>
+  <button class="anim-btn" id="tlPrev" onclick="timeline.prev()">← 上一步</button>
+  <button class="anim-btn" id="tlNext" onclick="timeline.next()">下一步 →</button>
+  <button class="anim-btn" id="tlAuto" onclick="timeline.auto()">▶ 自动播放</button>
 </div>
+<div class="step-label" id="tlStepLabel"></div>
+<div class="step-count" id="tlStepCount"></div>
 <div style="display:flex; gap:20px; margin-top:10px; justify-content:center; font-size:0.8rem; flex-wrap:wrap;">
   <span><span style="color:#ff6b6b;">■</span> GPU Forward</span>
   <span><span style="color:#00d4aa;">■</span> CPU-S (Short)</span>
@@ -38,21 +58,51 @@ body {
 </div>
 
 <script>
-// ==================== Timeline Animation ====================
-let timelineAnimId = null;
-let timelineProgress = 0;
-let timelinePlaying = false;
+// ==================== Timeline Step-Through ====================
+const timeline = (() => {
+  const canvas = document.getElementById('timelineCanvas');
+  const ctx = canvas.getContext('2d');
 
-function drawTimeline(progress) {
-    const canvas = document.getElementById('timelineCanvas');
-    const ctx = canvas.getContext('2d');
+  // HiDPI crisp rendering: scale the backing store by devicePixelRatio while
+  // keeping the logical W/H coordinate system. The canvas is sized via CSS
+  // (width:100%, height:200px) so we measure the rendered box, then upscale
+  // the backing store. All drawing below uses the logical W/H.
+  let W = 0, H = 0;
+  function setupCanvas() {
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = canvas.offsetWidth * dpr;
-    canvas.height = canvas.offsetHeight * dpr;
+    W = canvas.offsetWidth;
+    H = canvas.offsetHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
-    const W = canvas.offsetWidth;
-    const H = canvas.offsetHeight;
+  }
 
+  const TOTAL_STEPS = 4; // steps 0..3
+
+  const STEP_TEXT = [
+    'Step 0 — 串行执行 (Without Overlap)：GPU Forward → CPU-S 采样 → CPU-L 调度，依次进行，存在 idle bubble。',
+    'Step 1 — 流水线重叠 (Pipelined)：第二个 batch 的 Schedule 与第一个 batch 的 Forward 并行展开。',
+    'Step 2 — 重叠区域：CPU-L 的调度时间被 GPU 的 Forward 计算所掩盖（overlap）。',
+    'Step 3 — 收益总结：通过 compute / communication 重叠，每个 step 约快 ~27%。'
+  ];
+
+  // Each discrete step maps to a settled (still) frame. We branch the draw
+  // by step rather than a single progress timeline, so each phase renders
+  // its own fully-settled visual: `seqP` controls the sequential bars (0..1),
+  // `pipP` controls the pipelined bars (0..1), `showOverlap` draws the arrow,
+  // `showSavings` draws the time-savings annotation.
+  function frameFor(step) {
+    switch (step) {
+      case 0: return { seqP: 1, pipP: 0, showOverlap: false, showSavings: false };
+      case 1: return { seqP: 1, pipP: 1, showOverlap: false, showSavings: false };
+      case 2: return { seqP: 1, pipP: 1, showOverlap: true,  showSavings: false };
+      case 3: return { seqP: 1, pipP: 1, showOverlap: true,  showSavings: true  };
+      default: return { seqP: 1, pipP: 1, showOverlap: true, showSavings: true };
+    }
+  }
+
+  function drawTimeline(seqP, pipP, showOverlap, showSavings) {
     ctx.clearRect(0, 0, W, H);
 
     const rowHeight = 40;
@@ -90,7 +140,7 @@ function drawTimeline(progress) {
 
     for (const bar of seqBars) {
         const x = seqStart + bar.start * unitW;
-        const w = bar.width * unitW * Math.min(progress * 2, 1);
+        const w = bar.width * unitW * seqP;
         const y = topMargin + bar.row * rowHeight + 8;
         ctx.fillStyle = bar.color;
         ctx.beginPath();
@@ -120,10 +170,9 @@ function drawTimeline(progress) {
         { row: 2, start: 2.6, width: 1.0, color: '#0088ff', label: 'Schedule₃' },
     ];
 
-    const pipProgress = Math.max((progress - 0.3) / 0.7, 0);
     for (const bar of pipBars) {
         const x = pipStart + bar.start * pUnitW;
-        const w = bar.width * pUnitW * Math.min(pipProgress * 1.5, 1);
+        const w = bar.width * pUnitW * pipP;
         const y = topMargin + bar.row * rowHeight + 8;
         ctx.fillStyle = bar.color;
         ctx.beginPath();
@@ -138,7 +187,7 @@ function drawTimeline(progress) {
     }
 
     // Overlap indication arrow
-    if (pipProgress > 0.5) {
+    if (showOverlap) {
         ctx.strokeStyle = '#ffcc00';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 3]);
@@ -156,43 +205,60 @@ function drawTimeline(progress) {
     }
 
     // Time savings annotation
-    if (progress > 0.8) {
+    if (showSavings) {
         ctx.fillStyle = '#00d4aa';
         ctx.font = '11px -apple-system, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('~27% faster per step', pipStart + pipWidth * 0.5, H - 10);
     }
-}
+  }
 
-function playTimeline() {
-    if (timelinePlaying) return;
-    timelinePlaying = true;
-    timelineProgress = 0;
-    function animate() {
-        timelineProgress += 0.008;
-        drawTimeline(Math.min(timelineProgress, 1));
-        if (timelineProgress < 1) {
-            timelineAnimId = requestAnimationFrame(animate);
-        } else {
-            timelinePlaying = false;
-        }
+  let step = 0;
+
+  function render() {
+    setupCanvas();
+    const f = frameFor(step);
+    drawTimeline(f.seqP, f.pipP, f.showOverlap, f.showSavings);
+
+    document.getElementById('tlStepLabel').textContent = STEP_TEXT[step];
+    document.getElementById('tlStepCount').textContent = 'Step ' + step + ' / ' + (TOTAL_STEPS - 1);
+    document.getElementById('tlPrev').disabled = (step === 0);
+    document.getElementById('tlNext').disabled = (step === TOTAL_STEPS - 1);
+    document.getElementById('tlAuto').disabled = (step === TOTAL_STEPS - 1);
+  }
+
+  // ---- controls ----
+  let autoTimer = null, autoOn = false;
+  function stopAuto() {
+    autoOn = false;
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  }
+  function goNext() {
+    if (step >= TOTAL_STEPS - 1) { stopAuto(); return; }
+    step++;
+    render();
+    if (autoOn && step < TOTAL_STEPS - 1) {
+      autoTimer = setTimeout(goNext, 900);
+    } else {
+      stopAuto();
     }
-    animate();
-}
+  }
+  function next() { stopAuto(); if (step < TOTAL_STEPS - 1) { step++; render(); } }
+  function prev() { stopAuto(); if (step > 0) { step--; render(); } }
+  function reset() { stopAuto(); step = 0; render(); }
+  function auto() {
+    if (autoOn) return;
+    if (step >= TOTAL_STEPS - 1) { step = 0; render(); }
+    autoOn = true;
+    autoTimer = setTimeout(goNext, 600);
+  }
 
-function resetTimeline() {
-    timelinePlaying = false;
-    if (timelineAnimId) cancelAnimationFrame(timelineAnimId);
-    timelineProgress = 0;
-    drawTimeline(0);
-}
+  render();
+  return { next, prev, reset, auto, redraw: render };
+})();
 
-window.addEventListener('DOMContentLoaded', () => {
-    drawTimeline(0);
-});
-window.addEventListener('resize', () => {
-    drawTimeline(timelineProgress);
-});
+window.addEventListener('DOMContentLoaded', () => { timeline.redraw(); });
+window.addEventListener('resize', () => { timeline.redraw(); });
 </script>
 
 <script>

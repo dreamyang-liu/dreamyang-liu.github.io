@@ -43,9 +43,15 @@ body {
 
 <div class="animation-container">
 <div class="controls">
-  <button class="btn" onclick="startDemo('clear')">n & (n-1) 清最低位1</button>
-  <button class="btn btn-secondary" onclick="startDemo('lowbit')">n & -n 取最低位1</button>
-  <button class="btn btn-secondary" onclick="resetDemo()">重置</button>
+  <button class="btn" onclick="selectDemo('clear')">n & (n-1) 清最低位1</button>
+  <button class="btn btn-secondary" onclick="selectDemo('lowbit')">n & -n 取最低位1</button>
+</div>
+<div class="controls">
+  <button class="btn btn-secondary" id="btn-prev" onclick="prevStep()">← 上一步</button>
+  <button class="btn" id="btn-next" onclick="nextStep()">下一步 →</button>
+  <button class="btn btn-secondary" id="btn-auto" onclick="autoPlay()">▶ 自动播放</button>
+  <button class="btn btn-secondary" onclick="resetDemo()">↺ 重置</button>
+  <span class="step-info" id="step-counter" style="margin:0;"></span>
 </div>
 <div id="bit-display">
   <div class="bit-row">
@@ -88,82 +94,192 @@ function renderBits(containerId, bits, highlights = [], classes = []) {
   });
 }
 
-function resetDemo() {
-  const bits = toBits(NUM);
-  renderBits('bits-n', bits);
+// --- Step-driven demos ---
+// Each demo has N phases. Step 0 renders phase 1 (n highlighted),
+// step 1 adds the operand row, step 2 adds the result row.
+const N = 3; // phases per demo
+
+const bitsN = toBits(NUM);
+const demos = {
+  clear: (function () {
+    const operand = NUM - 1;           // 12
+    const result = NUM & operand;      // 12
+    return {
+      bitsOp: toBits(operand),
+      bitsRes: toBits(result),
+      operandLabel: 'n-1 = 12',
+      operandDec: '= 12',
+      resultLabel: 'n&(n-1)',
+      resultDec: '= 12',
+      steps: [
+        function () {
+          renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
+        },
+        function () {
+          // bit 7 (LSB) was 1->0, bit 6 was 0->1
+          renderBits('bits-operand', demos.clear.bitsOp, [6, 7], ['highlight', 'highlight']);
+        },
+        function () {
+          renderBits('bits-n', bitsN, [7], ['removed']);
+          renderBits('bits-result', demos.clear.bitsRes, [4, 5], ['highlight', 'highlight']);
+        }
+      ],
+      descs: [
+        'Step 1: n = 13，二进制为 00001101',
+        'Step 2: n-1 = 12。最低位的1（第0位）变0，更低位全变1',
+        'Step 3: AND 操作 — 最低位的1被清掉了！13 (3个1) -> 12 (2个1)'
+      ]
+    };
+  })(),
+  lowbit: (function () {
+    const neg = (~NUM + 1) & 0xFF;     // -n in 8-bit two's complement = 243
+    const result = NUM & neg;          // 1
+    return {
+      bitsOp: toBits(neg),
+      bitsRes: toBits(result),
+      operandLabel: '-n (补码)',
+      operandDec: '= ~n+1',
+      resultLabel: 'n&(-n)',
+      resultDec: '= 1',
+      steps: [
+        function () {
+          renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
+        },
+        function () {
+          renderBits('bits-operand', demos.lowbit.bitsOp, [7], ['highlight']);
+        },
+        function () {
+          renderBits('bits-result', demos.lowbit.bitsRes, [7], ['highlight']);
+        }
+      ],
+      descs: [
+        'Step 1: n = 13，二进制为 00001101',
+        'Step 2: -n = ~n + 1。取反再加1，最低位的1保持，更高位全反转',
+        'Step 3: AND 操作 — 只留下最低位的1！lowbit(13) = 1'
+      ]
+    };
+  })()
+};
+
+// Independent step state per demo
+const stepState = { clear: 0, lowbit: 0 };
+let currentType = null; // null = nothing selected yet
+let autoTimer = null;
+
+function stopAuto() {
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+}
+
+function updateControls() {
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  const auto = document.getElementById('btn-auto');
+  const counter = document.getElementById('step-counter');
+  if (!currentType) {
+    prev.disabled = true;
+    next.disabled = false;
+    auto.disabled = false;
+    prev.style.opacity = 0.4;
+    next.style.opacity = 1;
+    auto.style.opacity = 1;
+    counter.textContent = '';
+    return;
+  }
+  const step = stepState[currentType];
+  const atStart = step <= 0;
+  const atEnd = step >= N - 1;
+  prev.disabled = atStart;
+  next.disabled = atEnd;
+  auto.disabled = atEnd;
+  prev.style.opacity = atStart ? 0.4 : 1;
+  next.style.opacity = atEnd ? 0.4 : 1;
+  auto.style.opacity = atEnd ? 0.4 : 1;
+  counter.textContent = 'Step ' + step + ' / ' + (N - 1);
+}
+
+// Render the settled still frame for currentType at its current step.
+function renderFrame() {
+  // Base layout: always start from a clean n row, hide operand/result.
+  renderBits('bits-n', bitsN);
   document.getElementById('decimal-n').textContent = '= 13';
   document.getElementById('row-operand').style.display = 'none';
   document.getElementById('row-result').style.display = 'none';
-  document.getElementById('bit-step-info').textContent = '点击按钮开始演示';
+
+  if (!currentType) {
+    document.getElementById('bit-step-info').textContent = '点击上方按钮选择一种位操作演示';
+    updateControls();
+    return;
+  }
+
+  const demo = demos[currentType];
+  const step = stepState[currentType];
+
+  // Reveal rows appropriate to the step, then apply cumulative still frame.
+  if (step >= 1) {
+    document.getElementById('row-operand').style.display = 'flex';
+    document.getElementById('label-operand').textContent = demo.operandLabel;
+    document.getElementById('decimal-operand').textContent = demo.operandDec;
+    renderBits('bits-operand', demo.bitsOp);
+  }
+  if (step >= 2) {
+    document.getElementById('row-result').style.display = 'flex';
+    document.getElementById('label-result').textContent = demo.resultLabel;
+    document.getElementById('decimal-result').textContent = demo.resultDec;
+    renderBits('bits-result', demo.bitsRes);
+  }
+
+  // Apply per-phase highlight overlays up to and including current step.
+  for (let i = 0; i <= step; i++) demo.steps[i]();
+
+  document.getElementById('bit-step-info').textContent = demo.descs[step];
+  updateControls();
 }
 
-function startDemo(type) {
-  resetDemo();
-  const n = NUM;
-  const bitsN = toBits(n);
+function selectDemo(type) {
+  stopAuto();
+  currentType = type;
+  stepState[type] = 0;
+  renderFrame();
+}
 
-  if (type === 'clear') {
-    // n & (n-1): clear lowest set bit
-    const operand = n - 1; // 12
-    const result = n & operand; // 12
-    const bitsOp = toBits(operand);
-    const bitsRes = toBits(result);
-
-    setTimeout(() => {
-      document.getElementById('bit-step-info').textContent = 'Step 1: n = 13，二进制为 00001101';
-      renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
-    }, 300);
-
-    setTimeout(() => {
-      document.getElementById('row-operand').style.display = 'flex';
-      document.getElementById('label-operand').textContent = 'n-1 = 12';
-      document.getElementById('decimal-operand').textContent = '= 12';
-      renderBits('bits-operand', bitsOp);
-      document.getElementById('bit-step-info').textContent = 'Step 2: n-1 = 12。最低位的1（第0位）变0，更低位全变1';
-      // Highlight the difference: bit 7 (LSB) was 1->0, bit 6 was 0->1
-      renderBits('bits-operand', bitsOp, [6, 7], ['highlight', 'highlight']);
-    }, 1500);
-
-    setTimeout(() => {
-      document.getElementById('row-result').style.display = 'flex';
-      document.getElementById('label-result').textContent = 'n&(n-1)';
-      document.getElementById('decimal-result').textContent = '= 12';
-      renderBits('bits-result', bitsRes);
-      document.getElementById('bit-step-info').textContent = 'Step 3: AND 操作 — 最低位的1被清掉了！13 (3个1) -> 12 (2个1)';
-      // Highlight cleared bit
-      renderBits('bits-n', bitsN, [7], ['removed']);
-      renderBits('bits-result', bitsRes, [4, 5], ['highlight', 'highlight']);
-    }, 3000);
-
-  } else if (type === 'lowbit') {
-    // n & -n: get lowest set bit
-    const neg = (~n + 1) & 0xFF; // -n in 8-bit two's complement = 243
-    const result = n & ((~n + 1) & 0xFF); // 1
-    const bitsNeg = toBits(neg);
-    const bitsRes = toBits(result);
-
-    setTimeout(() => {
-      document.getElementById('bit-step-info').textContent = 'Step 1: n = 13，二进制为 00001101';
-      renderBits('bits-n', bitsN, [4, 5, 7], ['highlight', 'highlight', 'highlight']);
-    }, 300);
-
-    setTimeout(() => {
-      document.getElementById('row-operand').style.display = 'flex';
-      document.getElementById('label-operand').textContent = '-n (补码)';
-      document.getElementById('decimal-operand').textContent = '= ~n+1';
-      renderBits('bits-operand', bitsNeg);
-      document.getElementById('bit-step-info').textContent = 'Step 2: -n = ~n + 1。取反再加1，最低位的1保持，更高位全反转';
-      renderBits('bits-operand', bitsNeg, [7], ['highlight']);
-    }, 1500);
-
-    setTimeout(() => {
-      document.getElementById('row-result').style.display = 'flex';
-      document.getElementById('label-result').textContent = 'n&(-n)';
-      document.getElementById('decimal-result').textContent = '= 1';
-      renderBits('bits-result', bitsRes, [7], ['highlight']);
-      document.getElementById('bit-step-info').textContent = 'Step 3: AND 操作 — 只留下最低位的1！lowbit(13) = 1';
-    }, 3000);
+function nextStep() {
+  if (!currentType) { selectDemo('clear'); return; }
+  if (stepState[currentType] < N - 1) {
+    stepState[currentType]++;
+    renderFrame();
   }
+}
+
+function prevStep() {
+  if (!currentType) return;
+  if (stepState[currentType] > 0) {
+    stepState[currentType]--;
+    renderFrame();
+  }
+}
+
+function autoPlay() {
+  if (!currentType) selectDemo('clear');
+  stopAuto();
+  function walk() {
+    if (!currentType || stepState[currentType] >= N - 1) { stopAuto(); return; }
+    stepState[currentType]++;
+    renderFrame();
+    if (stepState[currentType] < N - 1) {
+      autoTimer = setTimeout(walk, 1500);
+    } else {
+      stopAuto();
+    }
+  }
+  walk();
+}
+
+function resetDemo() {
+  stopAuto();
+  currentType = null;
+  stepState.clear = 0;
+  stepState.lowbit = 0;
+  renderFrame();
 }
 
 // Initialize

@@ -28,6 +28,15 @@ p { margin: 12px 0; color: #ccc; }
 .tab-btn.active { background: #1a1a2e; color: #ff9800; border-color: #ff9800; border-bottom: 1px solid #1a1a2e; }
 .tab-content { display: none; background: #1a1a2e; border: 1px solid #333; border-radius: 0 12px 12px 12px; padding: 20px; }
 .tab-content.active { display: block; }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover { background: #444; }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.controls { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #50fa7b; font-size: 0.9em; margin: 8px 0; min-height: 22px; }
+.step-counter { color: #888; font-size: 0.85em; margin-left: auto; }
+.gpu-node.synced { box-shadow: 0 0 12px #50fa7b; outline: 2px solid #50fa7b; }
+.gpu-node.active-src { box-shadow: 0 0 14px #ffd866; outline: 2px solid #ffd866; }
+.sync-packet.settled { transition: none; opacity: 1; }
 </style>
 </head>
 <body>
@@ -49,7 +58,14 @@ p { margin: 12px 0; color: #ccc; }
 <div class="gpu-node gpu-infer" style="right:10%; top:50%;">Infer 1</div>
 <div class="gpu-node gpu-infer" style="right:10%; top:80%;">Infer 2</div>
 </div>
-<button class="btn" id="btn-sync-nccl">▶ 播放 NCCL Sync</button>
+<div class="controls">
+  <button class="btn btn-secondary" id="btn-sync-prev" onclick="prev()">← 上一步</button>
+  <button class="btn btn-secondary" id="btn-sync-next" onclick="next()">下一步 →</button>
+  <button class="btn btn-secondary" id="btn-sync-reset" onclick="reset()">↺ 重置</button>
+  <button class="btn" id="btn-sync-auto" onclick="auto()">▶ 自动播放</button>
+  <span class="step-counter" id="sync-counter">Step 0 / 4</span>
+</div>
+<div class="step-info" id="sync-step-info">源就绪：3 个 Training GPU 已更新权重，等待 broadcast</div>
 <p style="font-size:0.85em; color:#888;">延迟低 (~秒级)，需要 training 和 inference GPU 在同一 NCCL group 内</p>
 </div>
 <div class="tab-content" id="disk-tab">
@@ -81,43 +97,117 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
-// === Weight Sync NCCL Animation ===
+// === Weight Sync NCCL Animation (step-through) ===
 (function() {
-    const btn = document.getElementById('btn-sync-nccl');
     const container = document.getElementById('sync-nccl-container');
-    let packets = [];
+    const info = document.getElementById('sync-step-info');
+    const counter = document.getElementById('sync-counter');
+    const btnPrev = document.getElementById('btn-sync-prev');
+    const btnNext = document.getElementById('btn-sync-next');
+    const btnReset = document.getElementById('btn-sync-reset');
+    const btnAuto = document.getElementById('btn-sync-auto');
 
-    btn.addEventListener('click', () => {
-        // Clear old packets
+    // Geometry (percent within container), matching the gpu-node positions
+    const trainPositions = [{x: 14, y: 20}, {x: 14, y: 50}, {x: 14, y: 80}];
+    const inferPositions = [{x: 78, y: 20}, {x: 78, y: 50}, {x: 78, y: 80}];
+    const trainNodes = container.querySelectorAll('.gpu-train');
+    const inferNodes = container.querySelectorAll('.gpu-infer');
+
+    // Discrete broadcast phases.
+    // 0: source ready, 1..3: Train i broadcasts to all Infer GPUs (settled wave),
+    // 4: all ranks synced.
+    const steps = [
+        { src: -1, desc: '源就绪：3 个 Training GPU 已更新权重，等待 broadcast' },
+        { src: 0,  desc: 'Wave 1：Train 0 将权重 broadcast 到 Infer 0/1/2' },
+        { src: 1,  desc: 'Wave 2：Train 1 将权重 broadcast 到 Infer 0/1/2' },
+        { src: 2,  desc: 'Wave 3：Train 2 将权重 broadcast 到 Infer 0/1/2' },
+        { src: -1, desc: '完成：所有 Inference GPU 已与 Training 权重同步' },
+    ];
+    const N = steps.length;          // N = 5 phases (steps 0..4)
+    let step = 0;
+    let autoTimer = null;
+
+    let packets = [];
+    function clearPackets() {
         packets.forEach(p => p.remove());
         packets = [];
+    }
 
-        // Animate packets from train to infer GPUs
-        const trainPositions = [{x: 14, y: 20}, {x: 14, y: 50}, {x: 14, y: 80}];
-        const inferPositions = [{x: 78, y: 20}, {x: 78, y: 50}, {x: 78, y: 80}];
+    function render() {
+        clearPackets();
+        // Reset node highlights
+        trainNodes.forEach(n => n.classList.remove('active-src', 'synced'));
+        inferNodes.forEach(n => n.classList.remove('synced'));
 
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                const delay = i * 200 + j * 100;
-                setTimeout(() => {
-                    const pkt = document.createElement('div');
-                    pkt.className = 'sync-packet';
-                    pkt.style.left = trainPositions[i].x + '%';
-                    pkt.style.top = trainPositions[i].y + '%';
-                    pkt.style.transition = 'left 1s ease-in-out, top 0.8s ease-in-out';
-                    container.appendChild(pkt);
-                    packets.push(pkt);
+        const s = steps[step];
 
-                    setTimeout(() => {
-                        pkt.style.left = inferPositions[j].x + '%';
-                        pkt.style.top = inferPositions[j].y + '%';
-                    }, 50);
-
-                    setTimeout(() => { pkt.style.opacity = '0'; }, 1200);
-                }, delay);
+        if (step === N - 1) {
+            // Final synced frame: everything lit up.
+            trainNodes.forEach(n => n.classList.add('synced'));
+            inferNodes.forEach(n => n.classList.add('synced'));
+        } else if (s.src >= 0) {
+            // A broadcast wave: highlight source, draw settled packets at each
+            // Infer GPU, and mark Infer GPUs synced for this wave.
+            trainNodes[s.src].classList.add('active-src');
+            for (let j = 0; j < inferPositions.length; j++) {
+                const pkt = document.createElement('div');
+                pkt.className = 'sync-packet settled';
+                pkt.style.left = inferPositions[j].x + '%';
+                pkt.style.top = inferPositions[j].y + '%';
+                container.appendChild(pkt);
+                packets.push(pkt);
+                inferNodes[j].classList.add('synced');
             }
         }
-    });
+        // step 0: source ready — no packets, no highlights.
+
+        info.textContent = s.desc;
+        counter.textContent = 'Step ' + step + ' / ' + (N - 1);
+        updateButtons();
+    }
+
+    function updateButtons() {
+        btnPrev.disabled = step <= 0;
+        const atEnd = step >= N - 1;
+        btnNext.disabled = atEnd;
+        btnAuto.disabled = atEnd;
+    }
+
+    function stopAuto() {
+        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    }
+
+    window.prev = function() {
+        stopAuto();
+        if (step > 0) { step--; render(); }
+    };
+    window.next = function() {
+        stopAuto();
+        if (step < N - 1) { step++; render(); }
+    };
+    window.reset = function() {
+        stopAuto();
+        step = 0;
+        render();
+    };
+    window.auto = function() {
+        stopAuto();
+        function tick() {
+            if (step >= N - 1) { autoTimer = null; return; }
+            step++;
+            render();
+            if (step < N - 1) {
+                autoTimer = setTimeout(tick, 1400);
+            } else {
+                autoTimer = null;
+            }
+        }
+        // If already at the end, restart from 0 for a fresh play.
+        if (step >= N - 1) { step = 0; render(); }
+        autoTimer = setTimeout(tick, 600);
+    };
+
+    render();
 })();
 
 // === 自动把高度汇报给父页面（让 iframe 自适应高度）===

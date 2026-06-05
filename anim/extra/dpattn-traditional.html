@@ -20,6 +20,7 @@ canvas { border-radius: 10px; background: #0d0d20; max-width: 100%; }
 .controls { text-align: center; margin: 16px 0; }
 button { background: linear-gradient(135deg, #00d2ff, #667eea); border: none; color: #fff; padding: 10px 22px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin: 0 6px; font-weight: bold; }
 button:hover { opacity: 0.9; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
 button.secondary { background: #333; border: 1px solid #555; color: #ccc; }
 .step-label { color: #888; font-size: 0.85rem; margin: 0 12px; }
 </style>
@@ -32,9 +33,12 @@ button.secondary { background: #333; border: 1px solid #555; color: #ccc; }
     <canvas id="traditionalCanvas" width="950" height="520"></canvas>
   </div>
   <div class="controls">
+    <button class="secondary" id="tradPrev" onclick="tradAnim.prev()">&larr; 上一步</button>
+    <button id="tradNext" onclick="tradAnim.next()">下一步 &rarr;</button>
     <button class="secondary" onclick="tradAnim.reset()">↺ 重置</button>
-    <button onclick="tradAnim.reset();tradAnim.play();">▶ 播放</button>
+    <button id="tradAuto" onclick="tradAnim.auto()">▶ 自动播放</button>
     <span class="step-label" id="tradStep"></span>
+    <span class="step-label" id="tradCounter"></span>
   </div>
 </div>
 
@@ -221,17 +225,63 @@ const tradAnim = (() => {
       p < 0.95 ? 'Step 4: All-to-All combine' : '完成';
   }
 
+  // Discrete steps: one per phase. Each maps to a representative `progress`
+  // value inside that phase so the existing render()/phase logic is reused.
+  const STEP_PROGRESS = [
+    0.05,  // 0: KV Cache 冗余状态
+    0.25,  // 1: Attention (TP) + AllReduce
+    0.45,  // 2: All-to-All dispatch
+    0.65,  // 3: Expert 本地计算
+    0.85,  // 4: All-to-All combine
+    1.0    // 5: 完成
+  ];
+  const STEPS = STEP_PROGRESS.length; // 6
+  let step = 0;
+
+  function updateControls() {
+    document.getElementById('tradPrev').disabled = (step === 0);
+    document.getElementById('tradNext').disabled = (step === STEPS - 1);
+    document.getElementById('tradAuto').disabled = (step === STEPS - 1);
+    document.getElementById('tradCounter').textContent = `Step ${step} / ${STEPS - 1}`;
+  }
+
+  function showStep(s) {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    step = Math.max(0, Math.min(s, STEPS - 1));
+    progress = STEP_PROGRESS[step];
+    render();
+    updateControls();
+  }
+
+  function prev() { showStep(step - 1); }
+  function next() { showStep(step + 1); }
+  function reset() { showStep(0); }
+
+  // Auto-play: advance through the discrete steps over `duration`, ending on
+  // the last step.
   function animate(ts) {
     if (!startTime) startTime = ts;
     progress = Math.min((ts - startTime) / duration, 1);
+    // Derive the current discrete step from progress for bounds-disabling.
+    let s = STEPS - 1;
+    for (let i = 0; i < STEPS; i++) {
+      if (progress < STEP_PROGRESS[i]) { s = i; break; }
+    }
+    step = Math.max(0, s);
     render();
-    if (progress < 1) animId = requestAnimationFrame(animate);
+    updateControls();
+    if (progress < 1) { animId = requestAnimationFrame(animate); }
+    else { step = STEPS - 1; updateControls(); }
   }
-  function play() { startTime = null; if (animId) cancelAnimationFrame(animId); animId = requestAnimationFrame(animate); }
-  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; progress = 0; render(); }
+  function auto() {
+    startTime = null;
+    if (animId) cancelAnimationFrame(animId);
+    progress = 0;
+    animId = requestAnimationFrame(animate);
+  }
 
-  progress = 0; render();
-  return { play, reset };
+  showStep(0);
+  return { prev, next, reset, auto };
 })();
 
 (function () {

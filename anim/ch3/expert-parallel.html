@@ -14,6 +14,21 @@ body {
   padding: 4px;
 }
 .diagram { background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0; }
+.anim-btn {
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.9rem; }
+.step-label { color: #a78bfa; font-size: 0.9rem; margin: 10px auto; padding: 10px; background: #1a1a2e; border-radius: 6px; max-width: 820px; min-height: 22px; }
 </style>
 </head>
 <body>
@@ -22,17 +37,21 @@ body {
   <div style="text-align:center;padding:10px;">
     <div style="margin-bottom:10px;color:#fbbf24;font-weight:bold;">Expert Parallelism: Token Routing &amp; All-to-All (4 GPUs, 8 Experts, top-1)</div>
     <canvas id="epCanvas" width="860" height="460" style="width:100%;max-width:860px;border-radius:8px;background:#0a0a1a;"></canvas>
+    <div class="step-label" id="epStepLabel"></div>
     <div style="margin-top:10px;">
-      <button onclick="epAnim.reset();epAnim.play();" style="background:linear-gradient(135deg,#fbbf24,#ff6b6b);border:none;color:#000;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:bold;">&#9654; 播放</button>
-      <button onclick="epAnim.reset();" style="background:#333;border:1px solid #555;color:#ccc;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;margin-left:8px;">&#8635; 重置</button>
+      <button class="anim-btn" id="epPrev" onclick="epAnim.prev();">&#8592; 上一步</button>
+      <button class="anim-btn" id="epNext" onclick="epAnim.next();">下一步 &#8594;</button>
+      <button class="anim-btn" id="epAuto" onclick="epAnim.auto();">&#9654; 自动播放</button>
+      <button class="anim-btn" onclick="epAnim.reset();">&#8635; 重置</button>
     </div>
+    <div class="step-indicator" id="epStepCounter">Step 0 / 5</div>
   </div>
 </div>
 
 <script>
 const epAnim = (() => {
   const canvas = document.getElementById('epCanvas');
-  if (!canvas) return { play(){}, reset(){} };
+  if (!canvas) return { prev(){}, next(){}, reset(){}, auto(){} };
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   // HiDPI crisp rendering: scale the backing store by devicePixelRatio while
@@ -64,6 +83,22 @@ const epAnim = (() => {
 
   let progress = 0, animId = null, startTime = null;
   const duration = 8000;
+
+  // Discrete step model: each of the 6 phases ①..⑥ is one step.
+  // Each step maps to a representative settled progress value at the END of
+  // its phase so render() draws a still frame (eased motions resolve to 1).
+  let step = 0;
+  let autoTimer = null;
+  const STEP_PROGRESS = [0.06, 0.24, 0.49, 0.50, 0.89, 1.0];
+  const STEP_N = STEP_PROGRESS.length; // 6
+  const STEP_LABELS = [
+    '① 初始状态: 每 GPU 持有 2 个 token',
+    '② Router: 决定每个 token 发往哪个 expert',
+    '③ All-to-All Dispatch: token 发送到目标 expert 所在 GPU',
+    '④ Expert 本地计算 (每 GPU 只算自己的 expert)',
+    '⑤ All-to-All Combine: 结果返回原 GPU',
+    '⑥ 完成: weighted sum 输出'
+  ];
 
   function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
   function lerp(a,b,t) { return a+(b-a)*t; }
@@ -262,18 +297,39 @@ const epAnim = (() => {
     ctx.fillText(`8 tokens | ${localCount} local (无通信) | ${remoteCount} remote (需 All-to-All) | 8 experts across 4 GPUs`, W/2, statsY);
   }
 
-  function animate(ts) {
-    if (!startTime) startTime = ts;
-    progress = Math.min((ts - startTime) / duration, 1);
+  function renderStep() {
+    progress = STEP_PROGRESS[step];
     render();
-    if (progress < 1) animId = requestAnimationFrame(animate);
+    const labelEl = document.getElementById('epStepLabel');
+    if (labelEl) labelEl.textContent = STEP_LABELS[step];
+    const counterEl = document.getElementById('epStepCounter');
+    if (counterEl) counterEl.textContent = `Step ${step} / ${STEP_N - 1}`;
+    const prevBtn = document.getElementById('epPrev');
+    const nextBtn = document.getElementById('epNext');
+    const autoBtn = document.getElementById('epAuto');
+    if (prevBtn) prevBtn.disabled = (step === 0);
+    if (nextBtn) nextBtn.disabled = (step === STEP_N - 1);
+    if (autoBtn) autoBtn.disabled = (step === STEP_N - 1);
   }
 
-  function play() { startTime = null; if (animId) cancelAnimationFrame(animId); animId = requestAnimationFrame(animate); }
-  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; progress = 0; render(); }
+  function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
 
-  progress = 0; render();
-  return { play, reset };
+  function prev() { stopAuto(); if (step > 0) { step--; renderStep(); } }
+  function next() { stopAuto(); if (step < STEP_N - 1) { step++; renderStep(); } }
+  function reset() { stopAuto(); step = 0; renderStep(); }
+  function auto() {
+    stopAuto();
+    if (step >= STEP_N - 1) step = 0;
+    renderStep();
+    autoTimer = setInterval(() => {
+      if (step >= STEP_N - 1) { stopAuto(); return; }
+      step++;
+      renderStep();
+    }, 1300);
+  }
+
+  step = 0; renderStep();
+  return { prev, next, reset, auto };
 })();
 </script>
 

@@ -24,6 +24,9 @@ body {
 .step-info { color: #76b900; font-size: 0.95rem; margin: 10px 0; min-height: 24px; }
 .tree-canvas { width: 100%; height: 320px; display: block; }
 .order-display { font-family: monospace; font-size: 1.1rem; color: #76b900; margin: 10px 0; min-height: 30px; letter-spacing: 2px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn:disabled:hover { transform: none; opacity: 0.4; }
+.step-counter { font-family: monospace; color: #888; font-size: 0.9rem; margin-left: auto; }
 @media (max-width: 600px) {
   .tree-canvas { height: 260px; }
 }
@@ -38,13 +41,20 @@ body {
 <button class="btn" id="btnPre" onclick="startTraversal('pre')">前序遍历</button>
 <button class="btn" id="btnIn" onclick="startTraversal('in')">中序遍历</button>
 <button class="btn" id="btnPost" onclick="startTraversal('post')">后序遍历</button>
-<button class="btn btn-secondary" onclick="resetTree()">重置</button>
 </div>
 
 <canvas class="tree-canvas" id="treeCanvas"></canvas>
 
 <div class="order-display" id="orderDisplay"></div>
 <div class="step-info" id="stepInfo">选择一种遍历方式开始动画</div>
+
+<div class="controls">
+<button class="btn btn-secondary" id="btnPrev" onclick="prev()">← 上一步</button>
+<button class="btn" id="btnNext" onclick="next()">下一步 →</button>
+<button class="btn" id="btnAuto" onclick="auto()">▶ 自动播放</button>
+<button class="btn btn-secondary" id="btnReset" onclick="reset()">↺ 重置</button>
+<span class="step-counter" id="stepCounter">Step 0 / 6</span>
+</div>
 </div>
 
 <script>
@@ -61,9 +71,12 @@ const canvas = document.getElementById('treeCanvas');
 const ctx = canvas.getContext('2d');
 
 let nodeStates = new Array(7).fill(0); // 0=normal, 1=visiting, 2=visited
-let animationOrder = [];
-let animStep = 0;
-let animTimer = null;
+let animationOrder = [];   // sequence of node indices in visit order
+let animStep = 0;          // discrete step 0..N-1; -1 means nothing selected yet
+let animTimer = null;      // auto-play timer
+let currentType = null;    // 'pre' | 'in' | 'post'
+const N = 7;               // number of node visits per traversal
+const TRAVERSAL_NAMES = { pre: '前序 (根左右)', in: '中序 (左根右)', post: '后序 (左右根)' };
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
@@ -166,12 +179,15 @@ function postorder(i, result) {
   result.push(i);
 }
 
+// Build the visit sequence for the chosen traversal and reset to step 0.
 function startTraversal(type) {
-  if (animTimer) clearInterval(animTimer);
-  resetTree();
+  stopAuto();
+  currentType = type;
 
-  // Update button styles
-  document.querySelectorAll('.controls .btn').forEach(b => b.classList.remove('btn-active'));
+  // Update traversal-order button styles
+  document.getElementById('btnPre').classList.remove('btn-active');
+  document.getElementById('btnIn').classList.remove('btn-active');
+  document.getElementById('btnPost').classList.remove('btn-active');
   document.getElementById('btn' + (type === 'pre' ? 'Pre' : type === 'in' ? 'In' : 'Post')).classList.add('btn-active');
 
   animationOrder = [];
@@ -179,48 +195,97 @@ function startTraversal(type) {
   else if (type === 'in') inorder(0, animationOrder);
   else postorder(0, animationOrder);
 
-  const names = { pre: '前序 (根左右)', in: '中序 (左根右)', post: '后序 (左右根)' };
-  document.getElementById('stepInfo').textContent = `${names[type]} 遍历中...`;
+  animStep = 0; // start at the first visited node
+  render();
+}
 
-  animStep = 0;
-  const orderEl = document.getElementById('orderDisplay');
-  orderEl.textContent = '';
-
-  animTimer = setInterval(() => {
-    if (animStep >= animationOrder.length) {
-      clearInterval(animTimer);
-      animTimer = null;
-      document.getElementById('stepInfo').textContent = `遍历完成！`;
-      return;
-    }
-
-    // Mark previous as visited
-    if (animStep > 0) {
-      nodeStates[animationOrder[animStep - 1]] = 2;
-    }
-    // Mark current as visiting
-    nodeStates[animationOrder[animStep]] = 1;
-
-    orderEl.textContent += (animStep > 0 ? ' → ' : '') + tree[animationOrder[animStep]];
-    animStep++;
+// Render a settled still frame for the current step.
+function render() {
+  // No traversal chosen yet: blank tree.
+  if (currentType === null) {
+    nodeStates = new Array(N).fill(0);
     drawTree();
+    document.getElementById('orderDisplay').textContent = '';
+    document.getElementById('stepInfo').textContent = '选择一种遍历方式开始动画';
+    document.getElementById('stepCounter').textContent = 'Step 0 / ' + (N - 1);
+    updateButtons();
+    return;
+  }
+
+  // Node states: visited up to step-1, current = visiting.
+  nodeStates = new Array(N).fill(0);
+  for (let i = 0; i < animStep; i++) nodeStates[animationOrder[i]] = 2;
+  nodeStates[animationOrder[animStep]] = 1;
+  drawTree();
+
+  // Order display: values visited up to and including current.
+  let seq = [];
+  for (let i = 0; i <= animStep; i++) seq.push(tree[animationOrder[i]]);
+  document.getElementById('orderDisplay').textContent = seq.join(' → ');
+
+  const name = TRAVERSAL_NAMES[currentType];
+  const curVal = tree[animationOrder[animStep]];
+  if (animStep === animationOrder.length - 1) {
+    document.getElementById('stepInfo').textContent = `${name}：访问节点 ${curVal}，遍历完成！`;
+  } else {
+    document.getElementById('stepInfo').textContent = `${name}：访问节点 ${curVal}`;
+  }
+  document.getElementById('stepCounter').textContent = 'Step ' + animStep + ' / ' + (N - 1);
+  updateButtons();
+}
+
+function updateButtons() {
+  const atStart = (currentType === null) || animStep <= 0;
+  const atEnd = (currentType === null) || animStep >= animationOrder.length - 1;
+  document.getElementById('btnPrev').disabled = atStart;
+  document.getElementById('btnNext').disabled = atEnd;
+  document.getElementById('btnAuto').disabled = atEnd;
+}
+
+function prev() {
+  if (currentType === null) return;
+  stopAuto();
+  if (animStep > 0) { animStep--; render(); }
+}
+
+function next() {
+  if (currentType === null) startTraversal('pre');
+  else if (animStep < animationOrder.length - 1) { animStep++; render(); }
+}
+
+function auto() {
+  if (currentType === null) startTraversal('pre');
+  if (animTimer) return;
+  if (animStep >= animationOrder.length - 1) return;
+  document.getElementById('btnAuto').textContent = '⏸ 播放中';
+  animTimer = setInterval(() => {
+    if (animStep >= animationOrder.length - 1) { stopAuto(); return; }
+    animStep++;
+    render();
   }, 700);
 }
 
-function resetTree() {
+function stopAuto() {
   if (animTimer) { clearInterval(animTimer); animTimer = null; }
-  nodeStates = new Array(7).fill(0);
+  const b = document.getElementById('btnAuto');
+  if (b) b.textContent = '▶ 自动播放';
+}
+
+function reset() {
+  stopAuto();
+  currentType = null;
+  animationOrder = [];
   animStep = 0;
-  document.getElementById('orderDisplay').textContent = '';
-  document.getElementById('stepInfo').textContent = '选择一种遍历方式开始动画';
-  document.querySelectorAll('.controls .btn').forEach(b => b.classList.remove('btn-active'));
-  drawTree();
+  document.getElementById('btnPre').classList.remove('btn-active');
+  document.getElementById('btnIn').classList.remove('btn-active');
+  document.getElementById('btnPost').classList.remove('btn-active');
+  render();
 }
 
 // Init
 window.addEventListener('load', () => {
   resizeCanvas();
-  drawTree();
+  render();
 });
 window.addEventListener('resize', () => {
   resizeCanvas();

@@ -34,10 +34,13 @@ body {
 <p style="font-size:0.85rem; color:#888; margin-bottom:10px;">观察 tokens 如何从随机 mask 逐步被 "去噪" 为连贯文本 (Block-Parallel Decoding)</p>
 <div class="diffusion-grid" id="diffusionGrid"></div>
 <div class="diffusion-controls">
-  <button onclick="startDiffusion()">Start Denoising</button>
-  <button onclick="resetDiffusion()" style="background:#16213e; border:1px solid #444;">Reset</button>
+  <button id="diffPrev" onclick="prev()">← 上一步</button>
+  <button id="diffNext" onclick="next()">下一步 →</button>
+  <button id="diffAuto" onclick="auto()">▶ 自动播放</button>
+  <button onclick="reset()" style="background:#16213e; border:1px solid #444;">↺ 重置</button>
   <span class="step-indicator">Step: <span id="diffusionStep">0</span> / <span id="diffusionTotal">8</span></span>
 </div>
+<p class="step-indicator" id="diffDesc" style="text-align:center; margin-top:4px;"></p>
 <p style="font-size:0.8rem; color:#666; margin-top:8px; text-align:center;">每步可并行恢复多个 token，不同于 AR 的逐个生成</p>
 </div>
 
@@ -46,90 +49,160 @@ body {
 const targetSentence = ['机器', '学习', '系统', '需要', '高效', '的', '推理', '优化',
                         '通过', '并行', '计算', '来', '加速', '模型', '训练', '过程'];
 const noiseChars = ['▓', '░', '▒', '█', '◆', '◇', '●', '○', '△', '□', '■', '◎', '※', '⊕', '⊗', '⊙'];
+const N_TOKENS = 16;
+const totalSteps = 8;          // last step index = totalSteps
+const noiseLevels = [100, 87, 75, 62, 50, 37, 25, 12, 0]; // %, one per step 0..8
+
 let diffusionStep = 0;
 let diffusionInterval = null;
-const totalSteps = 8;
+
+// --- Deterministic per-step plan -------------------------------------------
+// fixedNoise[i]   : the noise glyph shown for token i while noisy (no randomness)
+// stateAt(step)[i]: token i's state ('noisy'|'partial'|'clean') at a given step
+// This makes the rendered frame a pure function of step index, so prev()/next()
+// reproduce identical frames.
+let fixedNoise = [];
+let partialAtStep = [];  // step at which token i becomes 'partial'
+let cleanAtStep = [];    // step at which token i becomes 'clean'
+
+function buildPlan() {
+    // Deterministic noise glyph per token.
+    fixedNoise = [];
+    for (let i = 0; i < N_TOKENS; i++) {
+        fixedNoise.push(noiseChars[i % noiseChars.length]);
+    }
+
+    // Deterministic, fixed reveal order (no Math.random). Spread so every step
+    // does some block-parallel work and all tokens are clean by the last step.
+    const order = [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15];
+
+    partialAtStep = new Array(N_TOKENS).fill(totalSteps);
+    cleanAtStep = new Array(N_TOKENS).fill(totalSteps);
+
+    // Steps 1..totalSteps-1 each promote 2 tokens noisy->partial and 2 partial->clean.
+    // Last step (totalSteps) settles everything to clean.
+    const revealPerStep = 2;
+    let nextNoisy = 0;          // pointer into order for noisy->partial
+    let nextPartial = 0;        // pointer into order for partial->clean
+    for (let s = 1; s < totalSteps; s++) {
+        for (let r = 0; r < revealPerStep && nextNoisy < N_TOKENS; r++) {
+            const idx = order[nextNoisy++];
+            partialAtStep[idx] = s;
+        }
+        for (let r = 0; r < revealPerStep && nextPartial < N_TOKENS; r++) {
+            const idx = order[nextPartial];
+            // only promote to clean if it has already become partial
+            if (partialAtStep[idx] < s) {
+                cleanAtStep[idx] = s;
+                nextPartial++;
+            } else {
+                break;
+            }
+        }
+    }
+    // Final step: guarantee all clean (and all at least partial).
+    for (let i = 0; i < N_TOKENS; i++) {
+        if (partialAtStep[i] > totalSteps - 1) partialAtStep[i] = Math.min(partialAtStep[i], totalSteps);
+        cleanAtStep[i] = Math.min(cleanAtStep[i], totalSteps);
+    }
+}
+
+function tokenStateAt(i, step) {
+    if (step >= cleanAtStep[i]) return 'clean';
+    if (step >= partialAtStep[i]) return 'partial';
+    return 'noisy';
+}
 
 function initDiffusionGrid() {
     const grid = document.getElementById('diffusionGrid');
     grid.innerHTML = '';
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < N_TOKENS; i++) {
         const token = document.createElement('div');
-        token.className = 'diffusion-token noisy';
-        token.textContent = noiseChars[Math.floor(Math.random() * noiseChars.length)];
         token.id = `dtoken-${i}`;
         grid.appendChild(token);
     }
-    diffusionStep = 0;
-    document.getElementById('diffusionStep').textContent = '0';
 }
 
-function startDiffusion() {
-    if (diffusionInterval) return;
-    if (diffusionStep >= totalSteps) resetDiffusion();
-
-    diffusionInterval = setInterval(() => {
-        diffusionStep++;
-        document.getElementById('diffusionStep').textContent = diffusionStep;
-
-        // Each step reveals ~2 tokens (block-parallel)
-        const revealCount = 2;
-        const unrevealed = [];
-        for (let i = 0; i < 16; i++) {
-            const el = document.getElementById(`dtoken-${i}`);
-            if (el.className.includes('noisy') || el.className.includes('partial')) {
-                unrevealed.push(i);
-            }
+function renderStep(step) {
+    for (let i = 0; i < N_TOKENS; i++) {
+        const el = document.getElementById(`dtoken-${i}`);
+        const st = tokenStateAt(i, step);
+        if (st === 'clean') {
+            el.className = 'diffusion-token clean';
+            el.textContent = targetSentence[i];
+        } else if (st === 'partial') {
+            el.className = 'diffusion-token partial';
+            el.textContent = targetSentence[i].charAt(0) + '?';
+        } else {
+            el.className = 'diffusion-token noisy';
+            el.textContent = fixedNoise[i];
         }
-
-        // Shuffle and pick tokens to reveal/partially reveal
-        const shuffled = unrevealed.sort(() => Math.random() - 0.5);
-
-        for (let j = 0; j < Math.min(revealCount, shuffled.length); j++) {
-            const idx = shuffled[j];
-            const el = document.getElementById(`dtoken-${idx}`);
-            if (el.className.includes('noisy')) {
-                el.className = 'diffusion-token partial';
-                el.textContent = targetSentence[idx].charAt(0) + '?';
-            } else if (el.className.includes('partial')) {
-                el.className = 'diffusion-token clean';
-                el.textContent = targetSentence[idx];
-            }
-        }
-
-        // Also advance some partial to clean
-        for (let j = revealCount; j < Math.min(revealCount + 1, shuffled.length); j++) {
-            const idx = shuffled[j];
-            const el = document.getElementById(`dtoken-${idx}`);
-            if (el.className.includes('partial')) {
-                el.className = 'diffusion-token clean';
-                el.textContent = targetSentence[idx];
-            }
-        }
-
-        if (diffusionStep >= totalSteps) {
-            // Reveal all remaining
-            for (let i = 0; i < 16; i++) {
-                const el = document.getElementById(`dtoken-${i}`);
-                el.className = 'diffusion-token clean';
-                el.textContent = targetSentence[i];
-            }
-            clearInterval(diffusionInterval);
-            diffusionInterval = null;
-        }
-    }, 600);
+    }
+    document.getElementById('diffusionStep').textContent = step;
+    const noise = noiseLevels[Math.min(step, noiseLevels.length - 1)];
+    document.getElementById('diffDesc').textContent =
+        step === 0 ? '初始：全部 token 为随机噪声 (噪声 100%)'
+        : step >= totalSteps ? '完成：所有 token 已去噪为连贯文本 (噪声 0%)'
+        : `第 ${step} 步去噪 · 噪声水平约 ${noise}%`;
+    updateButtons();
 }
 
-function resetDiffusion() {
+function updateButtons() {
+    const prevBtn = document.getElementById('diffPrev');
+    const nextBtn = document.getElementById('diffNext');
+    const autoBtn = document.getElementById('diffAuto');
+    const atStart = diffusionStep <= 0;
+    const atEnd = diffusionStep >= totalSteps;
+    prevBtn.disabled = atStart;
+    nextBtn.disabled = atEnd;
+    autoBtn.disabled = atEnd;
+    [prevBtn, nextBtn, autoBtn].forEach(b => {
+        b.style.opacity = b.disabled ? '0.4' : '1';
+        b.style.cursor = b.disabled ? 'not-allowed' : 'pointer';
+    });
+}
+
+function stopAuto() {
     if (diffusionInterval) {
         clearInterval(diffusionInterval);
         diffusionInterval = null;
     }
-    initDiffusionGrid();
+}
+
+function next() {
+    if (diffusionStep >= totalSteps) return;
+    diffusionStep++;
+    renderStep(diffusionStep);
+}
+
+function prev() {
+    stopAuto();
+    if (diffusionStep <= 0) return;
+    diffusionStep--;
+    renderStep(diffusionStep);
+}
+
+function reset() {
+    stopAuto();
+    diffusionStep = 0;
+    renderStep(diffusionStep);
+}
+
+function auto() {
+    if (diffusionInterval) return;
+    if (diffusionStep >= totalSteps) return;
+    diffusionInterval = setInterval(() => {
+        next();
+        if (diffusionStep >= totalSteps) stopAuto();
+    }, 600);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    buildPlan();
     initDiffusionGrid();
+    document.getElementById('diffusionTotal').textContent = totalSteps;
+    diffusionStep = 0;
+    renderStep(diffusionStep);
 });
 </script>
 

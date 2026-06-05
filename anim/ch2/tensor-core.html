@@ -18,17 +18,49 @@ body {
 .tc-cell { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; border-radius: 3px; font-weight: bold; }
 .tc-op { font-size: 1.5rem; color: #7b2ff7; font-weight: bold; }
 code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #7df9ff; }
+
+/* step-through controls */
+.btn { background: linear-gradient(135deg, #7b2ff7, #00d2ff); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover:not(:disabled) { transform: scale(1.05); opacity: 0.92; }
+.btn:active:not(:disabled) { transform: scale(0.95); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-secondary { background: #2a2a4a; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover:not(:disabled) { background: #3a3a5a; }
+.controls { display: flex; gap: 10px; margin: 4px 0 14px; flex-wrap: wrap; align-items: center; justify-content: center; }
+.step-info { color: #00d2ff; font-size: 0.9rem; margin: 8px auto 4px; min-height: 24px; text-align: center; }
+.step-counter { color: #888; font-size: 0.8rem; margin-left: 6px; }
+
+/* highlight / dim states for the step-through */
+.tc-frag { transition: opacity 0.3s ease, filter 0.3s ease; }
+.tc-frag.tc-dim { opacity: 0.28; filter: grayscale(0.6); }
+.tc-frag.tc-active { opacity: 1; filter: none; }
+.tc-op.tc-dim { opacity: 0.28; }
+.tc-op.tc-active { opacity: 1; text-shadow: 0 0 10px #7b2ff7; }
+
 @media (max-width: 768px) {
   .tensor-core-visual { flex-direction: column; }
+  .controls { flex-direction: column; align-items: stretch; }
 }
 </style>
 </head>
 <body>
 
+<!-- step-through controls -->
+<div class="controls">
+  <button class="btn btn-secondary" id="tc-prev" onclick="prev()">← 上一步</button>
+  <button class="btn" id="tc-next" onclick="next()">下一步 →</button>
+  <button class="btn btn-secondary" id="tc-auto" onclick="auto()">▶ 自动播放</button>
+  <button class="btn btn-secondary" id="tc-reset" onclick="reset()">↺ 重置</button>
+</div>
+<div class="step-info">
+  <span id="tc-desc">点击"下一步"或"自动播放"，逐阶段观察 MMA 运算 D = A × B + C</span>
+  <span class="step-counter" id="tc-counter">Step 0 / 4</span>
+</div>
+
 <!-- Warp-level MMA fragment view -->
 <div style="background: #12122a; border-radius: 8px; padding: 20px; margin: 5px 0 20px; border: 1px solid #7b2ff7;">
   <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center;">
-    <div style="text-align: center;">
+    <div class="tc-frag" data-frag="A" style="text-align: center; color:#ff6b6b;">
       <div style="font-size: 0.75rem; color: #ff6b6b; margin-bottom: 4px;">A Fragment</div>
       <div style="display: grid; grid-template-columns: repeat(4,24px); gap: 1px;">
         <div style="width:24px;height:24px;background:#ff6b6b33;border:1px solid #ff6b6b;border-radius:2px;"></div>
@@ -50,8 +82,8 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
       </div>
       <div style="font-size: 0.65rem; color: #888; margin-top: 4px;">[m=16, k=16] FP16</div>
     </div>
-    <div style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">×</div>
-    <div style="text-align: center;">
+    <div class="tc-op" data-op="mul" style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">×</div>
+    <div class="tc-frag" data-frag="B" style="text-align: center; color:#00d2ff;">
       <div style="font-size: 0.75rem; color: #00d2ff; margin-bottom: 4px;">B Fragment</div>
       <div style="display: grid; grid-template-columns: repeat(4,24px); gap: 1px;">
         <div style="width:24px;height:24px;background:#00d2ff33;border:1px solid #00d2ff;border-radius:2px;"></div>
@@ -73,8 +105,8 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
       </div>
       <div style="font-size: 0.65rem; color: #888; margin-top: 4px;">[k=16, n=8] FP16</div>
     </div>
-    <div style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">+</div>
-    <div style="text-align: center;">
+    <div class="tc-op" data-op="add" style="font-size: 1.5rem; color: #7b2ff7; font-weight: bold;">+</div>
+    <div class="tc-frag" data-frag="CD" style="text-align: center; color:#7b2ff7;">
       <div style="font-size: 0.75rem; color: #7b2ff7; margin-bottom: 4px;">C/D Accumulator</div>
       <div style="display: grid; grid-template-columns: repeat(2,24px); gap: 1px;">
         <div style="width:24px;height:24px;background:#7b2ff733;border:1px solid #7b2ff7;border-radius:2px;"></div>
@@ -98,7 +130,7 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
 <!-- Conceptual 4x4 MMA -->
 <p style="margin-bottom:10px;">每个 Tensor Core 在<strong>一个时钟周期</strong>内完成一次 4×4 的矩阵乘加运算 <code>D = A × B + C</code>：</p>
 <div class="tensor-core-visual">
-  <div>
+  <div class="tc-frag" data-frag="A" style="color:#ff6b6b;">
     <div style="text-align:center;font-size:0.8rem;color:#ff6b6b;margin-bottom:4px;">A (FP16) 4×4</div>
     <div class="tc-matrix">
       <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
@@ -119,8 +151,8 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
       <div class="tc-cell" style="background:#ff6b6b30;color:#ff6b6b;">a</div>
     </div>
   </div>
-  <div class="tc-op">×</div>
-  <div>
+  <div class="tc-op" data-op="mul">×</div>
+  <div class="tc-frag" data-frag="B" style="color:#00d2ff;">
     <div style="text-align:center;font-size:0.8rem;color:#00d2ff;margin-bottom:4px;">B (FP16) 4×4</div>
     <div class="tc-matrix">
       <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
@@ -141,8 +173,8 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
       <div class="tc-cell" style="background:#00d2ff30;color:#00d2ff;">b</div>
     </div>
   </div>
-  <div class="tc-op">+</div>
-  <div>
+  <div class="tc-op" data-op="add">+</div>
+  <div class="tc-frag" data-frag="C" style="color:#6ab04c;">
     <div style="text-align:center;font-size:0.8rem;color:#6ab04c;margin-bottom:4px;">C (FP32) 4×4</div>
     <div class="tc-matrix">
       <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
@@ -163,8 +195,8 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
       <div class="tc-cell" style="background:#6ab04c30;color:#6ab04c;">c</div>
     </div>
   </div>
-  <div class="tc-op">=</div>
-  <div>
+  <div class="tc-op" data-op="eq">=</div>
+  <div class="tc-frag" data-frag="D" style="color:#7b2ff7;">
     <div style="text-align:center;font-size:0.8rem;color:#7b2ff7;margin-bottom:4px;">D (FP32) 4×4</div>
     <div class="tc-matrix">
       <div class="tc-cell" style="background:#7b2ff730;color:#7b2ff7;">d</div>
@@ -189,6 +221,78 @@ code { background: #2a2a4a; padding: 2px 6px; border-radius: 4px; font-family: '
 <p style="font-size:0.85rem;color:#aaa;margin-top:10px;">H100 的 Tensor Core 支持更大的 <code>mma.m16n8k16</code> 指令，一个 Warp 协作完成 16×8×16 的矩阵乘加。FP16 输入 → FP32 累加器，保证精度。</p>
 
 <script>
+// ---- Tensor Core MMA step-through ----
+// Stages: load A -> load B -> multiply A×B -> accumulate +C -> produce D
+var STEPS = [
+  { frags: ['A'],            ops: [],            desc: '① 加载 A Fragment：从共享内存读入 A 矩阵分块（FP16）到寄存器。' },
+  { frags: ['B'],            ops: [],            desc: '② 加载 B Fragment：从共享内存读入 B 矩阵分块（FP16）到寄存器。' },
+  { frags: ['A','B'],        ops: ['mul'],       desc: '③ 矩阵乘 A × B：Tensor Core 并行计算分块点积，FP16 输入相乘。' },
+  { frags: ['A','B','C','CD'], ops: ['mul','add'], desc: '④ 累加 + C：乘积累加到 FP32 累加器 C，保证精度。' },
+  { frags: ['D','CD'],       ops: ['eq'],        desc: '⑤ 产出 D：写回结果 D = A × B + C（FP32），完成一次 Warp MMA。' }
+];
+var step = 0;
+var autoTimer = null;
+
+function render() {
+  var s = STEPS[step];
+  // fragments: CD wrapper participates in both C(load) and D(store) for the warp view
+  var fragSet = {};
+  s.frags.forEach(function (f) { fragSet[f] = true; });
+  document.querySelectorAll('.tc-frag').forEach(function (el) {
+    var f = el.getAttribute('data-frag');
+    var on = !!fragSet[f];
+    el.classList.toggle('tc-active', on);
+    el.classList.toggle('tc-dim', !on);
+    el.querySelectorAll('.tc-cell, [style*="border:1px solid"]').forEach(function (box) {
+      box.style.boxShadow = on ? '0 0 8px currentColor' : 'none';
+    });
+  });
+  var opSet = {};
+  s.ops.forEach(function (o) { opSet[o] = true; });
+  document.querySelectorAll('.tc-op').forEach(function (el) {
+    var o = el.getAttribute('data-op');
+    var on = !!opSet[o];
+    el.classList.toggle('tc-active', on);
+    el.classList.toggle('tc-dim', !on);
+  });
+  document.getElementById('tc-desc').textContent = s.desc;
+  document.getElementById('tc-counter').textContent = 'Step ' + step + ' / ' + (STEPS.length - 1);
+  document.getElementById('tc-prev').disabled = (step === 0);
+  var atEnd = (step === STEPS.length - 1);
+  document.getElementById('tc-next').disabled = atEnd;
+  document.getElementById('tc-auto').disabled = atEnd && !autoTimer;
+}
+
+function next() {
+  if (step < STEPS.length - 1) { step++; render(); }
+  if (step === STEPS.length - 1) { stopAuto(); }
+}
+function prev() {
+  stopAuto();
+  if (step > 0) { step--; render(); }
+}
+function reset() {
+  stopAuto();
+  step = 0;
+  render();
+}
+function stopAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  var b = document.getElementById('tc-auto');
+  if (b) b.textContent = '▶ 自动播放';
+}
+function auto() {
+  if (autoTimer) { stopAuto(); render(); return; }
+  if (step === STEPS.length - 1) { step = 0; render(); }
+  document.getElementById('tc-auto').textContent = '⏸ 暂停';
+  autoTimer = setInterval(function () {
+    if (step >= STEPS.length - 1) { stopAuto(); render(); return; }
+    step++; render();
+  }, 1500);
+}
+
+render();
+
 (function () {
   function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
   window.addEventListener('load', reportHeight);

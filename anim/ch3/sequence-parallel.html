@@ -13,6 +13,21 @@ body {
   line-height: 1.6;
   padding: 4px;
 }
+.anim-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-controls { text-align: center; margin: 15px 0; }
+.step-indicator { color: #888; margin: 10px 0; font-size: 0.95em; }
 </style>
 </head>
 <body>
@@ -20,9 +35,13 @@ body {
 <div style="background:#12121f; border:1px solid #333; border-radius:8px; padding:20px; margin:15px 0; text-align:center;">
   <div style="margin-bottom:10px;color:#f472b6;font-weight:bold;">Sequence Parallelism: TP ↔ SP 区域切换 (4 GPUs)</div>
   <canvas id="spCanvas" width="860" height="420" style="width:100%;max-width:860px;border-radius:8px;background:#0a0a1a;"></canvas>
-  <div style="margin-top:10px;">
-    <button onclick="spAnim.reset();spAnim.play();" style="background:linear-gradient(135deg,#f472b6,#667eea);border:none;color:#fff;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;">▶ 播放</button>
-    <button onclick="spAnim.reset();" style="background:#333;border:1px solid #555;color:#ccc;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.85rem;margin-left:8px;">↺ 重置</button>
+  <div class="step-indicator" id="spStepCounter" style="margin-top:12px;"></div>
+  <div id="spStepLabel" style="color:#f472b6;font-size:0.92rem;min-height:22px;margin:4px 0 10px;"></div>
+  <div class="anim-controls">
+    <button class="anim-btn" id="spPrev" onclick="spAnim.prev()">&larr; 上一步</button>
+    <button class="anim-btn" id="spNext" onclick="spAnim.next()">下一步 &rarr;</button>
+    <button class="anim-btn" id="spAuto" onclick="spAnim.auto()">&#9654; 自动播放</button>
+    <button class="anim-btn" onclick="spAnim.reset()">&#8635; 重置</button>
   </div>
 </div>
 
@@ -43,8 +62,21 @@ const spAnim = (() => {
 
   const N = 4;
   const gpuColors = ['#ff6b6b', '#4caf50', '#667eea', '#fbbf24'];
-  let progress = 0, animId = null, startTime = null;
-  const duration = 7000;
+  let progress = 0, animId = null;
+
+  // Discrete steps: each existing timeline phase becomes one settled frame.
+  // Each step maps to a representative progress value at the END of its phase
+  // so the existing phase-detection draw code renders a fully-settled still.
+  const stepFrames = [
+    { p: 0.24, label: 'SP 区域: 每 GPU 独立计算自己的序列 chunk (无通信!)' },
+    { p: 0.39, label: 'AllGather: 收集完整序列, 准备进入 TP 区域' },
+    { p: 0.59, label: 'TP 区域: 完整序列, 按 hidden dim 切分计算' },
+    { p: 0.74, label: 'ReduceScatter: reduce 并切分回各 GPU 的序列 chunk' },
+    { p: 0.89, label: 'SP 区域: 再次独立计算 (LayerNorm 2)' },
+    { p: 1.00, label: 'AllGather → 进入下一个 TP 区域 (FFN)' },
+  ];
+  const STEP_N = stepFrames.length;
+  let step = 0;
 
   function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
   function lerp(a,b,t) { return a+(b-a)*t; }
@@ -250,18 +282,56 @@ const spAnim = (() => {
     ctx.fillText(`With SP: seq/${N} × hidden (${Math.round(100/N)}%)`, barStartX + maxBarW/2, memY + 24);
   }
 
-  function animate(ts) {
-    if (!startTime) startTime = ts;
-    progress = Math.min((ts - startTime) / duration, 1);
-    render();
-    if (progress < 1) animId = requestAnimationFrame(animate);
+  function updateControls() {
+    const counter = document.getElementById('spStepCounter');
+    const label = document.getElementById('spStepLabel');
+    if (counter) counter.textContent = `Step ${step} / ${STEP_N - 1}`;
+    if (label) label.textContent = stepFrames[step].label;
+    const prevBtn = document.getElementById('spPrev');
+    const nextBtn = document.getElementById('spNext');
+    const autoBtn = document.getElementById('spAuto');
+    if (prevBtn) prevBtn.disabled = (step === 0);
+    if (nextBtn) nextBtn.disabled = (step === STEP_N - 1);
+    if (autoBtn) autoBtn.disabled = (step === STEP_N - 1);
   }
 
-  function play() { startTime = null; if (animId) cancelAnimationFrame(animId); animId = requestAnimationFrame(animate); }
-  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; progress = 0; render(); }
+  function renderStep() {
+    progress = stepFrames[step].p;
+    render();
+    updateControls();
+  }
 
-  progress = 0; render();
-  return { play, reset };
+  function stopAuto() { if (animId) { clearTimeout(animId); animId = null; } }
+
+  function next() {
+    stopAuto();
+    if (step < STEP_N - 1) { step++; renderStep(); }
+  }
+  function prev() {
+    stopAuto();
+    if (step > 0) { step--; renderStep(); }
+  }
+  function reset() {
+    stopAuto();
+    step = 0;
+    renderStep();
+  }
+  function auto() {
+    stopAuto();
+    function tick() {
+      if (step < STEP_N - 1) {
+        step++;
+        renderStep();
+        if (step < STEP_N - 1) animId = setTimeout(tick, 1400);
+        else animId = null;
+      }
+    }
+    if (step >= STEP_N - 1) { step = 0; renderStep(); }
+    animId = setTimeout(tick, 1400);
+  }
+
+  renderStep();
+  return { prev, next, reset, auto };
 })();
 
 (function () {

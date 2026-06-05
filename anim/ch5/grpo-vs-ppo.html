@@ -21,13 +21,24 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
 @media (max-width: 768px) { .comparison { grid-template-columns: 1fr; } }
 .btn { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #ff4444, #ff9800); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 0.9em; margin: 5px; }
 .btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.anim-controls { text-align: center; margin: 12px 0 4px; }
+.step-desc { color: #a78bfa; font-size: 0.95em; min-height: 40px; margin: 12px 0; padding: 10px; background: #12121f; border-radius: 6px; border: 1px solid #333; }
+.step-counter { color: #888; margin: 6px 0; font-size: 0.95em; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="card">
 <h3>交互式：GRPO vs PPO 对比</h3>
-<button class="btn" id="btn-compare-play">▶ 开始对比动画</button>
+<div class="step-desc" id="compare-step-desc"></div>
+<div class="anim-controls">
+  <button class="btn" id="compare-prev" onclick="prev()">&larr; 上一步</button>
+  <button class="btn" id="compare-next" onclick="next()">下一步 &rarr;</button>
+  <button class="btn" id="compare-reset" onclick="reset()">&#8634; 重置</button>
+  <button class="btn" id="compare-auto" onclick="auto()">&#9654; 自动播放</button>
+</div>
+<div class="step-counter" id="compare-step-counter">Step 0 / 3</div>
 <div class="comparison" id="grpo-ppo-compare">
 <div class="compare-panel">
 <h4 style="color:#ff4444;">PPO (with Critic)</h4>
@@ -47,14 +58,34 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
 </div>
 
 <script>
-// === GRPO vs PPO Comparison Animation ===
+// === GRPO vs PPO Comparison Animation (manual step-through) ===
 (function() {
-    const playBtn = document.getElementById('btn-compare-play');
     const ppoCanvas = document.getElementById('ppo-compare-canvas');
     const grpoCanvas = document.getElementById('grpo-compare-canvas');
-    let animRunning = false;
+    const prevBtn = document.getElementById('compare-prev');
+    const nextBtn = document.getElementById('compare-next');
+    const autoBtn = document.getElementById('compare-auto');
+    const descEl = document.getElementById('compare-step-desc');
+    const counterEl = document.getElementById('compare-step-counter');
 
-    function drawPPOComparison() {
+    // Shared data so PPO & GRPO panels stay consistent
+    const colors = ['#ff4444', '#ff9800', '#50fa7b', '#4488ff', '#a569bd'];
+    const rewards = [0.3, 0.7, 0.9, 0.5, 0.2];
+    const mean = rewards.reduce((a, b) => a + b, 0) / rewards.length;
+
+    const STEPS = [
+        { desc: 'Step 0 — 采样: 同一 prompt 采样一组 G=5 个回复, 各自获得奖励 r。两边方法共享这组样本。' },
+        { desc: 'Step 1 — PPO 侧: 训练一个 Critic 价值网络 V(s) 作为基线, 优势 A = Q − V (需要额外的价值网络)。' },
+        { desc: 'Step 2 — GRPO 侧: 基线直接取「组内平均奖励」mean, 优势 A = (r − mean) / std (无需 Critic)。' },
+        { desc: 'Step 3 — 对比小结: GRPO 用组内相对比较取代了 PPO 的 Critic 网络, 省去一整个价值网络的训练。' }
+    ];
+    const N = STEPS.length;          // total steps = 4
+    const LAST = N - 1;              // last index = 3
+    let step = 0;
+    let autoTimer = null;
+
+    // step >= 1 : PPO panel becomes meaningful; step >= 3 : highlight summary
+    function drawPPOComparison(step) {
         const ctx = ppoCanvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const W = ppoCanvas.width = ppoCanvas.clientWidth * dpr;
@@ -62,6 +93,15 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
         ctx.scale(dpr, dpr);
         const w = W / dpr, h = H / dpr;
         ctx.clearRect(0, 0, w, h);
+
+        // Step 0: PPO panel waits for the shared samples — show a hint only.
+        if (step < 1) {
+            ctx.fillStyle = '#666';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('等待样本 (Step 1 揭示)', w / 2, h / 2);
+            return;
+        }
 
         // Draw critic network
         ctx.fillStyle = '#2a2a4e';
@@ -98,9 +138,18 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
         ctx.strokeRect(130, 65, 60, 25);
         ctx.fillStyle = '#50fa7b';
         ctx.fillText('A = Q - V', 160, 82);
+
+        // Step 3 summary: emphasize that PPO keeps the critic.
+        if (step >= LAST) {
+            ctx.fillStyle = '#ff6666';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('需要额外的 Critic 网络', w / 2, h - 14);
+        }
     }
 
-    function drawGRPOComparison() {
+    // step >= 0 : show group + rewards; step >= 2 : reveal mean baseline + advantage
+    function drawGRPOComparison(step) {
         const ctx = grpoCanvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const W = grpoCanvas.width = grpoCanvas.clientWidth * dpr;
@@ -109,11 +158,7 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
         const w = W / dpr, h = H / dpr;
         ctx.clearRect(0, 0, w, h);
 
-        // Draw group of responses
-        const colors = ['#ff4444', '#ff9800', '#50fa7b', '#4488ff', '#a569bd'];
-        const rewards = [0.3, 0.7, 0.9, 0.5, 0.2];
-        const mean = rewards.reduce((a, b) => a + b, 0) / rewards.length;
-
+        // Draw group of responses (visible from step 0)
         ctx.fillStyle = '#e0e0e0';
         ctx.font = '9px sans-serif';
         ctx.textAlign = 'left';
@@ -131,34 +176,72 @@ h4 { font-size: 1.1em; color: #ffcc80; margin: 0; text-align: center; }
             ctx.fillText(`r=${rewards[i].toFixed(1)}`, barW + 15, y + 11);
         }
 
-        // Mean line
-        const meanX = 10 + mean * 100;
-        ctx.strokeStyle = '#ffcc80';
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.moveTo(meanX, 28);
-        ctx.lineTo(meanX, 140);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#ffcc80';
-        ctx.font = '9px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`mean=${mean.toFixed(2)}`, meanX, 150);
+        // Mean baseline + advantage only revealed at step >= 2
+        if (step >= 2) {
+            const meanX = 10 + mean * 100;
+            ctx.strokeStyle = '#ffcc80';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(meanX, 28);
+            ctx.lineTo(meanX, 140);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#ffcc80';
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`mean=${mean.toFixed(2)}`, meanX, 150);
 
-        // Advantage label
-        ctx.fillStyle = '#50fa7b';
-        ctx.textAlign = 'left';
-        ctx.fillText('A = (r - mean) / std', 10, 170);
-        ctx.fillText('No critic needed!', 10, 185);
+            // Advantage label
+            ctx.fillStyle = '#50fa7b';
+            ctx.textAlign = 'left';
+            ctx.fillText('A = (r - mean) / std', 10, 170);
+
+            // Step 3 summary: emphasize no critic.
+            ctx.fillStyle = '#50fa7b';
+            ctx.font = (step >= LAST) ? 'bold 10px sans-serif' : '9px sans-serif';
+            ctx.fillText('No critic needed!', 10, 185);
+        }
     }
 
-    playBtn.addEventListener('click', () => {
-        drawPPOComparison();
-        drawGRPOComparison();
-    });
+    function render() {
+        drawPPOComparison(step);
+        drawGRPOComparison(step);
+        descEl.textContent = STEPS[step].desc;
+        counterEl.textContent = `Step ${step} / ${LAST}`;
+        prevBtn.disabled = (step === 0);
+        nextBtn.disabled = (step === LAST);
+        autoBtn.disabled = (step === LAST);
+    }
 
-    // Initial draw
-    setTimeout(() => { drawPPOComparison(); drawGRPOComparison(); }, 200);
+    function stopAuto() {
+        if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    window.prev = function() {
+        stopAuto();
+        if (step > 0) { step--; render(); }
+    };
+    window.next = function() {
+        stopAuto();
+        if (step < LAST) { step++; render(); }
+    };
+    window.reset = function() {
+        stopAuto();
+        step = 0;
+        render();
+    };
+    window.auto = function() {
+        stopAuto();
+        if (step >= LAST) return;
+        autoTimer = setInterval(() => {
+            if (step >= LAST) { stopAuto(); render(); return; }
+            step++;
+            render();
+        }, 1200);
+    };
+
+    // Initial draw (defer so canvas clientWidth is laid out)
+    setTimeout(render, 200);
 })();
 
 // === 自动把高度汇报给父页面（让 iframe 自适应高度）===

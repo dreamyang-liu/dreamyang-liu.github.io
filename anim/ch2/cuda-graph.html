@@ -15,6 +15,21 @@ body {
 }
 .card { background: #1a1a2e; border-radius: 12px; border: 1px solid #333; padding: 24px; }
 .card h3 { color: #00d2ff; margin-bottom: 12px; font-size: 1.2rem; }
+.anim-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #00d2ff, #7b2ff7);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.anim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4); }
+.anim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.anim-btn.secondary { background: #333; border: 1px solid #555; color: #ccc; }
+.anim-btn.secondary:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 </style>
 </head>
 <body>
@@ -23,9 +38,15 @@ body {
   <h3>CUDA Graph 时间线对比（动画）</h3>
   <div style="position:relative;">
     <canvas id="cudaGraphCanvas" width="900" height="420" style="width:100%;max-width:900px;display:block;margin:0 auto;border-radius:8px;background:#0a0a1a;"></canvas>
-    <div style="text-align:center;margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button onclick="cgAnim.reset(); cgAnim.play();" style="background:linear-gradient(135deg,#00d2ff,#7b2ff7);border:none;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;">▶ 播放动画</button>
-      <button onclick="cgAnim.reset();" style="background:#333;border:1px solid #555;color:#ccc;padding:8px 20px;border-radius:6px;cursor:pointer;">↺ 重置</button>
+    <div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;">
+      <button class="anim-btn" id="cgPrev" onclick="cgAnim.prev()">&#8592; 上一步</button>
+      <button class="anim-btn" id="cgNext" onclick="cgAnim.next()">下一步 &#8594;</button>
+      <button class="anim-btn" id="cgAuto" onclick="cgAnim.auto()">&#9654; 自动播放</button>
+      <button class="anim-btn secondary" onclick="cgAnim.reset()">&#8635; 重置</button>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <div id="cgStepLabel" style="color:#a78bfa;font-size:0.9rem;min-height:22px;"></div>
+      <div id="cgStepCounter" style="color:#888;font-size:0.8rem;margin-top:4px;"></div>
     </div>
     <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:0.75rem;color:#888;flex-wrap:wrap;">
       <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b6b;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>CPU Launch</span>
@@ -95,10 +116,33 @@ const cgAnim = (() => {
   const maxTime = normalTotal;
   const pxPerUs = trackW / maxTime;
 
-  let progress = 0; // 0 to 1
-  let animId = null;
-  let startTime = null;
-  const duration = 3000; // ms
+  // ----- Discrete step model -----
+  // step 0          : empty timeline (lanes only)
+  // step 1..N kernels: progressively reveal each kernel's launch + execution
+  // step kernels+1  : full timeline + CUDA Graph speedup summary
+  const NUM_STEPS = kernels.length + 2; // total step count (indices 0..NUM_STEPS-1)
+  const lastStep = NUM_STEPS - 1;
+
+  // Map each step -> a reveal progress value (0..1 over maxTime axis).
+  // Reveal up to the END of normalGPU[i] block for kernel-reveal steps.
+  const stepProgress = [];
+  stepProgress.push(0); // step 0: nothing revealed
+  kernels.forEach((k, i) => {
+    const endUs = normalGPU[i].start + normalGPU[i].dur; // end of this kernel's GPU exec
+    stepProgress.push(Math.min(endUs / maxTime, 1));
+  });
+  stepProgress.push(1); // final step: full timeline + summary
+
+  const stepLabels = [];
+  stepLabels.push('初始状态: CPU/GPU 时间线就绪, 尚未发射任何 kernel');
+  kernels.forEach((k, i) => {
+    stepLabels.push(`发射 ${k.name}: CPU 提交 L${i+1} (launch 开销 ${launchTime}μs), GPU 执行 ${k.name} (${k.compute}μs)`);
+  });
+  stepLabels.push('完整对比: 全部 kernel 完成, 展示 CUDA Graph 加速汇总');
+
+  let step = 0;       // discrete current step
+  let progress = 0;   // derived reveal value used by draw code
+  let animId = null;  // auto-play timer id
 
   function drawLane(y, label) {
     ctx.fillStyle = '#aaa';
@@ -220,8 +264,8 @@ const cgAnim = (() => {
     // Time axis
     drawTimeAxis(g_gpuY + laneH + 20);
 
-    // Total time comparison (show when done)
-    if (progress >= 1) {
+    // Total time comparison (only on the final step)
+    if (step >= lastStep) {
       const summaryY = g_gpuY + laneH + 55;
       drawTotalTime(`Without Graph`, normalTotal, summaryY, '#ff6b6b');
       drawTotalTime(`With Graph`, graphTotal, summaryY + 20, '#7b2ff7');
@@ -244,33 +288,55 @@ const cgAnim = (() => {
     }
   }
 
-  function animate(ts) {
-    if (!startTime) startTime = ts;
-    progress = Math.min((ts - startTime) / duration, 1);
-    render();
-    if (progress < 1) {
-      animId = requestAnimationFrame(animate);
-    }
+  function stopAuto() {
+    if (animId) { clearTimeout(animId); animId = null; }
   }
 
-  function play() {
-    startTime = null;
-    if (animId) cancelAnimationFrame(animId);
-    animId = requestAnimationFrame(animate);
+  // Draw the settled still frame for the current `step`.
+  function show() {
+    progress = stepProgress[step];
+    render();
+    // Update step indicator
+    document.getElementById('cgStepLabel').textContent = stepLabels[step];
+    document.getElementById('cgStepCounter').textContent = `Step ${step} / ${lastStep}`;
+    // Bounds-disabling
+    document.getElementById('cgPrev').disabled = (step === 0);
+    document.getElementById('cgNext').disabled = (step === lastStep);
+    document.getElementById('cgAuto').disabled = (step === lastStep);
+  }
+
+  function prev() {
+    stopAuto();
+    if (step > 0) { step--; show(); }
+  }
+
+  function next() {
+    stopAuto();
+    if (step < lastStep) { step++; show(); }
   }
 
   function reset() {
-    if (animId) cancelAnimationFrame(animId);
-    animId = null;
-    progress = 0;
-    render();
+    stopAuto();
+    step = 0;
+    show();
   }
 
-  // Initial render
-  progress = 1;
-  render();
+  function auto() {
+    stopAuto();
+    function tick() {
+      if (step >= lastStep) { stopAuto(); return; }
+      step++;
+      show();
+      if (step < lastStep) { animId = setTimeout(tick, 700); }
+    }
+    animId = setTimeout(tick, 700);
+  }
 
-  return { play, reset };
+  // Initial render: full timeline so the still preview is informative.
+  step = lastStep;
+  show();
+
+  return { prev, next, reset, auto };
 })();
 </script>
 

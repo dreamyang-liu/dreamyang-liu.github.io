@@ -52,11 +52,33 @@ body {
 .bar-fill.allgather { background: linear-gradient(90deg, #4caf50, #66bb6a); }
 .bar-fill.reducescatter { background: linear-gradient(90deg, #f44336, #ef5350); }
 .bar-fill.broadcast { background: linear-gradient(90deg, #ff9800, #ffb74d); }
+.bar-row.hidden { opacity: 0.25; }
+.btn { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover:not(:disabled) { transform: scale(1.05); opacity: 0.9; }
+.btn:active:not(:disabled) { transform: scale(0.95); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover:not(:disabled) { background: #444; }
+.controls { display: flex; gap: 10px; margin: 12px 0; flex-wrap: wrap; align-items: center; }
+.step-info { color: #a78bfa; font-size: 0.9rem; margin: 10px 0; min-height: 24px; }
+.step-counter { color: #888; font-size: 0.85rem; margin-left: auto; }
+@media (max-width: 600px) {
+  .controls { flex-direction: column; align-items: stretch; }
+  .step-counter { margin-left: 0; }
+}
 </style>
 </head>
 <body>
 
 <div class="wrap">
+  <div class="controls">
+    <button class="btn btn-secondary" id="btnPrev" onclick="prev()">← 上一步</button>
+    <button class="btn btn-secondary" id="btnNext" onclick="next()">下一步 →</button>
+    <button class="btn btn-secondary" id="btnReset" onclick="reset()">↺ 重置</button>
+    <button class="btn" id="btnAuto" onclick="auto()">▶ 自动播放</button>
+    <span class="step-counter" id="stepCounter">Step 0 / 3</span>
+  </div>
+  <div class="step-info" id="stepInfo"></div>
   <div class="bar-chart" id="commBarChart">
     <div class="bar-row">
       <div class="bar-label">AllReduce</div>
@@ -87,15 +109,69 @@ body {
 </div>
 
 <script>
-function animateCommBars() {
-  const bars = document.querySelectorAll('#commBarChart .bar-fill');
-  bars.forEach(bar => {
-    const width = bar.getAttribute('data-width');
-    bar.style.width = width + '%';
+// Step-by-step reveal of communication-volume bars.
+const rows = Array.from(document.querySelectorAll('#commBarChart .bar-row'));
+const N = rows.length; // number of primitives/bars (4): step k reveals first k+1
+let step = 0;
+let autoTimer = null;
+
+// Description per step: primitive name + its volume formula.
+const stepDesc = [
+  'AllReduce：每节点收发约 2M(N-1)/N ≈ 1.5 GB（最大）。',
+  'AllGather：每节点收发约 M(N-1)/N ≈ 0.75 GB。',
+  'ReduceScatter：每节点收发约 M(N-1)/N ≈ 0.75 GB。',
+  'Broadcast：每节点收发约 M(N-1)/N ≈ 0.75 GB。',
+];
+
+function render() {
+  rows.forEach((row, i) => {
+    const fill = row.querySelector('.bar-fill');
+    if (i <= step) {
+      row.classList.remove('hidden');
+      fill.style.width = fill.getAttribute('data-width') + '%';
+    } else {
+      row.classList.add('hidden');
+      fill.style.width = '0%';
+    }
   });
+  document.getElementById('stepInfo').textContent = stepDesc[step] || '';
+  document.getElementById('stepCounter').textContent = 'Step ' + step + ' / ' + (N - 1);
+  document.getElementById('btnPrev').disabled = (step === 0);
+  document.getElementById('btnNext').disabled = (step === N - 1);
+  document.getElementById('btnAuto').disabled = (step === N - 1);
 }
-// Standalone trigger: animate after load (replaces page IntersectionObserver)
-window.addEventListener('load', () => { setTimeout(animateCommBars, 300); });
+
+function stopAuto() {
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+}
+
+function next() {
+  if (step < N - 1) { step++; render(); }
+}
+
+function prev() {
+  stopAuto();
+  if (step > 0) { step--; render(); }
+}
+
+function reset() {
+  stopAuto();
+  step = 0;
+  render();
+}
+
+function auto() {
+  stopAuto();
+  if (step >= N - 1) return;
+  const tick = () => {
+    if (step >= N - 1) { stopAuto(); return; }
+    next();
+    if (step < N - 1) { autoTimer = setTimeout(tick, 1500); } else { stopAuto(); }
+  };
+  autoTimer = setTimeout(tick, 600);
+}
+
+window.addEventListener('load', () => { render(); });
 </script>
 
 <script>

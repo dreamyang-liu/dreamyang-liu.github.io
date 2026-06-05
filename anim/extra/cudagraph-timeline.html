@@ -15,15 +15,26 @@ body {
 }
 #timeline-demo { background: #0f0f23; border-radius: 8px; padding: 20px; margin: 0; border: 1px solid #333; }
 button { font-family: inherit; }
+.anim-btn { padding:8px 14px; background:#333; border:1px solid #555; color:#e0e0e0; border-radius:6px; cursor:pointer; font-size:14px; transition: opacity 0.2s, background 0.2s; }
+.anim-btn:hover:not(:disabled) { background:#444; }
+.anim-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.preset-btn.active { outline:2px solid #ffd700; outline-offset:1px; }
 </style>
 </head>
 <body>
 
 <div id="timeline-demo">
-<div style="margin-bottom:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-<button onclick="runWithoutGraph()" style="padding:8px 16px; background:#ff4444; border:none; color:white; border-radius:6px; cursor:pointer; font-size:14px;">不使用 Graph 运行</button>
-<button onclick="runWithGraph()" style="padding:8px 16px; background:#76b900; border:none; color:white; border-radius:6px; cursor:pointer; font-size:14px;">使用 Graph 运行</button>
-<button onclick="resetTimeline()" style="padding:8px 16px; background:#555; border:none; color:white; border-radius:6px; cursor:pointer; font-size:14px;">重置</button>
+<div style="margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+<button id="preset-without" class="preset-btn" onclick="setMode('without')" style="padding:8px 16px; background:#ff4444; border:none; color:white; border-radius:6px; cursor:pointer; font-size:14px;">不使用 Graph</button>
+<button id="preset-with" class="preset-btn" onclick="setMode('with')" style="padding:8px 16px; background:#76b900; border:none; color:white; border-radius:6px; cursor:pointer; font-size:14px;">使用 Graph</button>
+</div>
+
+<div style="margin-bottom:15px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+<button id="btn-prev" class="anim-btn" onclick="prev()">&#8592; 上一步</button>
+<button id="btn-next" class="anim-btn" onclick="next()">下一步 &#8594;</button>
+<button id="btn-auto" class="anim-btn" onclick="auto()">&#9654; 自动播放</button>
+<button id="btn-reset" class="anim-btn" onclick="reset()">&#8634; 重置</button>
+<span id="step-indicator" style="color:#888; font-size:0.85rem; margin-left:4px;">Step 0 / 0</span>
 </div>
 
 <div style="margin-bottom:8px; color:#888; font-size:12px;">CPU 时间线</div>
@@ -32,7 +43,8 @@ button { font-family: inherit; }
 <div style="margin-bottom:8px; color:#888; font-size:12px;">GPU 时间线</div>
 <div id="gpu-timeline" style="height:40px; background:#1a1a2e; border-radius:6px; position:relative; overflow:hidden; border:1px solid #333;"></div>
 
-<div id="timeline-stats" style="margin-top:15px; font-size:14px; color:#aaa;"></div>
+<div id="step-desc" style="margin-top:15px; font-size:14px; color:#76b900; min-height:22px;"></div>
+<div id="timeline-stats" style="margin-top:8px; font-size:14px; color:#aaa;"></div>
 </div>
 
 <div style="background:#16213e; padding:15px; border-radius:8px; margin-top:15px;">
@@ -40,69 +52,146 @@ button { font-family: inherit; }
 </div>
 
 <script>
-// 时间线动画
-function runWithoutGraph() {
-    const cpu = document.getElementById('cpu-timeline');
-    const gpu = document.getElementById('gpu-timeline');
-    const stats = document.getElementById('timeline-stats');
-    cpu.innerHTML = '';
-    gpu.innerHTML = '';
+// ===== CUDA Graph 时间线：分步演示 =====
+const KERNELS = 8;          // kernel 数量
+const KERNEL_W = 8;         // kernel 宽度 (percent)
+const GAP_W = 4;            // CPU launch 开销宽度 (percent)
+// 每个 kernel 占用的标称耗时 (ms)，仅用于累计文案
+const LAUNCH_MS = 0.6;      // 单次 CPU launch 开销
+const EXEC_MS = 0.6;        // 单个 kernel GPU 执行
+const GRAPH_LAUNCH_MS = 0.4;
 
-    const kernels = 8;
-    const kernelWidth = 8; // percent
-    const gapWidth = 4; // percent - CPU 开销
+let mode = 'without';       // 'without' | 'with'
+let step = 0;               // 当前步 (0 .. N-1)
+let autoTimer = null;
 
-    for (let i = 0; i < kernels; i++) {
-        const offset = i * (kernelWidth + gapWidth);
-        // CPU launch 开销（红色）
-        const cpuBlock = document.createElement('div');
-        cpuBlock.style.cssText = `position:absolute; left:${offset}%; width:${gapWidth}%; height:100%; background:#ff4444; border-radius:3px; opacity:0; transition: opacity 0.3s;`;
-        cpuBlock.style.transitionDelay = (i * 150) + 'ms';
-        cpu.appendChild(cpuBlock);
-
-        // GPU kernel（绿色）
-        const gpuBlock = document.createElement('div');
-        gpuBlock.style.cssText = `position:absolute; left:${offset + gapWidth}%; width:${kernelWidth}%; height:100%; background:#76b900; border-radius:3px; opacity:0; transition: opacity 0.3s;`;
-        gpuBlock.style.transitionDelay = (i * 150 + 80) + 'ms';
-        gpu.appendChild(gpuBlock);
-
-        setTimeout(() => { cpuBlock.style.opacity = '1'; }, 50);
-        setTimeout(() => { gpuBlock.style.opacity = '1'; }, 50);
-    }
-
-    stats.innerHTML = '<span style="color:#ff4444;">&#9632;</span> CPU 开销（driver 调用） &nbsp;&nbsp; <span style="color:#76b900;">&#9632;</span> GPU 计算 &nbsp;&nbsp; | 总耗时: ~9.6ms | GPU 空闲: ~33%';
+// 当前模式的步数（N）。without: 每个 kernel 一步；with: launch + 执行两步
+function stepCount() {
+  return mode === 'without' ? KERNELS : 2;
 }
 
-function runWithGraph() {
-    const cpu = document.getElementById('cpu-timeline');
-    const gpu = document.getElementById('gpu-timeline');
-    const stats = document.getElementById('timeline-stats');
-    cpu.innerHTML = '';
-    gpu.innerHTML = '';
+function clearTimeline() {
+  document.getElementById('cpu-timeline').innerHTML = '';
+  document.getElementById('gpu-timeline').innerHTML = '';
+}
 
-    // 单次 CPU launch
+// 渲染 without-graph 时间线，显示前 step+1 个 kernel（静止帧）
+function renderWithout(curStep) {
+  const cpu = document.getElementById('cpu-timeline');
+  const gpu = document.getElementById('gpu-timeline');
+  clearTimeline();
+  for (let i = 0; i <= curStep; i++) {
+    const offset = i * (KERNEL_W + GAP_W);
     const cpuBlock = document.createElement('div');
-    cpuBlock.style.cssText = 'position:absolute; left:0%; width:4%; height:100%; background:#2196f3; border-radius:3px; opacity:0; transition: opacity 0.3s;';
+    cpuBlock.style.cssText = `position:absolute; left:${offset}%; width:${GAP_W}%; height:100%; background:#ff4444; border-radius:3px; transition: opacity 0.3s;`;
     cpu.appendChild(cpuBlock);
 
-    // 连续 GPU 执行
     const gpuBlock = document.createElement('div');
-    gpuBlock.style.cssText = 'position:absolute; left:4%; width:64%; height:100%; background:linear-gradient(90deg, #76b900, #00d4aa); border-radius:3px; opacity:0; transition: opacity 0.5s; transition-delay: 0.1s;';
+    gpuBlock.style.cssText = `position:absolute; left:${offset + GAP_W}%; width:${KERNEL_W}%; height:100%; background:#76b900; border-radius:3px; transition: opacity 0.3s;`;
     gpu.appendChild(gpuBlock);
-
-    setTimeout(() => { cpuBlock.style.opacity = '1'; gpuBlock.style.opacity = '1'; }, 50);
-
-    stats.innerHTML = '<span style="color:#2196f3;">&#9632;</span> 单次 graph launch &nbsp;&nbsp; <span style="color:#76b900;">&#9632;</span> 连续 GPU 计算 &nbsp;&nbsp; | 总耗时: ~6.4ms | GPU 空闲: ~0% | <span style="color:#ffd700;">加速比: 1.5x</span>';
+  }
 }
 
-function resetTimeline() {
-    document.getElementById('cpu-timeline').innerHTML = '';
-    document.getElementById('gpu-timeline').innerHTML = '';
-    document.getElementById('timeline-stats').innerHTML = '<span style="color:#888;">点击上方按钮查看差异</span>';
+// 渲染 with-graph 时间线。curStep=0: 仅 launch；curStep>=1: launch + 连续执行
+function renderWith(curStep) {
+  const cpu = document.getElementById('cpu-timeline');
+  const gpu = document.getElementById('gpu-timeline');
+  clearTimeline();
+
+  const cpuBlock = document.createElement('div');
+  cpuBlock.style.cssText = 'position:absolute; left:0%; width:4%; height:100%; background:#2196f3; border-radius:3px; transition: opacity 0.3s;';
+  cpu.appendChild(cpuBlock);
+
+  if (curStep >= 1) {
+    const gpuBlock = document.createElement('div');
+    gpuBlock.style.cssText = 'position:absolute; left:4%; width:64%; height:100%; background:linear-gradient(90deg, #76b900, #00d4aa); border-radius:3px; transition: opacity 0.5s;';
+    gpu.appendChild(gpuBlock);
+  }
+}
+
+// 根据当前 mode + step 重绘静止帧、文案与按钮状态
+function render() {
+  const N = stepCount();
+  const desc = document.getElementById('step-desc');
+  const stats = document.getElementById('timeline-stats');
+  const indicator = document.getElementById('step-indicator');
+
+  if (mode === 'without') {
+    renderWithout(step);
+    const launched = step + 1;
+    const cumMs = (launched * (LAUNCH_MS + EXEC_MS)).toFixed(1);
+    if (step < N - 1) {
+      desc.innerHTML = `Kernel ${launched}/${KERNELS} 启动：CPU 先付出一次 launch 开销（红色），再由 GPU 执行（绿色）。累计耗时 ~${cumMs}ms`;
+    } else {
+      desc.innerHTML = `全部 ${KERNELS} 个 kernel 串行启动完毕。每个 kernel 前都有一段 CPU launch 间隙，GPU 被迫等待。累计耗时 ~${cumMs}ms`;
+    }
+    stats.innerHTML = '<span style="color:#ff4444;">&#9632;</span> CPU 开销（driver 调用） &nbsp;&nbsp; <span style="color:#76b900;">&#9632;</span> GPU 计算 &nbsp;&nbsp; | 总耗时: ~9.6ms | GPU 空闲: ~33%';
+  } else {
+    renderWith(step);
+    if (step === 0) {
+      desc.innerHTML = `单次 graph launch：CPU 只发起 <strong>一条</strong> 指令（蓝色，~${GRAPH_LAUNCH_MS}ms），即可触发整个 kernel 序列。`;
+    } else {
+      const cumMs = (GRAPH_LAUNCH_MS + KERNELS * EXEC_MS).toFixed(1);
+      desc.innerHTML = `GPU 连续执行全部 ${KERNELS} 个 kernel，<strong>没有</strong> 中间 launch 间隙。累计耗时 ~${cumMs}ms`;
+    }
+    stats.innerHTML = '<span style="color:#2196f3;">&#9632;</span> 单次 graph launch &nbsp;&nbsp; <span style="color:#76b900;">&#9632;</span> 连续 GPU 计算 &nbsp;&nbsp; | 总耗时: ~6.4ms | GPU 空闲: ~0% | <span style="color:#ffd700;">加速比: 1.5x</span>';
+  }
+
+  indicator.textContent = `Step ${step} / ${N - 1}`;
+  document.getElementById('btn-prev').disabled = (step === 0);
+  document.getElementById('btn-next').disabled = (step === N - 1);
+  document.getElementById('btn-auto').disabled = (step === N - 1);
+
+  // 预设按钮高亮
+  document.getElementById('preset-without').classList.toggle('active', mode === 'without');
+  document.getElementById('preset-with').classList.toggle('active', mode === 'with');
+}
+
+function stopAuto() {
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+}
+
+// 切换预设（保留步进逻辑），重置到 step 0
+function setMode(m) {
+  stopAuto();
+  mode = m;
+  step = 0;
+  render();
+}
+
+function next() {
+  const N = stepCount();
+  if (step < N - 1) { step++; render(); }
+}
+
+function prev() {
+  if (step > 0) { stopAuto(); step--; render(); }
+}
+
+function reset() {
+  stopAuto();
+  step = 0;
+  render();
+}
+
+function auto() {
+  stopAuto();
+  const tick = () => {
+    const N = stepCount();
+    if (step >= N - 1) { autoTimer = null; return; }
+    step++;
+    render();
+    if (step < N - 1) {
+      autoTimer = setTimeout(tick, mode === 'without' ? 600 : 900);
+    } else {
+      autoTimer = null;
+    }
+  };
+  tick();
 }
 
 // 初始化
-resetTimeline();
+setMode('without');
 </script>
 
 <script>

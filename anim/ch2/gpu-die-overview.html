@@ -14,17 +14,49 @@ body {
   padding: 4px;
 }
 @keyframes nvlinkPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ---- Guided tour styling ---- */
+.btn { background: linear-gradient(135deg, #76b900, #00d4aa); color: #000; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover:not(:disabled) { transform: scale(1.05); opacity: 0.9; }
+.btn:active:not(:disabled) { transform: scale(0.95); }
+.btn-secondary { background: #333; color: #e0e0e0; border: 1px solid #555; }
+.btn-secondary:hover:not(:disabled) { background: #444; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tour-controls { display: flex; gap: 10px; margin: 16px 0 4px; flex-wrap: wrap; align-items: center; }
+.tour-counter { margin-left: auto; font-size: 0.8rem; color: #888; font-family: monospace; }
+.tour-info { color: #00d4aa; font-size: 0.9rem; margin: 10px 0 4px; min-height: 44px; padding: 10px 14px; background: #12122a; border-left: 3px solid #00d4aa; border-radius: 6px; }
+.tour-info b { color: #fff; }
+
+/* Tour mode: dim everything, then re-highlight the active target */
+.tour-active [data-tour] { transition: opacity 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease; }
+.tour-active.dimming [data-tour]:not(.tour-on):not(.tour-keep) { opacity: 0.18; filter: saturate(0.4); }
+[data-tour].tour-keep { opacity: 1 !important; filter: none !important; }
+[data-tour].tour-on { opacity: 1 !important; filter: none !important; box-shadow: 0 0 0 2px #00d4aa, 0 0 18px 4px rgba(0,212,170,0.55); border-radius: 8px; position: relative; z-index: 5; }
+@media (max-width: 600px) {
+  .tour-controls { flex-direction: column; align-items: stretch; }
+  .tour-counter { margin-left: 0; text-align: center; }
+}
 </style>
 </head>
 <body>
 
 <!-- Full GPU Architecture Diagram -->
-<div style="background: #0a0a1a; border-radius: 12px; padding: 30px; margin: 0; border: 1px solid #333; position: relative; overflow: hidden;">
+<div id="die-root" style="background: #0a0a1a; border-radius: 12px; padding: 30px; margin: 0; border: 1px solid #333; position: relative; overflow: hidden;">
 
   <!-- Title -->
-  <div style="text-align: center; margin-bottom: 20px;">
+  <div style="text-align: center; margin-bottom: 12px;">
     <span style="font-size: 1.1em; font-weight: bold; color: #fff; background: linear-gradient(90deg, #00d2ff, #7b2ff7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GPU Die Overview</span>
   </div>
+
+  <!-- Guided tour controls -->
+  <div class="tour-controls">
+    <button class="btn btn-secondary" id="btn-prev" onclick="prev()">&larr; 上一步</button>
+    <button class="btn" id="btn-next" onclick="next()">下一步 &rarr;</button>
+    <button class="btn btn-secondary" id="btn-reset" onclick="reset()">&#8634; 重置</button>
+    <button class="btn btn-secondary" id="btn-auto" onclick="auto()">&#9654; 自动播放</button>
+    <span class="tour-counter" id="tour-counter">Step 0 / 0</span>
+  </div>
+  <div class="tour-info" id="tour-info">点击「下一步 →」或「▶ 自动播放」，逐层游览 GPU Die 的层级结构。</div>
 
   <!-- Main layout: GPC array + Memory -->
   <div style="display: flex; gap: 20px; align-items: stretch;">
@@ -33,24 +65,24 @@ body {
     <div style="flex: 3; display: flex; flex-direction: column; gap: 15px;">
 
       <!-- GPC Array -->
-      <div style="border: 2px solid #444; border-radius: 10px; padding: 18px; position: relative; background: #0f0f20;">
+      <div data-tour="gpc-array" style="border: 2px solid #444; border-radius: 10px; padding: 18px; position: relative; background: #0f0f20;">
         <div style="position: absolute; top: -11px; left: 16px; background: #0a0a1a; padding: 0 10px; color: #00d2ff; font-weight: bold; font-size: 0.85em;">GPC × 12 (Graphics Processing Clusters)</div>
 
         <!-- GPC grid showing SM clusters -->
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
 
           <!-- One detailed GPC -->
-          <div style="border: 1.5px solid #7b2ff7; border-radius: 8px; padding: 10px; background: #12122a; grid-column: span 2; grid-row: span 2;">
+          <div data-tour="gpc-detail" style="border: 1.5px solid #7b2ff7; border-radius: 8px; padding: 10px; background: #12122a; grid-column: span 2; grid-row: span 2;">
             <div style="color: #7b2ff7; font-size: 0.72em; font-weight: bold; margin-bottom: 8px; text-align: center;">GPC 0 (详细展开)</div>
 
             <!-- SM Units inside GPC -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
               <!-- Detailed SM -->
-              <div style="border: 1px solid #00d2ff; border-radius: 6px; padding: 6px; background: #1a1a30; grid-column: span 3;">
+              <div data-tour="sm" style="border: 1px solid #00d2ff; border-radius: 6px; padding: 6px; background: #1a1a30; grid-column: span 3;">
                 <div style="color: #00d2ff; font-size: 0.65em; font-weight: bold; text-align: center; margin-bottom: 6px;">SM (Streaming Multiprocessor)</div>
                 <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
                   <!-- CUDA Cores -->
-                  <div style="background: #4caf5025; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                  <div data-tour="cuda" style="background: #4caf5025; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 6px; text-align: center;">
                     <div style="font-size: 0.55em; color: #81c784; white-space: nowrap;">CUDA Cores</div>
                     <div style="display: grid; grid-template-columns: repeat(8, 6px); gap: 1px; margin-top: 3px;">
                       <div style="width:6px;height:6px;background:#4caf50;border-radius:1px;"></div>
@@ -73,7 +105,7 @@ body {
                     <div style="font-size: 0.5em; color: #666; margin-top: 2px;">128 FP32</div>
                   </div>
                   <!-- Tensor Cores -->
-                  <div style="background: #7b2ff725; border: 1px solid #7b2ff7; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                  <div data-tour="tensor" style="background: #7b2ff725; border: 1px solid #7b2ff7; border-radius: 4px; padding: 4px 6px; text-align: center;">
                     <div style="font-size: 0.55em; color: #b388ff; white-space: nowrap;">Tensor Cores</div>
                     <div style="display: grid; grid-template-columns: repeat(2, 12px); gap: 2px; margin-top: 3px; justify-content: center;">
                       <div style="width:12px;height:12px;background:linear-gradient(135deg,#7b2ff7,#a855f7);border-radius:2px;"></div>
@@ -92,7 +124,7 @@ body {
                     <div style="font-size: 0.5em; color: #666; margin-top: 2px;">4th Gen</div>
                   </div>
                   <!-- SRAM / Shared Memory -->
-                  <div style="background: #ff6b6b20; border: 1px solid #ff6b6b; border-radius: 4px; padding: 4px 6px; text-align: center;">
+                  <div data-tour="sram" style="background: #ff6b6b20; border: 1px solid #ff6b6b; border-radius: 4px; padding: 4px 6px; text-align: center;">
                     <div style="font-size: 0.55em; color: #ff8a80; white-space: nowrap;">Shared Mem / L1</div>
                     <div style="width: 100%; height: 10px; background: linear-gradient(90deg, #ff6b6b, #ff6b6b88); border-radius: 2px; margin-top: 4px;"></div>
                     <div style="font-size: 0.5em; color: #666; margin-top: 2px;">228 KB SRAM</div>
@@ -180,7 +212,7 @@ body {
       <!-- Interconnect: L2 Cache + Crossbar -->
       <div style="display: flex; gap: 10px;">
         <!-- L2 Cache -->
-        <div style="flex: 2; border: 2px solid #6ab04c; border-radius: 8px; padding: 12px; background: #0f1f0f; position: relative;">
+        <div data-tour="l2" style="flex: 2; border: 2px solid #6ab04c; border-radius: 8px; padding: 12px; background: #0f1f0f; position: relative;">
           <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #6ab04c; font-weight: bold; font-size: 0.8em;">L2 Cache</div>
           <div style="display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
             <div style="height: 14px; flex: 1; min-width: 30px; background: linear-gradient(90deg, #6ab04c, #009432); border-radius: 2px;"></div>
@@ -193,7 +225,7 @@ body {
           <div style="text-align: center; font-size: 0.68em; color: #aaa; margin-top: 6px;">96 MB | ~12 TB/s | All SMs share</div>
         </div>
         <!-- GigaThread Engine -->
-        <div style="flex: 1; border: 2px solid #ff9800; border-radius: 8px; padding: 12px; background: #1a1208; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div data-tour="gigathread" style="flex: 1; border: 2px solid #ff9800; border-radius: 8px; padding: 12px; background: #1a1208; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #ff9800; font-weight: bold; font-size: 0.72em; white-space: nowrap;">GigaThread Engine</div>
           <div style="font-size: 0.62em; color: #ffcc80; text-align: center; margin-top: 4px;">Block 调度<br>Warp 分配<br>负载均衡</div>
         </div>
@@ -205,7 +237,7 @@ body {
     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
 
       <!-- HBM -->
-      <div style="border: 2px solid #00d2ff; border-radius: 8px; padding: 14px; background: #001a2e; position: relative; flex: 1;">
+      <div data-tour="hbm" style="border: 2px solid #00d2ff; border-radius: 8px; padding: 14px; background: #001a2e; position: relative; flex: 1;">
         <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #00d2ff; font-weight: bold; font-size: 0.8em;">HBM3e (GDDR7)</div>
         <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
           <div style="display: flex; gap: 3px;">
@@ -229,7 +261,7 @@ body {
       </div>
 
       <!-- NVLink -->
-      <div style="border: 2px solid #76ff03; border-radius: 8px; padding: 10px; background: #0a1a0a; position: relative;">
+      <div data-tour="nvlink" style="border: 2px solid #76ff03; border-radius: 8px; padding: 10px; background: #0a1a0a; position: relative;">
         <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #76ff03; font-weight: bold; font-size: 0.75em;">NVLink 5.0</div>
         <div style="display: flex; gap: 3px; margin-top: 4px; justify-content: center;">
           <div style="width: 4px; height: 30px; background: linear-gradient(180deg, #76ff03, #33691e); border-radius: 2px; animation: nvlinkPulse 1.5s ease-in-out infinite;"></div>
@@ -241,7 +273,7 @@ body {
       </div>
 
       <!-- PCIe -->
-      <div style="border: 2px solid #888; border-radius: 8px; padding: 10px; background: #111; position: relative;">
+      <div data-tour="pcie" style="border: 2px solid #888; border-radius: 8px; padding: 10px; background: #111; position: relative;">
         <div style="position: absolute; top: -11px; left: 12px; background: #0a0a1a; padding: 0 8px; color: #aaa; font-weight: bold; font-size: 0.75em;">PCIe 5.0 x16</div>
         <div style="text-align: center; font-size: 0.62em; color: #999; margin-top: 4px;">128 GB/s<br>CPU↔GPU</div>
       </div>
@@ -276,6 +308,105 @@ body {
     </div>
   </div>
 </div>
+
+<script>
+// ---- Guided tour ----
+// Each stop highlights one component (by data-tour key) and shows a description.
+// Step 0 is the "whole die" overview (nothing highlighted).
+const tourSteps = [
+  { key: null,         title: '整块 GPU Die', desc: '一颗 GPU 由<b>计算侧</b>（左：GPC/SM 阵列、L2、GigaThread）和<b>存储/互联侧</b>（右：HBM、NVLink、PCIe）组成。下面逐层放大游览。' },
+  { key: 'gpc-array',  title: 'GPC × 12', desc: '<b>GPC（图形处理簇）</b>是最高一级计算分区。整颗 Die 含 12 个 GPC，每个 GPC 内再容纳多组 SM。' },
+  { key: 'gpc-detail', title: 'GPC 0（展开）', desc: '放大单个 <b>GPC</b>：内部包含约 12 个 <b>SM</b>，共享 GPC 级别的调度与光栅资源。' },
+  { key: 'sm',         title: 'SM（流多处理器）', desc: '<b>SM</b> 是 GPU 的基本执行单元，含 CUDA Core、Tensor Core、RT Core、共享内存/L1 与寄存器堆，按 warp（32 线程）调度执行。' },
+  { key: 'cuda',       title: 'CUDA Cores', desc: '<b>CUDA Core</b> 执行通用 FP32/INT32 标量运算，每个 SM 含 128 个 FP32 单元，是通用并行计算的主力。' },
+  { key: 'tensor',     title: 'Tensor Cores', desc: '<b>Tensor Core</b>（第 5 代）做矩阵乘加（MMA），支持 FP4/FP8/BF16/TF32，是深度学习算力的核心。' },
+  { key: 'sram',       title: 'Shared Mem / L1', desc: '<b>共享内存 / L1</b> 是 SM 内的 228 KB 片上 SRAM，供 block 内线程高速共享数据、做缓存与暂存。' },
+  { key: 'l2',         title: 'L2 Cache', desc: '<b>L2 缓存</b>（96 MB，~12 TB/s）被所有 SM 共享，缓冲对 HBM 的访问，是片上的最后一级缓存。' },
+  { key: 'gigathread', title: 'GigaThread Engine', desc: '<b>GigaThread 引擎</b>负责全局调度：把 Block 分发到各 SM、分配 warp 并做负载均衡。' },
+  { key: 'hbm',        title: 'HBM3e 显存', desc: '<b>HBM</b> 是片外高带宽显存（96 GB / 1792 GB/s / 512-bit），存放模型权重与激活，是全局内存。' },
+  { key: 'nvlink',     title: 'NVLink 5.0', desc: '<b>NVLink</b>（1800 GB/s）提供 GPU↔GPU 的高速互联，用于多卡张量/流水并行的跨卡通信。' },
+  { key: 'pcie',       title: 'PCIe 5.0 x16', desc: '<b>PCIe</b>（128 GB/s）连接 CPU 与 GPU，负责主机内存与显存之间的数据搬运。' },
+];
+
+const N = tourSteps.length;
+let step = 0;
+let autoTimer = null;
+
+const root = document.getElementById('die-root');
+
+function clearHighlights() {
+  root.querySelectorAll('[data-tour].tour-on, [data-tour].tour-keep').forEach(el => {
+    el.classList.remove('tour-on');
+    el.classList.remove('tour-keep');
+  });
+}
+
+function render() {
+  clearHighlights();
+  const s = tourSteps[step];
+
+  if (s.key === null) {
+    // whole-die overview: no dimming, nothing singled out
+    root.classList.remove('dimming');
+  } else {
+    root.classList.add('dimming');
+    const target = root.querySelector('[data-tour="' + s.key + '"]');
+    if (target) {
+      target.classList.add('tour-on');
+      // keep data-tour ancestors un-dimmed (no glow) so nested targets stay visible
+      let el = target.parentElement;
+      while (el && el !== root) {
+        if (el.hasAttribute && el.hasAttribute('data-tour')) el.classList.add('tour-keep');
+        el = el.parentElement;
+      }
+    }
+  }
+
+  document.getElementById('tour-info').innerHTML = '<b>' + s.title + '：</b> ' + s.desc;
+  document.getElementById('tour-counter').textContent = 'Step ' + step + ' / ' + (N - 1);
+
+  document.getElementById('btn-prev').disabled = (step === 0);
+  const atEnd = (step === N - 1);
+  document.getElementById('btn-next').disabled = atEnd;
+  document.getElementById('btn-auto').disabled = atEnd && autoTimer === null;
+}
+
+function stopAuto() {
+  if (autoTimer !== null) { clearInterval(autoTimer); autoTimer = null; }
+  document.getElementById('btn-auto').textContent = '▶ 自动播放';
+}
+
+function next() {
+  if (step < N - 1) { step++; render(); }
+  if (step === N - 1) stopAuto();
+}
+
+function prev() {
+  stopAuto();
+  if (step > 0) { step--; render(); }
+}
+
+function reset() {
+  stopAuto();
+  step = 0;
+  root.classList.remove('dimming');
+  render();
+}
+
+function auto() {
+  if (autoTimer !== null) { stopAuto(); return; }
+  if (step === N - 1) { step = 0; render(); }
+  document.getElementById('btn-auto').textContent = '⏸ 暂停';
+  autoTimer = setInterval(function () {
+    if (step >= N - 1) { stopAuto(); render(); return; }
+    next();
+  }, 2000);
+}
+
+// Activate tour mode and draw initial state
+root.classList.add('tour-active');
+render();
+</script>
 
 <script>
 (function () {

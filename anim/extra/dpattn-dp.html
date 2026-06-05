@@ -32,9 +32,11 @@ button.secondary { background: #333; border: 1px solid #555; color: #ccc; }
     <canvas id="dpAttnCanvas" width="950" height="520"></canvas>
   </div>
   <div class="controls">
-    <button class="secondary" onclick="dpAnim.reset()">↺ 重置</button>
-    <button onclick="dpAnim.reset();dpAnim.play();">▶ 播放</button>
-    <span class="step-label" id="dpStep"></span>
+    <button class="secondary" id="dpPrev" onclick="dpAnim.prev()">← 上一步</button>
+    <button class="secondary" id="dpNext" onclick="dpAnim.next()">下一步 →</button>
+    <button class="secondary" id="dpResetBtn" onclick="dpAnim.reset()">↺ 重置</button>
+    <button id="dpAutoBtn" onclick="dpAnim.auto()">▶ 自动播放</button>
+    <div><span class="step-label" id="dpStep"></span><span class="step-label" id="dpStepCounter"></span></div>
   </div>
 </div>
 
@@ -56,6 +58,13 @@ const dpAnim = (() => {
   const N = 4;
   let progress = 0, animId = null, startTime = null;
   const duration = 8000;
+
+  // Discrete step model: 6 phases, each mapped to a representative progress
+  // value (END/mid of that phase) so the existing render() phase logic shows
+  // the right still frame.
+  const STEP_PROGRESS = [0.07, 0.27, 0.50, 0.70, 0.87, 0.98];
+  const LAST_STEP = STEP_PROGRESS.length - 1;
+  let step = 0;
 
   const gpuW = 200, gpuH = 420, gpuGap = 20;
   const startX = (W - N * gpuW - (N-1) * gpuGap) / 2;
@@ -231,17 +240,45 @@ const dpAnim = (() => {
       p < 0.95 ? 'Step 4: All-to-All combine' : '完成';
   }
 
+  // Sync the step counter + button enabled/disabled states with `step`.
+  function syncControls() {
+    document.getElementById('dpStepCounter').textContent = `  ·  Step ${step} / ${LAST_STEP}`;
+    document.getElementById('dpPrev').disabled = (step === 0);
+    document.getElementById('dpNext').disabled = (step === LAST_STEP);
+    document.getElementById('dpAutoBtn').disabled = (step === LAST_STEP);
+  }
+
+  // Render the still frame for a discrete step.
+  function showStep(s) {
+    step = Math.max(0, Math.min(s, LAST_STEP));
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    progress = STEP_PROGRESS[step];
+    render();
+    syncControls();
+  }
+  function prev() { showStep(step - 1); }
+  function next() { showStep(step + 1); }
+
   function animate(ts) {
     if (!startTime) startTime = ts;
     progress = Math.min((ts - startTime) / duration, 1);
     render();
-    if (progress < 1) animId = requestAnimationFrame(animate);
+    if (progress < 1) {
+      animId = requestAnimationFrame(animate);
+    } else {
+      // Auto-play finished: land on the last discrete step.
+      animId = null;
+      step = LAST_STEP;
+      syncControls();
+    }
   }
   function play() { startTime = null; if (animId) cancelAnimationFrame(animId); animId = requestAnimationFrame(animate); }
-  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; progress = 0; render(); }
+  // Auto-play from the beginning; disables next/auto while running via syncControls on completion.
+  function auto() { step = 0; syncControls(); play(); }
+  function reset() { if (animId) cancelAnimationFrame(animId); animId = null; showStep(0); }
 
-  progress = 0; render();
-  return { play, reset };
+  showStep(0);
+  return { prev, next, reset, auto, play };
 })();
 
 (function () {

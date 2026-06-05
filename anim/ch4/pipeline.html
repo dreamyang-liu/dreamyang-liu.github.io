@@ -26,6 +26,9 @@ body {
 .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
 .btn:active { transform: translateY(0); }
 .btn.secondary { background: linear-gradient(135deg, #555, #444); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.step-text { color: #ff9800; font-size: 0.9em; min-height: 40px; margin: 10px auto 0; padding: 10px; background: #1a1a2e; border-radius: 6px; max-width: 600px; text-align: center; }
+.step-counter { color: #888; font-size: 0.8em; text-align: center; margin-top: 8px; letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -63,41 +66,94 @@ body {
 <div style="font-size:0.75em; color:#aaa; margin-top:5px;">Token IDs → 文本</div>
 </div>
 </div>
+<div class="step-text" id="pipeline-step-text"></div>
+<div class="step-counter" id="pipeline-step-counter">Step 0 / 4</div>
 <div style="text-align:center; margin-top:15px;">
-<button class="btn" onclick="startPipelineAnim()">播放动画</button>
-<button class="btn secondary" onclick="resetPipelineAnim()">重置</button>
+<button class="btn secondary" id="pipeline-prev" onclick="prev()">&larr; 上一步</button>
+<button class="btn secondary" id="pipeline-next" onclick="next()">下一步 &rarr;</button>
+<button class="btn secondary" onclick="reset()">&#8634; 重置</button>
+<button class="btn" id="pipeline-auto" onclick="auto()">&#9654; 自动播放</button>
 </div>
 </div>
 
 <script>
-// ==================== Pipeline Animation ====================
-let pipelineInterval = null;
-function startPipelineAnim() {
-    resetPipelineAnim();
-    const stages = ['stage-tokenize', 'stage-schedule', 'stage-prefill', 'stage-decode', 'stage-detokenize'];
-    let current = 0;
-    pipelineInterval = setInterval(() => {
-        stages.forEach(id => document.getElementById(id).classList.remove('active'));
-        if (current < stages.length) {
-            document.getElementById(stages[current]).classList.add('active');
-            current++;
-        } else {
-            current = 0;
-        }
-    }, 800);
-}
+// ==================== Pipeline Animation (step-through) ====================
+const pipelineSteps = [
+    { id: 'stage-tokenize',   desc: 'Step 1 - Tokenize: 输入文本被切分并映射为 Token IDs' },
+    { id: 'stage-schedule',   desc: 'Step 2 - Schedule: 调度器将请求组装进 Batch, 等待执行' },
+    { id: 'stage-prefill',    desc: 'Step 3 - Prefill: 并行处理整个 prompt, 填充 KV Cache' },
+    { id: 'stage-decode',     desc: 'Step 4 - Decode: 自回归逐 token 生成, 复用 KV Cache' },
+    { id: 'stage-detokenize', desc: 'Step 5 - Detokenize: 生成的 Token IDs 解码回可读文本' },
+];
+const N = pipelineSteps.length; // 5
 
-function resetPipelineAnim() {
-    if (pipelineInterval) clearInterval(pipelineInterval);
-    pipelineInterval = null;
+let pipelineStep = 0;
+let pipelineTimer = null;
+
+function renderPipeline() {
     document.querySelectorAll('.pipeline-stage').forEach(s => s.classList.remove('active'));
+    document.getElementById(pipelineSteps[pipelineStep].id).classList.add('active');
+    document.getElementById('pipeline-step-text').textContent = pipelineSteps[pipelineStep].desc;
+    document.getElementById('pipeline-step-counter').textContent = `Step ${pipelineStep} / ${N - 1}`;
+
+    const atStart = pipelineStep === 0;
+    const atEnd = pipelineStep === N - 1;
+    document.getElementById('pipeline-prev').disabled = atStart;
+    document.getElementById('pipeline-next').disabled = atEnd;
+    // disabled at the last step, or while an auto-play run is in progress
+    document.getElementById('pipeline-auto').disabled = atEnd || pipelineTimer !== null;
 }
 
-// ==================== Auto-start pipeline on scroll ====================
+function stopAuto() {
+    if (pipelineTimer) { clearTimeout(pipelineTimer); pipelineTimer = null; }
+}
+
+function prev() {
+    stopAuto();
+    pipelineStep = Math.max(0, pipelineStep - 1);
+    renderPipeline();
+}
+
+function next() {
+    stopAuto();
+    pipelineStep = Math.min(N - 1, pipelineStep + 1);
+    renderPipeline();
+}
+
+function reset() {
+    stopAuto();
+    pipelineStep = 0;
+    renderPipeline();
+}
+
+function auto() {
+    stopAuto();
+    const tick = () => {
+        if (pipelineStep >= N - 1) { pipelineTimer = null; renderPipeline(); return; }
+        pipelineStep++;
+        if (pipelineStep < N - 1) {
+            pipelineTimer = setTimeout(tick, 900);
+        } else {
+            pipelineTimer = null;
+        }
+        renderPipeline();
+    };
+    // mark a run as active so renderPipeline keeps the auto button disabled
+    pipelineTimer = setTimeout(tick, 900);
+    renderPipeline();
+}
+
+// initial still frame
+renderPipeline();
+
+// ==================== Auto-start pipeline once on scroll ====================
+let pipelineAutoTriggered = false;
 const pipelineObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting && !pipelineInterval) {
-            startPipelineAnim();
+        // only auto-play once, and never override manual stepping
+        if (entry.isIntersecting && !pipelineAutoTriggered && pipelineStep === 0 && pipelineTimer === null) {
+            pipelineAutoTriggered = true;
+            auto();
         }
     });
 }, { threshold: 0.5 });
