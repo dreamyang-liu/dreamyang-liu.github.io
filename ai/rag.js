@@ -40,17 +40,18 @@
   }
 
   function buildMessages(question, sources) {
+    // The retrieved excerpts are a HINT, not a constraint — if they help, use
+    // them and cite the article; if they don't, answer freely from your own
+    // knowledge. This avoids the over-refusal failure mode of strict grounding.
     const system = [
-      '你是这个技术博客的问答助手。',
-      '只能依据下面提供的「参考资料」回答问题；不要编造资料中没有的内容。',
-      '如果参考资料不足以回答，请直接说「本文未涉及」，并建议使用站内搜索。',
-      '回答时请引用相关文章标题。',
-      '请使用与用户提问相同的语言回答（中文问题用中文，English question in English）。',
+      '你是这个技术博客的 AI 助手, 博客的主题是 ML Systems 和算法。',
+      '下面会附上几段从博客检索出的可能相关的片段, 仅供参考 — 如果对回答有帮助, 就引用并标注来源文章标题; 如果不相关就忽略, 用你自己的知识正常回答即可。',
+      '请使用与用户提问相同的语言回答 (中文问题用中文, English questions in English)。',
     ].join('\n');
     const refs = sources
       .map((s, i) => `[${i + 1}] ${s.title}\n${s.text}`)
       .join('\n\n');
-    const user = `参考资料：\n${refs}\n\n问题：${question}`;
+    const user = `可能相关的博客片段 (仅供参考):\n${refs}\n\n问题: ${question}`;
     return [
       { role: 'system', content: system },
       { role: 'user', content: user },
