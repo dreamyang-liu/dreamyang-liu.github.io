@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Docker Memo | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile"><span class="toc-text">Dockerfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-Images"><span class="toc-text">Docker Images</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Base-Image-Parent-Image"><span class="toc-text">Base Image &#x2F; Parent Image</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RUN"><span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD"><span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COPY"><span class="toc-text">COPY</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VOLUME"><span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dive"><span class="toc-text">Dive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-Filesystem"><span class="toc-text">Docker Filesystem</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Docker</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Docker Memo.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Docker Memo</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2023-08-15
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Docker</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><p>A Dockerfile is a text file containing the <code>definition</code> of a container image, which can be used to launch containers. This <code>definition</code> includes commands, a base image, configuration, and more. In this post we’ll walk through each component and discuss when to use each one. Let’s get started.</p>
+<h2 id="Docker-Images"><a href="#Docker-Images" class="headerlink" title="Docker Images"></a>Docker Images</h2><p>Before diving into the individual components, you might want to know what a Docker image actually is. Reference: <a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/concepts/about-container-images#structure_of_an_image">Structure of an Image</a></p>
+<blockquote>
+<p><em>An image is a read-only template with instructions for creating a Docker container. Often, an image is based on another image, with some additional customization. –Docker Official Docs</em></p>
+</blockquote>
+<p>A Docker image can contain many files. To get a closer look, let’s pull one.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">alpine3.18: Pulling from library/python<br>9fda8d8052c6: Pull complete<br>e7ae3e644d56: Pull complete<br>4da8ee49dcce: Pull complete<br>7c6a85daf644: Pull complete<br>35f63c7ece91: Pull complete<br>Digest: sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c<br>Status: Downloaded newer image <span class="hljs-keyword">for</span> python:alpine3.18<br>docker.io/library/python:alpine3.18<br></code></pre></td></tr></table></figure>
+
+<p>From the output above we can see that we pulled the <code>python:alpine3.18</code> image from Docker Hub, and that this image has 5 layers.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">[</span><br>    <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;Id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sha256:0e3cec02f9651c77b976ef920ee7414ed059a7be05fb9b0c1e091afbfccd6f32&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;RepoTags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>            <span class="hljs-string">&quot;python:alpine3.18&quot;</span><br>        <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;RepoDigests&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>            <span class="hljs-string">&quot;python@sha256:603975e62d85aa07578034d3d10ffa1983b7618a6abb6371cf51941be6b8842c&quot;</span><br>        <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Parent&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Comment&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;buildkit.dockerfile.v0&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Created&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2023-07-22T09:54:20Z&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Container&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;ContainerConfig&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;Hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Domainname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;User&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStdin&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStdout&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStderr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Tty&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;OpenStdin&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;StdinOnce&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Env&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Cmd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Image&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Volumes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;WorkingDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Entrypoint&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;OnBuild&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Labels&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;DockerVersion&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Author&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Config&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;Hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Domainname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;User&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStdin&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStdout&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;AttachStderr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Tty&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;OpenStdin&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;StdinOnce&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Env&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>                <span class="hljs-string">&quot;PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;LANG=C.UTF-8&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;PYTHON_VERSION=3.11.4&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;PYTHON_PIP_VERSION=23.1.2&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;PYTHON_SETUPTOOLS_VERSION=65.5.1&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;PYTHON_GET_PIP_SHA256=45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe&quot;</span><br>            <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Cmd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>                <span class="hljs-string">&quot;python3&quot;</span><br>            <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;ArgsEscaped&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Image&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Volumes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;WorkingDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Entrypoint&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;OnBuild&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Labels&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Architecture&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;arm64&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Variant&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;v8&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Os&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;linux&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Size&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">57440899</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;VirtualSize&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">57440899</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;GraphDriver&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;Data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>                <span class="hljs-attr">&quot;LowerDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/bc0dd55b4f4eca654fb57ec3ab9997d5511bb31e1fbaa1e37e55d2d0c953ae78/diff:/var/lib/docker/overlay2/667b39e359e38324b6665b23a88143302006a058bccf71cc4465b5abc8f1394c/diff:/var/lib/docker/overlay2/d46312d087510c9820f8a8bf37bf437eda7f8f11a36bfc1497a2ce2a7d9d87de/diff:/var/lib/docker/overlay2/8a1a8952108eed0ca2e6b9b225204b1869cd946e345c7df86434ed56ce1a8a2b/diff&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-attr">&quot;MergedDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/merged&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-attr">&quot;UpperDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/diff&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-attr">&quot;WorkDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/48d3c75f4a01ef9eebb0dab62c561a835579ed37f26ae990911e09d15b33175f/work&quot;</span><br>            <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;overlay2&quot;</span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;RootFS&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;Type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;layers&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Layers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>                <span class="hljs-string">&quot;sha256:b2191e2be29d816fa6fbde954316d54e10df9a882c7ca38e3e087d9cbca49fe6&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;sha256:07c9596e31dd51b9652cd1ca250dbb2632b60b9930a41f8b35f723ad64f7759d&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;sha256:91225753119dc0605d12eeb9754f640054c6c8d936db3c0d7b9a382ddddcf1ec&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;sha256:cc409c6a686ee7a64acc8c0569f57e1a3c93cd53c82e782d8f2a623daa9cda64&quot;</span><span class="hljs-punctuation">,</span><br>                <span class="hljs-string">&quot;sha256:edd41b2a090ce8eef948b7d3979bda4726c46c3a5cee13fbe1b87acdbf6315b6&quot;</span><br>            <span class="hljs-punctuation">]</span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;Metadata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;LastTagTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0001-01-01T00:00:00Z&quot;</span><br>        <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">]</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="Base-Image-Parent-Image"><a href="#Base-Image-Parent-Image" class="headerlink" title="Base Image &#x2F; Parent Image"></a>Base Image &#x2F; Parent Image</h2><p>In most Dockerfiles, the first line you’ll see is <code>FROM &#123;base image&#125;</code>, for example <code>FROM python:3.8</code>.</p>
+<p>This line defines the base image for the image we’re building. A base image may itself consist of one or more layers.</p>
+<h2 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h2><p>The <code>RUN</code> command can be used to execute commands such as installing packages, downloading files, and so on. One important thing to note is that each command adds a new layer on top of the existing image. Combining multiple commands into a single <code>RUN</code> instruction is a common trick to reduce image size and minimize the number of layers.</p>
+<h2 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h2><p>CMD describes the default parameters or command for the container. Users can easily override the default command at runtime.</p>
+<h2 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h2><p>ENTRYPOINT also defines a command that <em><strong>always</strong></em> runs, meaning it cannot be overridden. ENTRYPOINT can be used to ensure that a specific command is always executed when the container starts, even if the user tries to override it.</p>
+<h2 id="COPY"><a href="#COPY" class="headerlink" title="COPY"></a>COPY</h2><p><code>COPY</code> can be used to copy local files into the container image, and nothing more.</p>
+<h2 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h2><p>The <code>ADD</code> command also allows files&#x2F;folders to be copied from the host into the image. It additionally supports tarball extraction and remote URL fetching. In general, <code>ADD</code> is preferred over <code>COPY</code>. Now let’s look at an example of using <code>ADD</code> in a Dockerfile.</p>
+<p>Suppose we are in a folder <code>/tmp/app</code> that contains the following files:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">server.js node_modules package.json<br></code></pre></td></tr></table></figure>
+<p>And we write the following command in the Dockerfile:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">ADD</span> <span class="hljs-keyword">server</span>.js /tmp<br># <span class="hljs-keyword">ADD</span> &lt;host <span class="hljs-type">path</span>&gt; &lt;image <span class="hljs-type">path</span>&gt;<br></code></pre></td></tr></table></figure>
+
+<p>The command above copies the file <code>/tmp/app/server.js</code> (host path) to <code>/tmp/server.js</code> (container image path). <em><strong>Note that the first argument must be within the build context</strong></em> — the context can be understood as the path from which the <code>docker build</code> command is executed.</p>
+<h2 id="VOLUME"><a href="#VOLUME" class="headerlink" title="VOLUME"></a>VOLUME</h2><p>A volume can be thought of as persistent data storage for a Docker container. The following command means that for any container started from this image, the <code>/var/www/html</code> directory on the host will be mounted to <code>/var/www/html</code> inside the container. Any changes made to that directory inside the container will be reflected on the host, and vice versa.</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">VOLUME /<span class="hljs-selector-tag">var</span>/www/<span class="hljs-selector-tag">html</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Dive"><a href="#Dive" class="headerlink" title="Dive"></a><em>Dive</em></h2><p><a target="_blank" rel="noopener" href="https://github.com/wagoodman/dive">Dive</a> is a very useful tool for analyzing container images. It lets you see the commands for each layer and the corresponding changes reflected in the filesystem.</p>
+<p><img src="https://raw.githubusercontent.com/wagoodman/dive/main/.data/demo.gif" alt="Dive"></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/opencontainers/image-spec/blob/main/manifest.md#oci-image-manifest-specification">OCI Image Manifest Specification</a></li>
+</ol>
+<h2 id="Docker-Filesystem"><a href="#Docker-Filesystem" class="headerlink" title="Docker Filesystem"></a>Docker Filesystem</h2><p>Docker supports many configurable filesystems; the most commonly used and recommended one today is overlay2, which offers good performance and stability. If you list Docker’s DataRoot directory, you’ll find many subdirectories, one of which is <code>overlay2</code> — that’s where overlay2 stores its data.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker<br>buildkit  containers  engine-id  image  network  overlay2  plugins  runtimes  swarm  tmp  volumes<br></code></pre></td></tr></table></figure>
+
+<p>Inside you’ll find many subdirectories whose names are hash strings. These directories are the storage locations for the filesystems of individual images; each one is a layer, which could be a layer of an image, a layer of a currently running container, or a layer of a volume.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker/overlay2<br>074c2e151731c12c6ec2fbb44dc248270142ee04c04d6003795e6a1fc57994f0      <br>89335ec1218350aca441be8a571fd7937473be28bb578ec4908b59b91d6eb8b0<br>074c2e151731c12c6ec2fbb44dc248270142ee04c04d6003795e6a1fc57994f0-init<br>205cc1a3d898504822c0a5c74a32a6572af61e2d8219a472f0cba2e0b5612b11       <br>8bb32d29875df42b515543e512571eece693ce9c0b2dc599d5dd9572cd823fe7<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ls</span> /var/lib/docker/overlay2/205cc1a3d898504822c0a5c74a32a6572af61e2d8219a472f0cba2e0b5612b11<br>diff  <span class="hljs-built_in">link</span>  lower  work<br></code></pre></td></tr></table></figure>
+
+
+<p>The hash in each folder name is not the layer’s sha256; it’s a short ID — the diff directory name assigned by Overlay2 on disk for that layer.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;GraphDriver&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;LowerDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/ead641d5d5794fe289eed7b83bb46408cca181111f434b57a56d44f99504ac78/diff:&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;MergedDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/merged&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;UpperDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/diff&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;WorkDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/var/lib/docker/overlay2/36849485abab637c098e9f88d4b5db39486a28b61c7d7b6782517c53a6bbf83b/work&quot;</span><br>    <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;Name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;overlay2&quot;</span><br><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br><span class="hljs-attr">&quot;RootFS&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;layers&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;Layers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>        <span class="hljs-string">&quot;sha256:f2a05f227c1388a37b341c57f367d4fffda24260eb043c30c884d9287c626106&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-string">&quot;sha256:80ddc4ff0604054169d1e2e2ad074d7ee4af7ba8174f94af6f3daeab6b13cca2&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-string">&quot;sha256:f646b5a3df86583662f76ff3202439763dce7cbff0af66288198e2a736e343a4&quot;</span><br>    <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>Key points of the Overlay2 storage structure:</p>
+<ol>
+<li>Image metadata &amp; LayerDB<ul>
+<li><code>/var/lib/docker/image/overlay2/imagedb/content/sha256/&lt;digest&gt;</code></li>
+<li><code>/var/lib/docker/image/overlay2/layerdb/sha256/&lt;digest&gt;/cache-id</code><br>The content of this file (a short ID such as <code>36849485abab637c0…</code>) is the diff directory name that Overlay2 assigned on disk for that layer.</li>
+</ul>
+</li>
+<li>Overlay2 working directories<ul>
+<li><code>/var/lib/docker/overlay2/&lt;cache-id&gt;/diff</code><br>Stores the actual file contents for that layer.</li>
+<li><code>/var/lib/docker/overlay2/&lt;cache-id&gt;/merged</code><br>The mount point when a container is running; on read, LowerDir + UpperDir are overlaid here.</li>
+</ul>
+</li>
+</ol>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>System Design Fundamentals | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CAP-Theorem"><span class="toc-text">CAP Theorem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Tolerance"><span class="toc-text">Partition Tolerance</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modern-Distributed-System-Components"><span class="toc-text">Modern Distributed System Components</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Load-Balancer"><span class="toc-text">Load Balancer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDN"><span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DNS"><span class="toc-text">DNS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Web-Tier"><span class="toc-text">Web Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-Tier"><span class="toc-text">Data Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Tier"><span class="toc-text">Cache Tier</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Message-Queue"><span class="toc-text">Message Queue</span></a></li></ol></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>System Design</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Theory</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>System Design Fundamentals.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>System Design Fundamentals</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2023-08-06
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">System Design</span>
+                  
+                    <span class="tag-item-post">Theory</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <h2 id="CAP-Theorem"><a href="#CAP-Theorem" class="headerlink" title="CAP Theorem"></a>CAP Theorem</h2><p>The CAP theorem, also known as Brewer’s theorem, states that a distributed database system can only guarantee two of the following three properties: Consistency, Availability, and Partition Tolerance. A system that prioritizes availability over consistency may respond with stale data.</p>
+<img src="https://miro.medium.com/v2/resize:fit:850/1*Br1FrvKnK3hU6Xl_LbDkwg.png" alt="cap" width="300">
+
+<h3 id="Partition-Tolerance"><a href="#Partition-Tolerance" class="headerlink" title="Partition Tolerance"></a>Partition Tolerance</h3><p>In CAP theory, Partition Tolerance refers to a system’s ability to continue serving requests even when a network partition occurs.</p>
+<p>A network partition is when the nodes in a system are split into two groups and the network communication between them is cut off. In this situation, a distributed system may exhibit one of two behaviors:</p>
+<ol>
+<li><p>Refuse to serve requests — the entire system becomes unavailable and invisible to users.</p>
+</li>
+<li><p>Continue serving at the cost of consistency — the system remains visible to users but may return inconsistent data.</p>
+</li>
+</ol>
+<p>Partition Tolerance means the system can tolerate network partitions and keep serving without completely breaking down. According to the CAP theorem, a system cannot simultaneously guarantee Consistency, Availability, and Partition Tolerance — at most two can be satisfied at once.</p>
+<p>So a Partition-Tolerant system typically sacrifices data consistency to maintain service availability. This may mean allowing stale reads or tolerating conflicting data across partitions. This is an acceptable trade-off in many large-scale distributed systems.</p>
+<p>A classic example of Partition Tolerance is the DNS system.</p>
+<p>DNS uses a distributed tree structure where a single domain name is served by multiple DNS servers. When a network partition occurs, the following may happen:</p>
+<ol>
+<li><p>Users in certain regions cannot reach some DNS servers, but can still reach others and get a name resolution result.</p>
+</li>
+<li><p>Different DNS servers return different resolution results (inconsistent IP addresses), but users still receive a response.</p>
+</li>
+</ol>
+<p>This is the Partition Tolerance behavior DNS exhibits. When a network partition occurs, DNS chooses to accept the risk of returning inconsistent data rather than stopping all responses.</p>
+<p>Another example of Partition Tolerance is distributed caching systems like Memcached. When nodes lose contact with each other, data across different partitions may be inconsistent, but each partition can continue using its local cache — the overall system does not stop serving.</p>
+<p>These systems all adopt the design philosophy of “allow dirty reads” or “tolerate brief inconsistency” to achieve Partition Tolerance. For most applications, returning slightly stale or inconsistent data is still preferable to the entire system being completely unavailable.</p>
+<h2 id="Modern-Distributed-System-Components"><a href="#Modern-Distributed-System-Components" class="headerlink" title="Modern Distributed System Components"></a>Modern Distributed System Components</h2><h3 id="Load-Balancer"><a href="#Load-Balancer" class="headerlink" title="Load Balancer"></a>Load Balancer</h3><p>A load balancer is the entry point for web applications. It distributes incoming client traffic across different worker nodes&#x2F;servers. It helps:</p>
+<ol>
+<li>Avoid overloading a single server</li>
+<li>Redirect requests to healthy servers when one is unavailable.</li>
+</ol>
+<p>Load balancers play an important role in enabling a system to scale horizontally. AWS provides the following load balancer services:</p>
+<ol>
+<li>Classic Load Balancer: primarily used to distribute traffic across EC2 instances</li>
+<li>Application Load Balancer: more flexible; the default choice.</li>
+<li><em>Network Load Balancer</em></li>
+<li><em>Gateway Load Balancer</em></li>
+</ol>
+<h3 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h3><p>A Content Delivery Network (CDN) is a fast file delivery service provided by a third party. By exposing a single endpoint, the CDN service automatically routes requests to the nearest server to fetch static files. It is mainly used to serve static assets such as HTML, JavaScript files, and images. It can also host other files like videos and archives. It can:</p>
+<ol>
+<li>Offload traffic from web servers</li>
+<li>Speed up file retrieval by fetching from the nearest server.</li>
+</ol>
+<p>CDNs require a TTL (Time to Live) to be configured. If the TTL is set too short, the cache will need to be refreshed from the origin frequently, increasing data transfer costs. If the TTL is set too long, clients may receive stale files. TTL should be set based on the system’s requirements.</p>
+<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>The Domain Name System (DNS) is a database that translates domain names into Internet Protocol (IP) addresses. DNS maps the names people use to locate websites to the IP addresses computers use to locate those websites.</p>
+<img src="https://d1.awsstatic.com/Route53/how-route-53-routes-traffic.8d313c7da075c3c7303aaef32e89b5d0b7885e7c.png" alt="dns" width="500">
+
+<h3 id="Web-Tier"><a href="#Web-Tier" class="headerlink" title="Web Tier"></a>Web Tier</h3><p>The web tier primarily refers to web services. Web services mainly contain business logic — for example, fetching data from a database and returning it to the user, or submitting an order on behalf of a user. Ideally, the web tier should be stateless, as this makes it much easier to scale horizontally.</p>
+<h3 id="Data-Tier"><a href="#Data-Tier" class="headerlink" title="Data Tier"></a>Data Tier</h3><p>The data tier primarily refers to databases or persistent storage. “Persistent” means data is not lost even when the server goes down. In contrast, some in-memory caching systems will lose all data if the server restarts. As data has grown increasingly complex, a wide variety of database systems have been developed to accommodate different use cases.</p>
+<ol>
+<li>Relational databases</li>
+<li>NoSQL (Not Only SQL)</li>
+</ol>
+<p>Describing databases in full detail here would be too ambitious — we will cover them in a dedicated post.</p>
+<h3 id="Cache-Tier"><a href="#Cache-Tier" class="headerlink" title="Cache Tier"></a>Cache Tier</h3><p>The cache tier exists because querying a database is an expensive operation. Some requests can also be expensive in other ways, such as running a model for computation. Thanks to the <strong>principle of locality</strong>, we know that processors tend to repeatedly access the same set of memory locations over a short period of time. This means the same data may be needed multiple times within a short window, making a cache tier very useful in production systems. The cache operates as middleware within the system and can be scaled independently. It also introduces its own set of challenges, such as cache stampede, cache misses, and data synchronization. Like the data tier, we will cover it in a dedicated post.</p>
+<img src="https://cdn-3.backendless.com/wp-content/uploads/2022/12/How-Redis-typically-works.png" alt="cache" height="270">
+
+<h3 id="Message-Queue"><a href="#Message-Queue" class="headerlink" title="Message Queue"></a>Message Queue</h3><p>Sometimes we may wonder about service call chains — how do these subsystems scale independently? For example, if Service A tries to call Service B and Service B is unavailable at the moment, Service A must wait, or the request from the client will be lost. We might want something that abstracts the input producers from the result consumers. This is where message queues come in.</p>
+<p>A message queue acts as a temporary storage service. Producers can publish messages to the MQ regardless of whether consumers are running. At the same time, consumers can consume messages from the MQ regardless of whether producers are running.</p>
+<img src="https://d1.awsstatic.com/product-marketing/Messaging/sqs_seo_queue.1dc710b63346bef869ee34b8a9a76abc014fbfc9.png" alt="mq">
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

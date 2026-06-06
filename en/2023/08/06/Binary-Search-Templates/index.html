@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Binary Search Templates | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-Not-%E2%80%9CFinding-an-Element-%E2%80%9D-but-%E2%80%9CMaking-a-Cut%E2%80%9D"><span class="toc-text">Intuition: Not “Finding an Element,” but “Making a Cut”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#One-Template-Four-Boundary-Cases"><span class="toc-text">One Template, Four Boundary Cases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Variants-Rotated-Array-and-Binary-Search-on-Answer"><span class="toc-text">Variants: Rotated Array and Binary Search on Answer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Find-Minimum-in-Rotated-Array"><span class="toc-text">Find Minimum in Rotated Array</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Binary-Search-on-Answer"><span class="toc-text">Binary Search on Answer</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-Problems"><span class="toc-text">Classic Problems</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mnemonics-Common-Pitfalls"><span class="toc-text">Mnemonics &#x2F; Common Pitfalls</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Binary Search</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Divide and Conquer</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Binary Search Templates.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Binary Search Templates</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2023-08-06
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Binary Search</span>
+                  
+                    <span class="tag-item-post">Divide and Conquer</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>99% of binary search bugs come down to not thinking clearly about the loop invariant. Lock in a half-open interval <code>[lo, hi)</code> template and handle all four boundary cases — <code>&gt;=</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&lt;</code> — with the exact same code.</p>
+<span id="more"></span>
+
+<h2 id="Intuition-Not-“Finding-an-Element-”-but-“Making-a-Cut”"><a href="#Intuition-Not-“Finding-an-Element-”-but-“Making-a-Cut”" class="headerlink" title="Intuition: Not “Finding an Element,” but “Making a Cut”"></a>Intuition: Not “Finding an Element,” but “Making a Cut”</h2><p>Textbooks frame binary search as “find a target in a sorted array,” which leads everyone to agonize over: <code>&lt;</code> or <code>&lt;=</code>? Should <code>mid</code> subtract 1? Is <code>right</code> initialized to <code>n</code> or <code>n-1</code>? — all of that is surface noise.</p>
+<p>What binary search is actually doing is: <strong>given a monotone boolean predicate <code>pred(i)</code> (False for a prefix, True for a suffix), find the first position where it’s True.</strong> That’s all. “Find target” is just “find the first position ≥ target, then verify” as a special case.</p>
+<p>Shift your perspective to the predicate and all the boundary confusion disappears. The trade-off is that you must maintain your <strong>loop invariant</strong> rigorously:</p>
+<blockquote>
+<p>The answer always lies within <code>[lo, hi)</code>. Everything to the left of <code>lo</code> is False; everything at or to the right of <code>hi</code> is True.</p>
+</blockquote>
+<p>Why is off-by-one so common? Because in a closed-interval <code>[lo, hi]</code> template, whether you write <code>hi = mid - 1</code> or <code>hi = mid</code> depends on whether <code>mid</code> has already been verified — easy to get wrong. The half-open interval <code>[lo, hi)</code> naturally makes <code>hi</code> mean “the unverified right end,” so <code>hi = mid</code> is always valid — <code>mid</code> hasn’t been verified yet and can’t be “excluded,” so it becomes the new unverified right end.</p>
+<p>The animation below demonstrates the standard template finding the “first element ≥ 7,” and then shows how the same loop invariant applies to a rotated array. Click “Next Step” to watch <code>lo</code> and <code>hi</code> shrink each iteration. Note: <strong><code>hi</code> always points to “a position known to be True (or the out-of-bounds sentinel n)”; when the loop ends, <code>lo == hi</code> is the answer.</strong></p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/binary-search.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="One-Template-Four-Boundary-Cases"><a href="#One-Template-Four-Boundary-Cases" class="headerlink" title="One Template, Four Boundary Cases"></a>One Template, Four Boundary Cases</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">lower_bound</span>(<span class="hljs-params">n, pred</span>):<br>    <span class="hljs-string">"""Returns the first index in [0, n] where pred(i) is True.</span><br><span class="hljs-string">    Returns n if all are False. Requires pred to be monotone: False...False True...True"""</span><br>    lo, hi = <span class="hljs-number">0</span>, n<br>    <span class="hljs-keyword">while</span> lo &lt; hi:<br>        mid = (lo + hi) // <span class="hljs-number">2</span><br>        <span class="hljs-keyword">if</span> pred(mid):<br>            hi = mid          <span class="hljs-comment"># mid is True, answer ≤ mid</span><br>        <span class="hljs-keyword">else</span>:<br>            lo = mid + <span class="hljs-number">1</span>      <span class="hljs-comment"># mid is False, answer &gt; mid</span><br>    <span class="hljs-keyword">return</span> lo<br></code></pre></td></tr></table></figure>
+
+<p>Memorize this one snippet. All four boundary cases reduce to “construct the right <code>pred</code>“:</p>
+<table>
+<thead>
+<tr>
+<th>What you want</th>
+<th><code>pred(i)</code></th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>First <code>arr[i] &gt;= x</code></td>
+<td><code>arr[i] &gt;= x</code></td>
+<td><code>lo</code></td>
+</tr>
+<tr>
+<td>First <code>arr[i] &gt; x</code></td>
+<td><code>arr[i] &gt; x</code></td>
+<td><code>lo</code></td>
+</tr>
+<tr>
+<td>Last <code>arr[i] &lt;= x</code></td>
+<td><code>arr[i] &gt; x</code></td>
+<td><code>lo - 1</code></td>
+</tr>
+<tr>
+<td>Last <code>arr[i] &lt; x</code></td>
+<td><code>arr[i] &gt;= x</code></td>
+<td><code>lo - 1</code></td>
+</tr>
+</tbody></table>
+<p>The rule: <strong>for leftmost-satisfying, apply directly; for rightmost-satisfying, flip the predicate and subtract one.</strong> The “flip” works because satisfying elements in a sorted array form a contiguous block — the position just before the first non-satisfying element is the last satisfying one.</p>
+<p>Why does this template never infinite-loop or go out of bounds? Three things guarantee it:</p>
+<ol>
+<li><code>mid = (lo + hi) // 2</code> floors, so <code>mid &lt; hi</code>, meaning <code>hi = mid</code> strictly shrinks the interval.</li>
+<li><code>lo = mid + 1</code> obviously shrinks the interval.</li>
+<li><code>hi</code> is initialized to <code>n</code>, not <code>n - 1</code> — this allows returning <code>n</code> for “answer doesn’t exist,” eliminating a lot of edge-case checks. After returning, just verify with <code>lo &lt; n and arr[lo] == x</code>.</li>
+</ol>
+<h2 id="Variants-Rotated-Array-and-Binary-Search-on-Answer"><a href="#Variants-Rotated-Array-and-Binary-Search-on-Answer" class="headerlink" title="Variants: Rotated Array and Binary Search on Answer"></a>Variants: Rotated Array and Binary Search on Answer</h2><h3 id="Find-Minimum-in-Rotated-Array"><a href="#Find-Minimum-in-Rotated-Array" class="headerlink" title="Find Minimum in Rotated Array"></a>Find Minimum in Rotated Array</h3><p>Array <code>[4,5,6,7,0,1,2]</code> is not globally sorted, but binary search still applies — the key is finding a <strong>monotone predicate</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">find_min_rotated</span>(<span class="hljs-params">nums</span>):<br>    lo, hi = <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(nums) - <span class="hljs-number">1</span><br>    <span class="hljs-keyword">while</span> lo &lt; hi:<br>        mid = (lo + hi) // <span class="hljs-number">2</span><br>        <span class="hljs-keyword">if</span> nums[mid] &lt;= nums[hi]:<br>            hi = mid          <span class="hljs-comment"># mid is in the right half (contains minimum)</span><br>        <span class="hljs-keyword">else</span>:<br>            lo = mid + <span class="hljs-number">1</span>      <span class="hljs-comment"># the "cliff" is to the right</span><br>    <span class="hljs-keyword">return</span> nums[lo]<br></code></pre></td></tr></table></figure>
+
+<p>Is the predicate <code>nums[i] &lt;= nums[hi_init]</code>? Not quite — here we compare against the dynamic right endpoint <code>nums[hi]</code>, relying on the monotonicity that “all elements in the right half are ≤ the array’s last element.” This is what the second scenario in the animation illustrates: watch the “cliff” marker and see how <code>lo</code> and <code>hi</code> converge onto the position of <code>0</code>.</p>
+<h3 id="Binary-Search-on-Answer"><a href="#Binary-Search-on-Answer" class="headerlink" title="Binary Search on Answer"></a>Binary Search on Answer</h3><p>When a problem asks to “minimize the maximum” or “maximize the minimum,” the answer itself lies in some interval and the feasibility check is monotone — binary search directly on the answer:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">koko_eating</span>(<span class="hljs-params">piles, h</span>):<br>    <span class="hljs-comment"># LC 875: minimum eating speed k such that all bananas are eaten in h hours</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">can_finish</span>(<span class="hljs-params">k</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">sum</span>((p + k - <span class="hljs-number">1</span>) // k <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> piles) &lt;= h<br><br>    lo, hi = <span class="hljs-number">1</span>, <span class="hljs-built_in">max</span>(piles) + <span class="hljs-number">1</span>   <span class="hljs-comment"># [1, max+1) half-open</span><br>    <span class="hljs-keyword">while</span> lo &lt; hi:<br>        mid = (lo + hi) // <span class="hljs-number">2</span><br>        <span class="hljs-keyword">if</span> can_finish(mid):<br>            hi = mid<br>        <span class="hljs-keyword">else</span>:<br>            lo = mid + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> lo<br></code></pre></td></tr></table></figure>
+
+<p>Exactly the same template; only <code>pred</code> changes to <code>can_finish</code>. Recognizing binary-search-on-answer: the problem asks for “the minimum X such that Y holds,” and a larger X makes Y easier to satisfy (or vice versa).</p>
+<h2 id="Classic-Problems"><a href="#Classic-Problems" class="headerlink" title="Classic Problems"></a>Classic Problems</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-search/">704. Binary Search</a> — template warm-up</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-insert-position/">35. Search Insert Position</a> — just <code>lower_bound</code>, return <code>lo</code> directly</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/">34. Find First and Last Position of Element in Sorted Array</a> — run twice with <code>&gt;= x</code> and <code>&gt; x</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array/">153. Find Minimum in Rotated Sorted Array</a> — apply the template above directly</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-in-rotated-sorted-array/">33. Search in Rotated Sorted Array</a> — find minimum to locate the pivot, then standard binary search on one half</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sqrtx/">69. Sqrt(x)</a> — binary search on answer: first position where <code>mid*mid &gt; x</code>, minus one</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/koko-eating-bananas/">875. Koko Eating Bananas</a> — canonical binary-search-on-answer problem</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/median-of-two-sorted-arrays/">4. Median of Two Sorted Arrays</a> — hard; binary search on the partition point</li>
+</ul>
+<h2 id="Mnemonics-Common-Pitfalls"><a href="#Mnemonics-Common-Pitfalls" class="headerlink" title="Mnemonics / Common Pitfalls"></a>Mnemonics / Common Pitfalls</h2><ul>
+<li><strong>First rule: before writing code, say out loud what <code>pred(i)</code> is and which direction is monotone.</strong> If you can’t articulate it, don’t start — it will be wrong.</li>
+<li><strong>Always write the half-open interval <code>[lo, hi)</code>.</strong> The closed-interval template has an infinite-loop trap (<code>lo = mid</code> doesn’t shrink the interval); the half-open one doesn’t.</li>
+<li><strong>Initialize <code>hi</code> to <code>n</code>, not <code>n - 1</code>.</strong> Returning <code>n</code> for “answer doesn’t exist” is far cleaner than a <code>-1</code> sentinel.</li>
+<li><strong><code>mid = (lo + hi) // 2</code> floors; pair it with <code>hi = mid</code>. Do not pair <code>lo = mid</code> with floor division — it infinite-loops.</strong> If you truly need to update the left end, switch to <code>mid = (lo + hi + 1) // 2</code>. Best advice: don’t write that variant at all.</li>
+<li><strong>Validate after returning <code>lo</code>.</strong> <code>lower_bound</code> finds “the first True position” — it doesn’t guarantee <code>target</code> is actually there. You might be out of bounds or off-value. Write <code>lo &lt; n and arr[lo] == x</code> rather than reasoning about edge cases in your head.</li>
+<li><strong>Overflow</strong>: not an issue in Python; in C++/Java always write <code>mid = lo + (hi - lo) // 2</code>.</li>
+<li><strong>In rotated arrays, compare against <code>nums[hi]</code>, not <code>nums[lo]</code>.</strong> Comparing with <code>lo</code> fails on a non-rotated array like <code>[1,2,3]</code> — <code>nums[mid] &gt;= nums[lo]</code> is trivially true but the “cliff” is not to the right.</li>
+</ul>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

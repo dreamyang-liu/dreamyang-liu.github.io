@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>LLM Inference Systems: A Deep Dive into SGLang | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-Request-Lifecycle"><span class="toc-text">4.1 Request Lifecycle</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Stage-Breakdown"><span class="toc-text">Stage Breakdown</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Essential-Difference-Between-Prefill-and-Decode"><span class="toc-text">The Essential Difference Between Prefill and Decode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Performance-Metrics-TTFT-and-TPOT"><span class="toc-text">Performance Metrics: TTFT and TPOT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefill-Speed-Derivation-From-GPU-FLOPS-to-Tokens-sec"><span class="toc-text">Prefill Speed Derivation: From GPU FLOPS to Tokens&#x2F;sec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Decode-Speed-Derivation-Memory-Bandwidth-Bound"><span class="toc-text">Decode Speed Derivation: Memory-Bandwidth Bound</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KV-Cache-Size-Estimation"><span class="toc-text">KV Cache Size Estimation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#How-GPU-Memory-Is-Actually-Allocated"><span class="toc-text">How GPU Memory Is Actually Allocated</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Key-Caveats-for-Each-Item"><span class="toc-text">Key Caveats for Each Item</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Concrete-Memory-Budget-70B-on-8-%C3%97-80-GB-H100"><span class="toc-text">Concrete Memory Budget: 70B on 8 × 80 GB H100</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#When-Should-You-Lower-gpu-memory-utilization"><span class="toc-text">When Should You Lower gpu_memory_utilization?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#One-Line-Intuition"><span class="toc-text">One-Line Intuition</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Where-Activations-Actually-Live-in-the-Transformer"><span class="toc-text">Where Activations Actually Live in the Transformer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#What-FlashAttention-Eliminates"><span class="toc-text">What FlashAttention Eliminates</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Two-%E2%80%9CNon-layer%E2%80%9D-Activations-at-the-Boundaries"><span class="toc-text">Two “Non-layer” Activations at the Boundaries</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Training-vs-Inference-Which-Activations-Survive-Which-Are-Freed"><span class="toc-text">Training vs. Inference: Which Activations Survive, Which Are Freed</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#One-Line-Intuition-1"><span class="toc-text">One-Line Intuition</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-Continuous-Batching-vs-Static-Batching"><span class="toc-text">4.2 Continuous Batching vs. Static Batching</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Core-Implementation-of-Continuous-Batching"><span class="toc-text">Core Implementation of Continuous Batching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Performance-Comparison"><span class="toc-text">Performance Comparison</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-KV-Cache-Management"><span class="toc-text">4.3 KV Cache Management</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PageAttention-Virtual-Memory-for-the-KV-Cache"><span class="toc-text">PageAttention: Virtual Memory for the KV Cache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-Prefix-Sharing-Tree"><span class="toc-text">Radix Cache: Prefix-Sharing Tree</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Radix-Cache-Implementation"><span class="toc-text">Radix Cache Implementation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-Scheduler-Design"><span class="toc-text">4.4 Scheduler Design</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Scheduling-Tension-Between-Prefill-and-Decode"><span class="toc-text">The Scheduling Tension Between Prefill and Decode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chunked-Prefill-Why-It-Is-Needed-and-How-to-Choose-Chunk-Size"><span class="toc-text">Chunked Prefill: Why It Is Needed and How to Choose Chunk Size</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Preemption-What-to-Do-When-Memory-Runs-Out"><span class="toc-text">Preemption: What to Do When Memory Runs Out</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Quantization-Overview"><span class="toc-text">4.5 Quantization Overview</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Common-Quantization-Strategies"><span class="toc-text">Common Quantization Strategies</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Speculative-Decoding"><span class="toc-text">4.6 Speculative Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Verification-Algorithm"><span class="toc-text">Verification Algorithm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Speedup-Analysis"><span class="toc-text">Speedup Analysis</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-Constraint-Decoding"><span class="toc-text">4.7 Constraint Decoding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Structured-Output-Generation"><span class="toc-text">Structured Output Generation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-8-Model-Loading-Pipeline"><span class="toc-text">4.8 Model Loading Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Complete-Flow-from-Disk-to-GPU"><span class="toc-text">The Complete Flow from Disk to GPU</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#System-Design-Interview-Questions-Anthropic-OpenAI-Style"><span class="toc-text">System Design Interview Questions (Anthropic&#x2F;OpenAI Style)</span></a></li></ol></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>llm</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>inference</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>mlsys</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>sglang</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>kv-cache</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>quantization</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>LLM Inference Systems: A Deep Dive into SGLang.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>LLM Inference Systems: A Deep Dive into SGLang</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-03
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">llm</span>
+                  
+                    <span class="tag-item-post">inference</span>
+                  
+                    <span class="tag-item-post">mlsys</span>
+                  
+                    <span class="tag-item-post">sglang</span>
+                  
+                    <span class="tag-item-post">kv-cache</span>
+                  
+                    <span class="tag-item-post">quantization</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>A complete walkthrough of an LLM inference request from user input to final output: request lifecycle, continuous batching, KV cache management, scheduler design, quantization, speculative decoding, and more. The post body is markdown; key mechanisms are accompanied by interactive animations (click the buttons to see them in action).</p>
+<span id="more"></span>
+
+<h2 id="4-1-Request-Lifecycle"><a href="#4-1-Request-Lifecycle" class="headerlink" title="4.1 Request Lifecycle"></a>4.1 Request Lifecycle</h2><p>An LLM inference request passes through several stages from user input to final output. In SGLang, this process is carefully designed as an efficient pipeline: <code>TokenizerManager → Scheduler → TpModelWorker → DetokenizerManager</code>.</p>
+<p>The animation below shows a request flowing through five stages: Tokenize → Schedule → Prefill → Decode → Detokenize.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/ch4/pipeline.html" loading="lazy" style="width:100%;height:320px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h3 id="Stage-Breakdown"><a href="#Stage-Breakdown" class="headerlink" title="Stage Breakdown"></a>Stage Breakdown</h3><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Operation</th>
+<th>Bottleneck</th>
+<th>SGLang Optimization</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Tokenize</code></td>
+<td>Convert user input text to a sequence of token IDs</td>
+<td>CPU-intensive</td>
+<td>Async tokenization overlapped with GPU computation</td>
+</tr>
+<tr>
+<td><code>Schedule</code></td>
+<td>Assign requests to batch slots, manage priorities</td>
+<td>Scheduling latency</td>
+<td>Continuous batching + priority queue</td>
+</tr>
+<tr>
+<td><code>Prefill</code></td>
+<td>Process all prompt tokens in parallel, populate KV cache</td>
+<td>Compute-bound</td>
+<td>Chunked prefill, radix cache reuse</td>
+</tr>
+<tr>
+<td><code>Decode</code></td>
+<td>Autoregressive token-by-token generation</td>
+<td>Memory bandwidth</td>
+<td>PageAttention, efficient KV cache access</td>
+</tr>
+<tr>
+<td><code>Detokenize</code></td>
+<td>Convert generated token IDs back to text</td>
+<td>CPU-intensive</td>
+<td>Incremental detokenization + streaming</td>
+</tr>
+</tbody></table>
+<h3 id="The-Essential-Difference-Between-Prefill-and-Decode"><a href="#The-Essential-Difference-Between-Prefill-and-Decode" class="headerlink" title="The Essential Difference Between Prefill and Decode"></a>The Essential Difference Between Prefill and Decode</h3><p><strong>The prefill stage</strong> is compute-bound (high compute volume; GPU compute units are the bottleneck): all prompt tokens can compute attention in parallel, leading to dense matrix operations.</p>
+<p><strong>The decode stage</strong> is memory-bandwidth-bound (frequent KV cache reads; HBM bandwidth is the bottleneck): only one token is generated per step, but the full KV cache must be read each time.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">// Prefill: process N tokens in parallel<br>// FLOPs ≈ 2 * N * d_model^2 * num_layers (compute bound)<br>attention_output = softmax(Q @ K.T / sqrt(d)) @ V  // Q: [N, d], K: [N, d]<br><br>// Decode: process only 1 token at a time<br>// Memory reads ≈ 2 * seq_len * d_model * num_layers (memory bound)<br>attention_output = softmax(q @ K_cache.T / sqrt(d)) @ V_cache  // q: [1, d], K: [seq, d]<br></code></pre></td></tr></table></figure>
+
+<h3 id="Performance-Metrics-TTFT-and-TPOT"><a href="#Performance-Metrics-TTFT-and-TPOT" class="headerlink" title="Performance Metrics: TTFT and TPOT"></a>Performance Metrics: TTFT and TPOT</h3><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Full Name</th>
+<th>Meaning</th>
+<th>Determining Factor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>TTFT</strong></td>
+<td>Time To First Token</td>
+<td>Latency from request submission to the first output token</td>
+<td>Prefill speed + queuing time</td>
+</tr>
+<tr>
+<td><strong>TPOT</strong></td>
+<td>Time Per Output Token</td>
+<td>Generation interval for each subsequent token (the “typing speed” perceived by users)</td>
+<td>Decode speed</td>
+</tr>
+</tbody></table>
+<p>User experience: 1000 / TPOT = tokens/sec. TPOT=50 ms → 20 tok/s (smooth), TPOT=200 ms → 5 tok/s (choppy).</p>
+<h3 id="Prefill-Speed-Derivation-From-GPU-FLOPS-to-Tokens-sec"><a href="#Prefill-Speed-Derivation-From-GPU-FLOPS-to-Tokens-sec" class="headerlink" title="Prefill Speed Derivation: From GPU FLOPS to Tokens/sec"></a>Prefill Speed Derivation: From GPU FLOPS to Tokens/sec</h3><p>Prefill is compute-bound; speed is determined by <strong>GPU throughput / FLOPs per token</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Core formula:</span><br>prefill_speed = GPU_FLOPS × MFU / FLOPs_per_token<br><br><span class="hljs-comment"># Step 1: FLOPs per token ≈ 2 × model_params</span><br><span class="hljs-comment"># Why 2×? Matrix multiply y=x@W (W has P parameters) = P multiplies + P additions = 2P FLOPs</span><br><span class="hljs-comment"># Model forward = one pass through all weight matrices, so FLOPs/token ≈ 2 × total_params</span><br><br><span class="hljs-comment"># Step 2: GPU effective throughput = peak × MFU (Model FLOPs Utilization)</span><br><span class="hljs-comment"># Prefill is large matmul, MFU is relatively high: 50–70%</span><br><span class="hljs-comment"># H100 BF16 peak 989 TFLOPS, effective ~500–700 TFLOPS</span><br><br><span class="hljs-comment"># Step 3: Divide</span><br><span class="hljs-comment"># 7B on H100 BF16, MFU=60%:</span><br><span class="hljs-comment">#   = 989 × 0.6 TFLOPS / (2 × 7 GFLOP/token)</span><br><span class="hljs-comment">#   = 593 TFLOPS / 14 GFLOP = ~42K tokens/sec</span><br></code></pre></td></tr></table></figure>
+
+<p>Quick-reference formula (H100 BF16, MFU≈60%):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># prefill_speed ≈ 300,000 / B  (tokens/sec, single GPU)</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># 7B   → ~42K tok/s</span><br><span class="hljs-comment"># 13B  → ~23K tok/s</span><br><span class="hljs-comment"># 70B  → ~4.3K tok/s  (single GPU; TP=8 → ~30K tok/s)</span><br><span class="hljs-comment"># 405B → ~740 tok/s   (single GPU; TP=8 → ~5K tok/s)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Decode-Speed-Derivation-Memory-Bandwidth-Bound"><a href="#Decode-Speed-Derivation-Memory-Bandwidth-Bound" class="headerlink" title="Decode Speed Derivation: Memory-Bandwidth Bound"></a>Decode Speed Derivation: Memory-Bandwidth Bound</h3><p>During decode, each weight is used by only one token per step; the bottleneck is <strong>the speed of reading data</strong>. Generating each token requires reading from HBM:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Full formula: total data read per token</span><br>bytes_per_token = model_weights + kv_cache_read<br><span class="hljs-comment">#                 ↑ fixed (full model read every step)   ↑ grows linearly with seq_len!</span><br><br><span class="hljs-comment"># TPOT = bytes_per_token / memory_bandwidth</span><br><span class="hljs-comment"># Decode throughput = memory_bandwidth / bytes_per_token</span><br></code></pre></td></tr></table></figure>
+
+<p>Simplified case: short sequences + GQA (KV cache negligible):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># LLaMA-70B GQA, seq_len=2048 on 2×A100-80GB (TP=2):</span><br>model_weights = <span class="hljs-number">140</span>  <span class="hljs-comment"># GB (BF16), TP=2 → each GPU reads 70 GB</span><br>kv_cache = <span class="hljs-number">80</span> * <span class="hljs-number">8</span> * <span class="hljs-number">128</span> * <span class="hljs-number">2048</span> * <span class="hljs-number">2</span> * <span class="hljs-number">2</span> / <span class="hljs-number">1e9</span>  <span class="hljs-comment"># = 0.67 GB (GQA has only 8 KV heads)</span><br><span class="hljs-comment"># KV cache is only 0.5% → negligible</span><br><br><span class="hljs-comment"># TP=2: two GPUs in parallel, each independently reads its own 70 GB of weights</span><br><span class="hljs-comment"># A100 bandwidth 2.0 TB/s:</span><br><span class="hljs-comment">#   theoretical TPOT = 70 GB / 2.0 TB/s = 35 ms</span><br><span class="hljs-comment">#   + TP AllReduce (80 layers × 2) + kernel launch overhead ≈ +15ms</span><br><span class="hljs-comment"># Measured: ~53.8 ms (Cursor blog, bs=1)</span><br><span class="hljs-comment"># → MBU = 35/53.8 ≈ 65% (reasonable: AllReduce + launch eat ~35% of time)</span><br></code></pre></td></tr></table></figure>
+
+<p>When is KV cache non-negligible?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Key: KV cache size = 2 × layers × kv_heads × head_dim × seq_len × 2</span><br><span class="hljs-comment"># It grows linearly with seq_len!</span><br><br><span class="hljs-comment"># Small model + MHA + long sequence: KV cache can be larger than the model</span><br><span class="hljs-comment"># LLaMA-7B (MHA, 32 KV heads), seq_len=32768:</span><br>model_weights = <span class="hljs-number">14</span>    <span class="hljs-comment"># GB</span><br>kv_cache = <span class="hljs-number">32</span> * <span class="hljs-number">32</span> * <span class="hljs-number">128</span> * <span class="hljs-number">32768</span> * <span class="hljs-number">2</span> * <span class="hljs-number">2</span> / <span class="hljs-number">1e9</span>  <span class="hljs-comment"># = 16.8 GB (!)</span><br><span class="hljs-comment"># KV cache exceeds model size! TPOT doubles:</span><br><span class="hljs-comment"># (14 + 16.8) / 3350 = 9.2 ms (vs 4.2ms without KV)</span><br><br><span class="hljs-comment"># Large model + GQA + short sequence: KV cache is negligible</span><br><span class="hljs-comment"># LLaMA-70B (GQA, 8 KV heads), seq_len=4096:</span><br><span class="hljs-comment"># KV = 80×8×128×4096×2×2 / 1e9 = 1.3 GB vs 140 GB model → ~1%</span><br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Model Size</th>
+<th>KV Cache</th>
+<th>KV Fraction</th>
+<th>TPOT Impact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>70B + GQA + 4K seq</td>
+<td>140 GB</td>
+<td>1.3 GB</td>
+<td>1%</td>
+<td>Negligible</td>
+</tr>
+<tr>
+<td>7B + MHA + 4K seq</td>
+<td>14 GB</td>
+<td>2.1 GB</td>
+<td>13%</td>
+<td>Minor</td>
+</tr>
+<tr>
+<td>7B + MHA + 32K seq</td>
+<td>14 GB</td>
+<td>16.8 GB</td>
+<td><strong>55%</strong></td>
+<td>TPOT doubles!</td>
+</tr>
+<tr>
+<td>7B + MHA + 128K seq</td>
+<td>14 GB</td>
+<td>67 GB</td>
+<td><strong>83%</strong></td>
+<td>Dominates entirely</td>
+</tr>
+<tr>
+<td>70B + GQA + 128K seq</td>
+<td>140 GB</td>
+<td>41 GB</td>
+<td>23%</td>
+<td>Non-negligible</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Takeaway:</strong> GQA/MLA not only saves memory — more importantly, it <strong>saves bandwidth</strong> — reducing the KV cache that must be read on every decode step, directly lowering TPOT.</p>
+</blockquote>
+<p>Empirical validation (theory vs. measured):</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>GPU</th>
+<th>Theoretical TPOT</th>
+<th>Measured TPOT</th>
+<th>MBU</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLaMA-7B (BF16)</td>
+<td>1×A100 80GB</td>
+<td>7.2 ms</td>
+<td>9.3 ms (bs=4)</td>
+<td>~77%</td>
+<td>HuggingFace TGI</td>
+</tr>
+<tr>
+<td>LLaMA-70B (BF16)</td>
+<td>2×A100 80GB</td>
+<td>36 ms</td>
+<td>53.8 ms (bs=1)</td>
+<td>~67%</td>
+<td>Cursor blog</td>
+</tr>
+<tr>
+<td>LLaMA-70B (BF16)</td>
+<td>H100 (estimated)</td>
+<td>21 ms</td>
+<td>~35 ms</td>
+<td>~60%</td>
+<td>Databricks (H100 is ~36% faster than A100)</td>
+</tr>
+</tbody></table>
+<p>MBU (Model Bandwidth Utilization) = theoretical TPOT / measured TPOT. A real-world 60–80% is normal, because kernel launch overhead, AllReduce (TP), and attention computation are all non-weight-read costs.</p>
+<p>Why does decode need batching?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Weights are read from HBM once and shared across B tokens in the batch:</span><br><span class="hljs-comment"># Arithmetic Intensity = 2B (B tokens each doing 2 ops per weight read)</span><br><span class="hljs-comment"># As B grows, the regime shifts from memory-bound toward compute-bound</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Critical batch size (compute/memory balance):</span><br><span class="hljs-comment">#   B_critical = FLOPS / (Bandwidth × 2) = 989e12 / (3.35e12 × 2) ≈ 148</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># B &lt; 148: memory-bound; increasing batch → throughput grows linearly, TPOT unchanged</span><br><span class="hljs-comment"># B &gt; 148: compute-bound; increasing batch → TPOT starts to grow</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Empirical validation (Cursor blog, LLaMA-70B on 2×A100):</span><br><span class="hljs-comment">#   bs=1:  18.6 tok/s  ← memory-bound</span><br><span class="hljs-comment">#   bs=8:  17.2 tok/s  ← still memory-bound (per-request TPOT unchanged)</span><br><span class="hljs-comment">#   bs=32: 12.4 tok/s  ← beginning to saturate</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># LLM-Viewer paper (arXiv 2402.16363) confirms:</span><br><span class="hljs-comment"># "In the decode stage, arithmetic intensity ≈ 1 OPs/byte across all compute layers,</span><br><span class="hljs-comment">#  firmly in memory-bound region"</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="KV-Cache-Size-Estimation"><a href="#KV-Cache-Size-Estimation" class="headerlink" title="KV Cache Size Estimation"></a>KV Cache Size Estimation</h3><p>Deriving KV cache per token from model config:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Formula:</span><br>kv_per_token = <span class="hljs-number">2</span> × n_layers × n_kv_heads × head_dim × dtype_bytes<br><span class="hljs-comment">#              ↑       ↑          ↑           ↑          ↑</span><br><span class="hljs-comment">#             K+V  num layers  KV heads   head dim   BF16=2</span><br><br><span class="hljs-comment"># Quick estimate: kv_per_token = 512 × n_layers × n_kv_heads  (bytes, BF16)</span><br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Params</th>
+<th>Layers</th>
+<th>KV Heads</th>
+<th>Attention</th>
+<th>KV/token (BF16)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLaMA-7B</td>
+<td>7B</td>
+<td>32</td>
+<td>32 (MHA)</td>
+<td>MHA</td>
+<td><strong>512 KB</strong></td>
+</tr>
+<tr>
+<td>LLaMA-13B</td>
+<td>13B</td>
+<td>40</td>
+<td>40 (MHA)</td>
+<td>MHA</td>
+<td><strong>800 KB</strong></td>
+</tr>
+<tr>
+<td>LLaMA-70B</td>
+<td>70B</td>
+<td>80</td>
+<td>8 (GQA)</td>
+<td>GQA</td>
+<td><strong>320 KB</strong></td>
+</tr>
+<tr>
+<td>LLaMA-405B</td>
+<td>405B</td>
+<td>126</td>
+<td>8 (GQA)</td>
+<td>GQA</td>
+<td><strong>504 KB</strong></td>
+</tr>
+<tr>
+<td>DeepSeek-V3</td>
+<td>671B</td>
+<td>61</td>
+<td>MLA</td>
+<td>MLA (512d)</td>
+<td><strong>122 KB</strong></td>
+</tr>
+</tbody></table>
+<p>Key observation: you cannot infer KV cache linearly from parameter count!</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 7B  → 512 KB/token  (73 KB per B of params)</span><br><span class="hljs-comment"># 70B → 320 KB/token  (4.6 KB per B of params) ← 16× difference!</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Reason: large models use GQA (8 KV heads shared across 64 Q heads)</span><br><span class="hljs-comment"># KV cache does not grow with Q heads, only with KV heads</span><br><span class="hljs-comment"># MLA is even more aggressive: compresses KV into a low-dimensional latent (512 vs 7168)</span><br></code></pre></td></tr></table></figure>
+
+<p>Serving capacity estimation:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 70B on 2×H100 (TP=2), model occupies 70 GB/GPU, 10 GB remaining for KV cache</span><br>available_kv = <span class="hljs-number">10</span> * <span class="hljs-number">1024</span>  <span class="hljs-comment"># 10240 MB</span><br>kv_per_token = <span class="hljs-number">0.32</span>       <span class="hljs-comment"># MB (320 KB, LLaMA-70B GQA)</span><br><br><span class="hljs-comment"># Assuming average seq_len = 4096:</span><br>max_concurrent = available_kv / (kv_per_token * <span class="hljs-number">4096</span>)<br><span class="hljs-comment"># = 10240 / 1310 ≈ 7–8 concurrent requests (very tight on a single GPU!)</span><br><span class="hljs-comment"># This is exactly why PagedAttention and memory management matter so much</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="How-GPU-Memory-Is-Actually-Allocated"><a href="#How-GPU-Memory-Is-Actually-Allocated" class="headerlink" title="How GPU Memory Is Actually Allocated"></a>How GPU Memory Is Actually Allocated</h3><p>KV cache is not the only tenant — during inference, a GPU’s memory is divided among several “residents.” What exactly is that 10% reserved by vLLM’s <code>gpu_memory_utilization=0.9</code>? Enumerating every item makes it possible to calculate how many concurrent requests fit, and when OOM happens.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Purpose</th>
+<th>Size (70B, TP=8, FP16, per GPU)</th>
+<th>Grows with concurrency / seq len?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Weights</strong></td>
+<td>Model parameters — Linear/Embedding/LayerNorm</td>
+<td>140 GB / 8 = <strong>17.5 GB</strong></td>
+<td>✗ Fixed</td>
+</tr>
+<tr>
+<td><strong>KV cache</strong></td>
+<td>K, V tensors for every past token, must be read during decode</td>
+<td>0 — tens of GB</td>
+<td>✓ <strong>The only item that grows linearly</strong></td>
+</tr>
+<tr>
+<td><strong>Activations</strong> (peak single layer)</td>
+<td>Intermediate results of current forward layer (QKV / attn out / MLP)</td>
+<td><strong>~100 MB</strong> (decode) — <strong>~1 GB</strong> (long prefill)</td>
+<td>✓ Only during prefill</td>
+</tr>
+<tr>
+<td><strong>cuBLAS / cuDNN workspace</strong></td>
+<td>GEMM kernel split-K / reduce staging buffers</td>
+<td>A few hundred MB per stream</td>
+<td>✗ Allocated at startup</td>
+</tr>
+<tr>
+<td><strong>NCCL / RCCL communication buffers</strong></td>
+<td>Send/receive staging for TP all-reduce / all-gather</td>
+<td>100 MB – 1 GB</td>
+<td>✗ Allocated at startup</td>
+</tr>
+<tr>
+<td><strong>CUDA graph memory</strong></td>
+<td>vLLM captures one graph per batch size by default</td>
+<td>Hundreds of MB – 1+ GB</td>
+<td>✗ Allocated at startup</td>
+</tr>
+<tr>
+<td><strong>PyTorch caching allocator fragmentation</strong></td>
+<td>Unreturned / uncoalesced blocks from past allocations</td>
+<td>0.5 – 2 GB</td>
+<td>✗ Accumulates over time</td>
+</tr>
+<tr>
+<td><strong>CUDA driver / runtime baseline</strong></td>
+<td>The baseline shown by <code>nvidia-smi</code> as soon as the process starts</td>
+<td>~500 MB</td>
+<td>✗ Fixed</td>
+</tr>
+</tbody></table>
+<p>Total non-KV-cache overhead for 70B per GPU ≈ <code>17.5 (weights) + 2–3 (workspaces/graph/fragmentation) + 0.5 (driver)</code> ≈ <strong>20 GB</strong>. On an 80 GB GPU that leaves roughly <strong>~60 GB</strong> for KV cache + prefill spikes — which is why <code>gpu_memory_utilization=0.9</code> reserves 8 GB as a buffer.</p>
+<h4 id="Key-Caveats-for-Each-Item"><a href="#Key-Caveats-for-Each-Item" class="headerlink" title="Key Caveats for Each Item"></a>Key Caveats for Each Item</h4><p><strong>Weights</strong> — After TP sharding, each GPU holds only <code>1/TP</code>, but <strong>embeddings are typically not sharded</strong> (the vocabulary is small enough that all-gathering after sharding would cost more). A 70B vocabulary of 32k × hidden 8192 × 2 bytes ≈ 0.5 GB — unsharded, not a problem.</p>
+<p><strong>Activations</strong> — These are the dominant term in training (70B training activations alone reach 145 GB, as covered in the previous chapter); during inference they sit at ~100 MB. The reason: inference <strong>does not store gradients</strong>, so each layer can be discarded as soon as it finishes; <strong>FlashAttention</strong> avoids materializing the O(s²) attention scores. The two scenarios where this can blow up:</p>
+<ul>
+<li>Ultra-long prefill: a <code>s=128k</code> prompt requires <code>10·128k·8192/8 ≈ 1.3 GB</code> per layer.</li>
+<li>Large prefill batch: doubling the batch doubles the activation footprint.</li>
+</ul>
+<p>vLLM’s <code>--max-num-batched-tokens</code> cap is specifically designed to bound this prefill peak.</p>
+<p><strong>cuBLAS workspace</strong> — Running <code>torch.cuda.memory_summary()</code> often reveals several hundred MB of <em>Allocated by CUDA libs</em>. This is primarily cuBLAS’s <strong>GEMM split-K reduction buffer</strong> — large matrix multiplications partition the K dimension into chunks, compute each chunk independently, then reduce; the intermediate results need staging. Each CUDA stream allocates independently; multiple streams multiply this footprint.</p>
+<p><strong>NCCL buffer</strong> — With TP=8, the staging memory for all-reduce per GPU ≈ <code>hidden × bs × seq × 2 bytes × 2 (recv+send)</code>. NCCL expands this on demand; large batches cause more inflation. You can cap it with environment variables like <code>NCCL_BUFFSIZE=8388608</code>.</p>
+<p><strong>CUDA graph</strong> — vLLM captures one graph for each common batch size (<code>1, 2, 4, 8, 16, 32, ...</code>) to eliminate kernel launch overhead. Each captured graph carries its own ~tens-of-MB workspace; the cumulative size is substantial. <code>--enforce-eager</code> disables this and saves 1–2 GB, at a cost of 10–20% decode throughput.</p>
+<p><strong>Allocator fragmentation</strong> — PyTorch’s caching allocator carves large blocks for small requests and may not be able to coalesce freed blocks. Long-running serving processes typically use 1–2 GB more than they did at startup, invisibly. <code>PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True</code> can substantially mitigate this.</p>
+<h4 id="Concrete-Memory-Budget-70B-on-8-×-80-GB-H100"><a href="#Concrete-Memory-Budget-70B-on-8-×-80-GB-H100" class="headerlink" title="Concrete Memory Budget: 70B on 8 × 80 GB H100"></a>Concrete Memory Budget: 70B on 8 × 80 GB H100</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text">Each GPU's 80 GB breakdown:<br>  Weights (TP=8, FP16):                17.5 GB<br>  CUDA driver / runtime:                0.5 GB<br>  cuBLAS + cuDNN workspaces:            0.6 GB<br>  NCCL TP buffers:                      0.8 GB<br>  CUDA graphs (vLLM default):           0.6 GB<br>  PyTorch allocator fragmentation:      1.0 GB<br>  ─────────────────────────────────────────────<br>  Total non-KV-cache overhead:          ~21 GB<br>  Remaining for KV cache + prefill:     ~59 GB<br><br>With gpu_memory_utilization=0.9:<br>  vLLM total budget = 80 × 0.9 = 72 GB<br>  Subtract weights 17.5 → KV cache pool: 54.5 GB<br>  (driver/workspaces etc. come from outside the 72 GB; 8 GB headroom is for them)<br><br>70B GQA, kv/token = 320 KB:<br>  KV cache pool: 54.5 GB / 320 KB ≈ 170k tokens total capacity<br>  At average seq=4k → ≈ 40 concurrent requests per GPU<br></code></pre></td></tr></table></figure>
+
+<h4 id="When-Should-You-Lower-gpu-memory-utilization"><a href="#When-Should-You-Lower-gpu-memory-utilization" class="headerlink" title="When Should You Lower gpu_memory_utilization?"></a>When Should You Lower <code>gpu_memory_utilization</code>?</h4><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Real Cause</th>
+<th>Not Caused By</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OOM at startup</td>
+<td>weights + workspaces already exceed 90%</td>
+<td>Activation growth</td>
+</tr>
+<tr>
+<td>OOM during prefill burst</td>
+<td>Long prompts / large prefill batch causes activations to spike to GB scale temporarily</td>
+<td>KV cache growth (KV cache grows gradually, not instantly)</td>
+</tr>
+<tr>
+<td>OOM after long runtime</td>
+<td>Allocator fragmentation accumulates</td>
+<td>Weights / KV cache</td>
+</tr>
+</tbody></table>
+<p>Lowering <code>gpu_memory_utilization</code> (e.g., 0.9 → 0.85) primarily provides headroom for <strong>workspaces + prefill spikes</strong>, and has little to do with steady-state activations.</p>
+<h4 id="One-Line-Intuition"><a href="#One-Line-Intuition" class="headerlink" title="One-Line Intuition"></a>One-Line Intuition</h4><blockquote>
+<p><strong>Training</strong> memory = <code>(weights + grads + optimizer) (shardable with ZeRO)</code> + <strong>activations (grow with batch×s², must be compressed with checkpointing + TP + SP)</strong></p>
+<p><strong>Inference</strong> memory = <code>weights (static)</code> + <strong>KV cache (grows linearly with concurrency, the only tunable pool)</strong> + <code>workspace (allocated at startup)</code> + <code>activation spike (only during prefill)</code></p>
+<p>What <code>gpu_memory_utilization</code> is really reserving space for is <strong>workspace + spike</strong>, not steady-state activations. Smaller value → smaller KV cache pool → <strong>fewer concurrent requests fit</strong>; larger value → <strong>more likely to OOM during a prefill burst</strong>.</p>
+</blockquote>
+<h3 id="Where-Activations-Actually-Live-in-the-Transformer"><a href="#Where-Activations-Actually-Live-in-the-Transformer" class="headerlink" title="Where Activations Actually Live in the Transformer"></a>Where Activations Actually Live in the Transformer</h3><p>The table above vaguely says “intermediate results” for activations, but knowing exactly which tensors, and their shapes, determines how large a prefill spike will be and what FlashAttention saves. Walk through the forward pass of a pre-LN transformer block with every activation labeled:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs stylus">x_in                                  shape: (<span class="hljs-selector-tag">b</span>, s, h)         ← <span class="hljs-selector-tag">input</span> from previous layer, also used <span class="hljs-keyword">for</span> residual<br>│<br>├─ x1 = <span class="hljs-built_in">LN1</span>(x_in)                     (<span class="hljs-selector-tag">b</span>, s, h)                ← LN output<br>├─ Q = x1 @ W_Q                       (<span class="hljs-selector-tag">b</span>, s, h)<br>├─ K = x1 @ W_K                       (<span class="hljs-selector-tag">b</span>, s, h)<br>├─ V = x1 @ W_V                       (<span class="hljs-selector-tag">b</span>, s, h)                ← Q, K, V: three tensors<br>│<br>├─ split heads → (<span class="hljs-selector-tag">b</span>, n_h, s, d_k)<br>├─ scores = Q @ K^T / √d_k            (<span class="hljs-selector-tag">b</span>, n_h, s, s)           ← ★ <span class="hljs-built_in">O</span>(s²), largest single item<br>├─ attn_w = <span class="hljs-built_in">softmax</span>(scores)           (<span class="hljs-selector-tag">b</span>, n_h, s, s)           ← ★ another <span class="hljs-built_in">O</span>(s²) tensor<br>├─ ctx = attn_w @ V                   (<span class="hljs-selector-tag">b</span>, n_h, s, d_k)<br>├─ merge → (<span class="hljs-selector-tag">b</span>, s, h)<br>├─ attn_out = ctx @ W_O               (<span class="hljs-selector-tag">b</span>, s, h)<br>├─ x_attn = x_in + attn_out           (<span class="hljs-selector-tag">b</span>, s, h)                ← residual sum<br>│<br>├─ x2 = <span class="hljs-built_in">LN2</span>(x_attn)                   (<span class="hljs-selector-tag">b</span>, s, h)<br>├─ up = x2 @ W_up                     (<span class="hljs-selector-tag">b</span>, s, <span class="hljs-number">4</span>h)               ← ★ MLP intermediate, <span class="hljs-number">4</span>× hidden<br>├─ act = <span class="hljs-built_in">GeLU</span>(up)                     (<span class="hljs-selector-tag">b</span>, s, <span class="hljs-number">4</span>h)               ← ★ another <span class="hljs-number">4</span>× tensor<br>├─ down = act @ W_down                (<span class="hljs-selector-tag">b</span>, s, h)<br>└─ x_out = x_attn + down              (<span class="hljs-selector-tag">b</span>, s, h)                ← <span class="hljs-selector-tag">input</span> to next layer<br></code></pre></td></tr></table></figure>
+
+<p>Each ★ is a large contributor; everything else is at the <code>(b, s, h)</code> scale. Grouping activations by order of magnitude:</p>
+<table>
+<thead>
+<tr>
+<th>Scale</th>
+<th>Shape</th>
+<th>Which tensors</th>
+<th>Size per instance (70B, b=1, s=2048)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>O(b·s·h)</strong></td>
+<td><code>(b, s, h)</code></td>
+<td>LN i/o, Q/K/V, attn_out, residual sum, LN2 i/o</td>
+<td>Each ≈ <strong>34 MB</strong></td>
+</tr>
+<tr>
+<td><strong>O(b·s·4h)</strong></td>
+<td><code>(b, s, 4h)</code></td>
+<td>MLP up output, GeLU output</td>
+<td>Each ≈ <strong>134 MB</strong> (4× larger)</td>
+</tr>
+<tr>
+<td><strong>O(b·n_h·s²)</strong></td>
+<td><code>(b, n_h, s, s)</code></td>
+<td>Attention scores, softmax output</td>
+<td>Each ≈ <strong>1.0 GB</strong> (s² explosion)</td>
+</tr>
+</tbody></table>
+<p>At <code>s=8192</code>, a single attention score tensor is <strong>17 GB per layer</strong> — it overwhelms everything else. This is why long-context training almost universally requires FlashAttention.</p>
+<h4 id="What-FlashAttention-Eliminates"><a href="#What-FlashAttention-Eliminates" class="headerlink" title="What FlashAttention Eliminates"></a>What FlashAttention Eliminates</h4><p>FlashAttention’s core: <strong>scores and softmax outputs are never materialized to HBM</strong>, computed in SRAM tile-by-tile and fed directly to <code>@ V</code>. So with FA:</p>
+<ul>
+<li>★ The two O(s²) items: <strong>disappear from the activation list</strong> (backward uses the same tiled recomputation — see <a href="#">FlashAttention backward</a>)</li>
+<li>Everything else is unchanged</li>
+</ul>
+<p>Megatron’s <code>Act per layer = 34·s·b·h + 5·a·s²·b</code> formula has the <strong>5·a·s²·b term eliminated by FA</strong>. This is why Megatron’s <em>selective activation recomputation</em> recomputes only attention scores by default — the single largest item, with the cheapest recompute cost (~10% extra FLOPs saves ~80% of activations).</p>
+<h4 id="Two-“Non-layer”-Activations-at-the-Boundaries"><a href="#Two-“Non-layer”-Activations-at-the-Boundaries" class="headerlink" title="Two “Non-layer” Activations at the Boundaries"></a>Two “Non-layer” Activations at the Boundaries</h4><table>
+<thead>
+<tr>
+<th>Tensor</th>
+<th>Shape</th>
+<th>Size (70B, b=1, s=2048)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Input embedding output</td>
+<td><code>(b, s, h)</code></td>
+<td>34 MB</td>
+<td>One copy; must be retained during training (needed for embedding backward)</td>
+</tr>
+<tr>
+<td>Output logits</td>
+<td><code>(b, s, vocab)</code></td>
+<td>LLaMA-2 vocab=32k: <strong>130 MB</strong>; LLaMA-3 vocab=128k: <strong>524 MB</strong></td>
+<td>Larger than a single-layer activation; a common OOM hotspot</td>
+</tr>
+<tr>
+<td>Loss softmax intermediate</td>
+<td><code>(b, s, vocab)</code></td>
+<td>Same as above</td>
+<td>Commonly eliminated with fused CE kernels (Liger/Apex)</td>
+</tr>
+</tbody></table>
+<p>The output logits tensor is the biggest single-point contributor — this is why <em>fused cross-entropy</em> is almost mandatory when training long-context + large-vocabulary models (the approach is identical to FlashAttention: avoid materializing the intermediate).</p>
+<h4 id="Training-vs-Inference-Which-Activations-Survive-Which-Are-Freed"><a href="#Training-vs-Inference-Which-Activations-Survive-Which-Are-Freed" class="headerlink" title="Training vs. Inference: Which Activations Survive, Which Are Freed"></a>Training vs. Inference: Which Activations Survive, Which Are Freed</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>Training (backward needs them)</th>
+<th>Inference (no backward)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LN i/o / Q / K / V / MLP intermediates</td>
+<td><strong>Kept until backward completes</strong></td>
+<td>Discarded as soon as a layer finishes; memory reused by the next layer</td>
+</tr>
+<tr>
+<td>Attention scores (O(s²))</td>
+<td>Without FA: stored; with FA: not stored</td>
+<td>Without FA: temporary; with FA: not stored</td>
+</tr>
+<tr>
+<td>Output logits</td>
+<td>Kept until loss backward</td>
+<td>Discarded immediately (one token generated is enough)</td>
+</tr>
+<tr>
+<td><strong>Total live activations simultaneously</strong></td>
+<td><strong>All layers × all items above</strong> (without checkpointing)</td>
+<td><strong>Roughly only the current layer’s intermediates</strong></td>
+</tr>
+</tbody></table>
+<p>This is why training activations are ~150 GB/GPU (70B) while inference activations are ~100 MB/GPU — not because inference “saves” anything special, but because inference simply does not need to retain them all before backward begins.</p>
+<h4 id="One-Line-Intuition-1"><a href="#One-Line-Intuition-1" class="headerlink" title="One-Line Intuition"></a>One-Line Intuition</h4><blockquote>
+<p><strong>“Short” activations</strong> (<code>O(b·s·h)</code>): like hidden states passing through a pipeline stage by stage, one copy each, not huge but numerous.</p>
+<p><strong>“Wide” activations</strong> (<code>O(b·s·4h)</code>): the MLP intermediate expands to 4×; these are the largest non-O(s²) items per layer and <strong>contribute the most to total activation memory</strong>.</p>
+<p><strong>“Square” activations</strong> (<code>O(b·n_h·s²)</code>): the attention score matrix — explodes as soon as s grows. <strong>FlashAttention exists specifically to eliminate them</strong>.</p>
+</blockquote>
+<h2 id="4-2-Continuous-Batching-vs-Static-Batching"><a href="#4-2-Continuous-Batching-vs-Static-Batching" class="headerlink" title="4.2 Continuous Batching vs. Static Batching"></a>4.2 Continuous Batching vs. Static Batching</h2><p>Traditional static batching waits for every request in a batch to finish generating before starting on the next batch, causing severe GPU resource waste. Continuous batching dynamically adds and removes requests so that the GPU stays highly utilized at all times.</p>
+<p>The animation below compares GPU utilization between the two batching strategies (red = wasted slots):</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/ch4/batching.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h3 id="Core-Implementation-of-Continuous-Batching"><a href="#Core-Implementation-of-Continuous-Batching" class="headerlink" title="Core Implementation of Continuous Batching"></a>Core Implementation of Continuous Batching</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ContinuousBatchScheduler</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, max_batch_size, max_seq_len</span>):<br>        <span class="hljs-variable language_">self</span>.running_batch = []        <span class="hljs-comment"># requests currently being processed</span><br>        <span class="hljs-variable language_">self</span>.waiting_queue = []        <span class="hljs-comment"># waiting queue</span><br>        <span class="hljs-variable language_">self</span>.max_batch_size = max_batch_size<br>        <span class="hljs-variable language_">self</span>.max_seq_len = max_seq_len<br>        <span class="hljs-variable language_">self</span>.kv_pool = KVCachePool()  <span class="hljs-comment"># KV cache memory pool</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">schedule_step</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-comment"># 1. Remove completed requests (EOS reached or max_len exceeded)</span><br>        finished = [r <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.running_batch <span class="hljs-keyword">if</span> r.is_finished()]<br>        <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> finished:<br>            <span class="hljs-variable language_">self</span>.running_batch.remove(req)<br>            <span class="hljs-variable language_">self</span>.kv_pool.free(req.kv_blocks)  <span class="hljs-comment"># free KV cache</span><br>            yield_response(req)<br><br>        <span class="hljs-comment"># 2. Fill empty slots from the waiting queue</span><br>        available_slots = <span class="hljs-variable language_">self</span>.max_batch_size - <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.running_batch)<br>        <span class="hljs-keyword">while</span> available_slots &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-variable language_">self</span>.waiting_queue:<br>            new_req = <span class="hljs-variable language_">self</span>.waiting_queue.pop(<span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.kv_pool.can_allocate(new_req.prompt_len):<br>                new_req.kv_blocks = <span class="hljs-variable language_">self</span>.kv_pool.allocate(new_req.prompt_len)<br>                <span class="hljs-variable language_">self</span>.running_batch.append(new_req)<br>                available_slots -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-variable language_">self</span>.waiting_queue.insert(<span class="hljs-number">0</span>, new_req)<br>                <span class="hljs-keyword">break</span>  <span class="hljs-comment"># insufficient memory, stop scheduling</span><br><br>        <span class="hljs-comment"># 3. Execute one decode step</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.running_batch:<br>            model_forward(<span class="hljs-variable language_">self</span>.running_batch)<br></code></pre></td></tr></table></figure>
+
+<p>Key design points:</p>
+<ul>
+<li><strong>Iteration-level scheduling</strong>: requests may join or leave after every decode iteration</li>
+<li><strong>No padding required</strong>: requests of different lengths are handled efficiently via PageAttention</li>
+<li><strong>Memory-aware scheduling</strong>: new requests are only admitted when the KV cache pool has sufficient space</li>
+<li><strong>Priority support</strong>: shorter requests complete first, reducing average latency</li>
+</ul>
+<h3 id="Performance-Comparison"><a href="#Performance-Comparison" class="headerlink" title="Performance Comparison"></a>Performance Comparison</h3><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Static Batching</th>
+<th>Continuous Batching</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPU utilization</td>
+<td>30–50%</td>
+<td>85–95%</td>
+<td>~2×</td>
+</tr>
+<tr>
+<td>Throughput (tokens/s)</td>
+<td>Baseline</td>
+<td>2–3×</td>
+<td>Significant</td>
+</tr>
+<tr>
+<td>Average latency</td>
+<td>High (waits for longest request)</td>
+<td>Low (timely release)</td>
+<td>50–70%↓</td>
+</tr>
+<tr>
+<td>Tail latency (P99)</td>
+<td>Very high</td>
+<td>Controllable</td>
+<td>Major improvement</td>
+</tr>
+</tbody></table>
+<h2 id="4-3-KV-Cache-Management"><a href="#4-3-KV-Cache-Management" class="headerlink" title="4.3 KV Cache Management"></a>4.3 KV Cache Management</h2><h3 id="PageAttention-Virtual-Memory-for-the-KV-Cache"><a href="#PageAttention-Virtual-Memory-for-the-KV-Cache" class="headerlink" title="PageAttention: Virtual Memory for the KV Cache"></a>PageAttention: Virtual Memory for the KV Cache</h3><p>Inspired by the OS paged memory model. PageAttention divides the KV cache into fixed-size <strong>pages (blocks)</strong> and uses a page table to implement non-contiguous physical memory mappings, solving the memory fragmentation problem in traditional approaches.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">KVCachePool</span>:<br>    <span class="hljs-string">"""KV cache manager analogous to OS virtual memory"""</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, num_blocks, block_size, num_layers, num_heads, head_dim</span>):<br>        <span class="hljs-comment"># block_size: number of tokens stored per block (typically 16 or 32)</span><br>        <span class="hljs-variable language_">self</span>.block_size = block_size<br>        <span class="hljs-variable language_">self</span>.num_blocks = num_blocks<br><br>        <span class="hljs-comment"># Physical memory pool: [num_blocks, 2, num_layers, block_size, num_heads, head_dim]</span><br>        <span class="hljs-comment"># 2 represents K and V</span><br>        <span class="hljs-variable language_">self</span>.kv_pool = torch.zeros(<br>            num_blocks, <span class="hljs-number">2</span>, num_layers, block_size, num_heads, head_dim,<br>            dtype=torch.float16, device=<span class="hljs-string">"cuda"</span><br>        )<br>        <span class="hljs-variable language_">self</span>.free_blocks = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(num_blocks))  <span class="hljs-comment"># free block list</span><br>        <span class="hljs-variable language_">self</span>.page_tables = {}  <span class="hljs-comment"># request_id → [block_indices]</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">allocate</span>(<span class="hljs-params">self, request_id, num_tokens</span>):<br>        <span class="hljs-comment"># Calculate number of blocks needed (ceiling division)</span><br>        num_needed = ceil_div(num_tokens, <span class="hljs-variable language_">self</span>.block_size)<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.free_blocks) &lt; num_needed:<br>            <span class="hljs-keyword">raise</span> MemoryError(<span class="hljs-string">"KV Cache pool exhausted"</span>)<br><br>        blocks = [<span class="hljs-variable language_">self</span>.free_blocks.pop() <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_needed)]<br>        <span class="hljs-variable language_">self</span>.page_tables[request_id] = blocks<br>        <span class="hljs-keyword">return</span> blocks<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">free</span>(<span class="hljs-params">self, request_id</span>):<br>        blocks = <span class="hljs-variable language_">self</span>.page_tables.pop(request_id)<br>        <span class="hljs-variable language_">self</span>.free_blocks.extend(blocks)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">append_token</span>(<span class="hljs-params">self, request_id, layer, k, v</span>):<br>        <span class="hljs-comment"># Append KV for a new token, may require allocating a new block</span><br>        blocks = <span class="hljs-variable language_">self</span>.page_tables[request_id]<br>        current_len = <span class="hljs-variable language_">self</span>.token_counts[request_id]<br>        block_idx = current_len // <span class="hljs-variable language_">self</span>.block_size<br>        offset = current_len % <span class="hljs-variable language_">self</span>.block_size<br><br>        <span class="hljs-keyword">if</span> offset == <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> block_idx == <span class="hljs-built_in">len</span>(blocks):<br>            <span class="hljs-comment"># Need a new block</span><br>            new_block = <span class="hljs-variable language_">self</span>.free_blocks.pop()<br>            blocks.append(new_block)<br><br>        physical_block = blocks[block_idx]<br>        <span class="hljs-variable language_">self</span>.kv_pool[physical_block, <span class="hljs-number">0</span>, layer, offset] = k<br>        <span class="hljs-variable language_">self</span>.kv_pool[physical_block, <span class="hljs-number">1</span>, layer, offset] = v<br></code></pre></td></tr></table></figure>
+
+<h3 id="Radix-Cache-Prefix-Sharing-Tree"><a href="#Radix-Cache-Prefix-Sharing-Tree" class="headerlink" title="Radix Cache: Prefix-Sharing Tree"></a>Radix Cache: Prefix-Sharing Tree</h3><p>One of SGLang’s core innovations. When multiple requests share the same system prompt or prefix, the radix cache shares KV cache via a tree structure, avoiding redundant computation.</p>
+<p>Below is an interactive radix tree: click the buttons to add requests and watch how shared prefixes are reused and how new requests match the longest cached prefix:</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/ch4/radix-cache.html" loading="lazy" style="width:100%;height:480px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h3 id="Radix-Cache-Implementation"><a href="#Radix-Cache-Implementation" class="headerlink" title="Radix Cache Implementation"></a>Radix Cache Implementation</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">RadixCacheNode</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-variable language_">self</span>.children = {}       <span class="hljs-comment"># token_id → RadixCacheNode</span><br>        <span class="hljs-variable language_">self</span>.kv_indices = []     <span class="hljs-comment"># corresponding KV cache block indices</span><br>        <span class="hljs-variable language_">self</span>.ref_count = <span class="hljs-number">0</span>       <span class="hljs-comment"># reference count (used for eviction)</span><br>        <span class="hljs-variable language_">self</span>.last_access = <span class="hljs-number">0</span>    <span class="hljs-comment"># LRU timestamp</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">RadixCache</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, kv_pool</span>):<br>        <span class="hljs-variable language_">self</span>.root = RadixCacheNode()<br>        <span class="hljs-variable language_">self</span>.kv_pool = kv_pool<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">match_prefix</span>(<span class="hljs-params">self, token_ids</span>):<br>        <span class="hljs-string">"""Find the longest matching prefix; return (match_length, KV blocks)"""</span><br>        node = <span class="hljs-variable language_">self</span>.root<br>        matched_len = <span class="hljs-number">0</span><br>        kv_blocks = []<br><br>        <span class="hljs-keyword">for</span> token_id <span class="hljs-keyword">in</span> token_ids:<br>            <span class="hljs-keyword">if</span> token_id <span class="hljs-keyword">in</span> node.children:<br>                node = node.children[token_id]<br>                node.ref_count += <span class="hljs-number">1</span><br>                node.last_access = current_time()<br>                kv_blocks.extend(node.kv_indices)<br>                matched_len += <span class="hljs-number">1</span><br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">break</span><br><br>        <span class="hljs-keyword">return</span> matched_len, kv_blocks<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">insert</span>(<span class="hljs-params">self, token_ids, kv_blocks</span>):<br>        <span class="hljs-string">"""Insert new KV cache entries into the tree"""</span><br>        node = <span class="hljs-variable language_">self</span>.root<br>        <span class="hljs-keyword">for</span> i, token_id <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(token_ids):<br>            <span class="hljs-keyword">if</span> token_id <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> node.children:<br>                new_node = RadixCacheNode()<br>                new_node.kv_indices = [kv_blocks[i]]<br>                node.children[token_id] = new_node<br>            node = node.children[token_id]<br>            node.ref_count += <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">evict_lru</span>(<span class="hljs-params">self, num_blocks_needed</span>):<br>        <span class="hljs-string">"""Evict using LRU policy when memory is insufficient"""</span><br>        <span class="hljs-comment"># Collect all leaf nodes, sort by last_access</span><br>        leaves = <span class="hljs-variable language_">self</span>._collect_leaves(<span class="hljs-variable language_">self</span>.root)<br>        leaves.sort(key=<span class="hljs-keyword">lambda</span> n: n.last_access)<br><br>        freed = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">for</span> leaf <span class="hljs-keyword">in</span> leaves:<br>            <span class="hljs-keyword">if</span> leaf.ref_count == <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> freed &lt; num_blocks_needed:<br>                <span class="hljs-variable language_">self</span>.kv_pool.free_blocks(leaf.kv_indices)<br>                freed += <span class="hljs-built_in">len</span>(leaf.kv_indices)<br>                <span class="hljs-variable language_">self</span>._remove_node(leaf)<br>        <span class="hljs-keyword">return</span> freed<br></code></pre></td></tr></table></figure>
+
+<p>Advantages of radix cache:</p>
+<ul>
+<li><strong>Prefix sharing</strong>: requests with the same system prompt share KV cache, saving GPU memory</li>
+<li><strong>Automatic matching</strong>: new requests automatically find the longest cached prefix, skipping already-cached prefill computation</li>
+<li><strong>LRU eviction</strong>: reclaims infrequently used cache entries when memory is tight</li>
+<li><strong>Multi-turn acceleration</strong>: KV from earlier turns in a multi-turn conversation is cached and reused</li>
+</ul>
+<h2 id="4-4-Scheduler-Design"><a href="#4-4-Scheduler-Design" class="headerlink" title="4.4 Scheduler Design"></a>4.4 Scheduler Design</h2><h3 id="The-Scheduling-Tension-Between-Prefill-and-Decode"><a href="#The-Scheduling-Tension-Between-Prefill-and-Decode" class="headerlink" title="The Scheduling Tension Between Prefill and Decode"></a>The Scheduling Tension Between Prefill and Decode</h3><p>Prefill and decode have fundamentally different compute characteristics; efficiently scheduling both on the same GPU is a core challenge:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Prefill</th>
+<th>Decode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Compute profile</td>
+<td>Compute-bound (large matmul)</td>
+<td>Memory-bound (KV cache reads)</td>
+</tr>
+<tr>
+<td>Latency sensitivity</td>
+<td>Affects TTFT</td>
+<td>Affects TPOT</td>
+</tr>
+<tr>
+<td>Token count</td>
+<td>Hundreds to thousands</td>
+<td>1 per step</td>
+</tr>
+<tr>
+<td>GPU utilization pattern</td>
+<td>High compute density</td>
+<td>High bandwidth demand</td>
+</tr>
+</tbody></table>
+<p>SGLang’s scheduling strategy (overlap scheduling: overlapping CPU scheduling with GPU computation):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">OverlapScheduler</span>:<br>    <span class="hljs-string">"""Prefill-Decode Overlap Scheduling"""</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">schedule_batch</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-comment"># Strategy: chunked prefill + decode mixed batch</span><br>        batch = MixedBatch()<br><br>        <span class="hljs-comment"># 1. Prioritize in-flight decode requests (to guarantee TPOT)</span><br>        <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.running_decode:<br>            batch.add_decode_request(req)<br><br>        <span class="hljs-comment"># 2. Use remaining compute budget for prefill (chunked)</span><br>        remaining_budget = <span class="hljs-variable language_">self</span>.compute_budget - batch.decode_flops<br>        <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.waiting_prefill:<br>            chunk_size = <span class="hljs-built_in">min</span>(req.remaining_prefill, remaining_budget)<br>            <span class="hljs-keyword">if</span> chunk_size &gt; <span class="hljs-number">0</span>:<br>                batch.add_prefill_chunk(req, chunk_size)<br>                remaining_budget -= chunk_size<br><br>        <span class="hljs-comment"># 3. Congestion control: if the waiting queue is too long, throttle new requests</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.waiting_prefill) &gt; <span class="hljs-variable language_">self</span>.congestion_threshold:<br>            <span class="hljs-variable language_">self</span>.apply_backpressure()<br><br>        <span class="hljs-keyword">return</span> batch<br></code></pre></td></tr></table></figure>
+
+<h3 id="Chunked-Prefill-Why-It-Is-Needed-and-How-to-Choose-Chunk-Size"><a href="#Chunked-Prefill-Why-It-Is-Needed-and-How-to-Choose-Chunk-Size" class="headerlink" title="Chunked Prefill: Why It Is Needed and How to Choose Chunk Size"></a>Chunked Prefill: Why It Is Needed and How to Choose Chunk Size</h3><p><strong>Problem: long prefill blocks decode.</strong> Prefill and decode share the GPU’s SMs (compute units). A large prefill kernel, once submitted to the GPU, monopolizes all SMs until it finishes; subsequent decode kernels queue behind it:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Without chunked prefill: a 32K-token prefill holds the GPU for ~1 second</span><br><span class="hljs-comment"># GPU timeline:</span><br><span class="hljs-comment"># |&lt;--- prefill 32K (occupies all SMs, ~1s) ---&gt;|&lt;- decode -&gt;|</span><br><span class="hljs-comment">#                                                ↑ decode waited 1 second</span><br><span class="hljs-comment"># User is mid-conversation → sudden 1-second pause → terrible experience</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note:</strong> Multiple CUDA streams do not solve this — if one kernel already occupies all SMs, a kernel on another stream, even if submitted, cannot get SM time. Chunked prefill interleaves at <strong>kernel boundaries</strong>; it is not true parallelism.</p>
+</blockquote>
+<p>Chunk size derivation:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Constraint: execution time of each chunk ≤ TPOT budget</span><br><span class="hljs-comment"># chunk_time = chunk_size / prefill_speed ≤ TPOT_budget</span><br><span class="hljs-comment"># → max_chunk_size = prefill_speed × TPOT_budget</span><br><br>prefill_speed = <span class="hljs-number">30000</span>   <span class="hljs-comment"># tokens/sec (7B on H100, from 300K/B formula)</span><br>tpot_budget = <span class="hljs-number">0.050</span>     <span class="hljs-comment"># 50ms, decode latency SLO</span><br>max_chunk_size = prefill_speed * tpot_budget  <span class="hljs-comment"># = 1500 tokens</span><br><br><span class="hljs-comment"># Per-request breakdown:</span><br><span class="hljs-comment"># 100 tokens:   1 chunk (&lt; 1500, no splitting needed)</span><br><span class="hljs-comment"># 500 tokens:   1 chunk</span><br><span class="hljs-comment"># 2000 tokens:  2 chunks (1500 + 500)</span><br><span class="hljs-comment"># 8000 tokens:  6 chunks, total prefill time = 6×50ms = 300ms</span><br><span class="hljs-comment"># 32000 tokens: 22 chunks, total prefill time ≈ 1.1s</span><br><span class="hljs-comment">#               but decode still produces 1 token every 51ms!</span><br><br><span class="hljs-comment"># Actual timeline:</span><br><span class="hljs-comment"># [chunk 1500tok][decode 1tok][chunk 1500tok][decode 1tok]...</span><br><span class="hljs-comment">#     50ms         ~1ms          50ms         ~1ms</span><br></code></pre></td></tr></table></figure>
+
+<p>Scheduling policy: SJF (Shortest Job First) + memory-aware:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># SJF: shorter requests get prefilled first → minimizes average wait time</span><br><span class="hljs-comment"># Memory-aware: if there is not enough KV cache for a request, skip it</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">schedule_prefills</span>(<span class="hljs-params">waiting_queue, available_kv_memory</span>):<br>    <span class="hljs-comment"># Sort by prompt length (SJF)</span><br>    sorted_queue = <span class="hljs-built_in">sorted</span>(waiting_queue, key=<span class="hljs-keyword">lambda</span> r: r.prompt_len)<br><br>    <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> sorted_queue:<br>        kv_needed = req.prompt_len * kv_per_token<br>        <span class="hljs-keyword">if</span> kv_needed &lt;= available_kv_memory:<br>            schedule(req)<br>            available_kv_memory -= kv_needed<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># Does not fit → skip (do not block smaller requests behind it)</span><br>            <span class="hljs-keyword">continue</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Preemption-What-to-Do-When-Memory-Runs-Out"><a href="#Preemption-What-to-Do-When-Memory-Runs-Out" class="headerlink" title="Preemption: What to Do When Memory Runs Out"></a>Preemption: What to Do When Memory Runs Out</h3><p>When KV cache memory is insufficient to accommodate a new request, some running requests must be “evicted” to free space.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Scenario: 7B model, H100, KV cache budget 50 GB</span><br><span class="hljs-comment"># Current state:</span><br>running_decode = <span class="hljs-number">20</span>  <span class="hljs-comment"># requests currently decoding, average seq_len=2000</span><br>kv_used = <span class="hljs-number">20</span> * <span class="hljs-number">2000</span> * <span class="hljs-number">0.5</span>  <span class="hljs-comment"># MB = 20 GB (0.5 MB/token for 7B MHA)</span><br><br><span class="hljs-comment"># New requests arriving:</span><br>new_requests = [<span class="hljs-number">100</span>, <span class="hljs-number">500</span>, <span class="hljs-number">2000</span>, <span class="hljs-number">8000</span>, <span class="hljs-number">32000</span>]  <span class="hljs-comment"># prompt lengths</span><br>kv_needed = <span class="hljs-built_in">sum</span>(new_requests) * <span class="hljs-number">0.5</span>  <span class="hljs-comment"># MB = 21.3 GB</span><br><br><span class="hljs-comment"># Current 20 + 21.3 = 41.3 GB &lt; 50 GB → sufficient for now</span><br><br><span class="hljs-comment"># ⚠ But decode sequences grow! Each decode request's seq_len keeps increasing:</span><br><span class="hljs-comment"># If every decode request eventually reaches 4096 tokens:</span><br>future_kv = <span class="hljs-number">20</span> * <span class="hljs-number">4096</span> * <span class="hljs-number">0.5</span>  <span class="hljs-comment"># = 40 GB</span><br><span class="hljs-comment"># Plus the 32000-token new request (16 GB) → 56 GB &gt; 50 GB → OOM!</span><br></code></pre></td></tr></table></figure>
+
+<p>Preemption strategies:</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Approach</th>
+<th>Recovery Speed</th>
+<th>Extra Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Swap to CPU</strong></td>
+<td>Move KV cache to CPU RAM</td>
+<td>Fast (PCIe copy back)</td>
+<td>Requires CPU memory + PCIe bandwidth</td>
+</tr>
+<tr>
+<td><strong>Recompute</strong></td>
+<td>Discard KV cache, re-prefill on recovery</td>
+<td>Slow (recompute)</td>
+<td>No extra memory, but wastes compute</td>
+</tr>
+<tr>
+<td><strong>Kill</strong></td>
+<td>Terminate the request entirely</td>
+<td>N/A</td>
+<td>Bad user experience</td>
+</tr>
+</tbody></table>
+<p>Who should be preempted?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Prioritize preempting the 32000-token request:</span><br><span class="hljs-comment"># 1. Largest KV cache (16 GB); evicting it frees the most memory</span><br><span class="hljs-comment"># 2. Still in chunked prefill, has not produced any output → low user-perceived cost</span><br><span class="hljs-comment"># 3. Short requests already in decode; preempting them = user sees output interrupted → worse</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># SGLang/vLLM strategy:</span><br><span class="hljs-comment">#   - LIFO preemption (last admitted, first evicted)</span><br><span class="hljs-comment">#   - Protect requests that have already produced output</span><br><span class="hljs-comment">#   - Assign low priority to large requests</span><br></code></pre></td></tr></table></figure>
+
+<p>Congestion control mechanism — analogous to TCP congestion control — when system load is high:</p>
+<ol>
+<li>Monitor waiting queue length and KV cache utilization</li>
+<li>When thresholds are exceeded, throttle new prefill admissions</li>
+<li>In extreme cases, trigger preemption (pause low-priority requests)</li>
+<li>Gradually restore admission rate as load decreases</li>
+</ol>
+<h2 id="4-5-Quantization-Overview"><a href="#4-5-Quantization-Overview" class="headerlink" title="4.5 Quantization Overview"></a>4.5 Quantization Overview</h2><p>Quantization reduces model memory footprint and compute overhead by lowering the numerical precision of weights and/or activations. For LLM inference, it is a key technology for deploying large models within constrained GPU memory budgets.</p>
+<p>Drag the slider below to switch precision levels and compare memory usage across FP32 / FP16 / FP8 / INT4:</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/ch4/quantization.html" loading="lazy" style="width:100%;height:320px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h3 id="Common-Quantization-Strategies"><a href="#Common-Quantization-Strategies" class="headerlink" title="Common Quantization Strategies"></a>Common Quantization Strategies</h3><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weight Precision</th>
+<th>Activation Precision</th>
+<th>Characteristics</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>W16A16</td>
+<td>FP16</td>
+<td>FP16</td>
+<td>Baseline, lossless</td>
+</tr>
+<tr>
+<td>W8A8 (FP8)</td>
+<td>FP8 E4M3</td>
+<td>FP8 E5M2</td>
+<td>Natively supported on H100, nearly lossless</td>
+</tr>
+<tr>
+<td>W4A16 (GPTQ/AWQ)</td>
+<td>INT4</td>
+<td>FP16</td>
+<td>Weight-only quantization, activations at high precision</td>
+</tr>
+<tr>
+<td>W4A8</td>
+<td>INT4</td>
+<td>INT8</td>
+<td>Aggressive compression, requires calibration</td>
+</tr>
+</tbody></table>
+<p>FP8 quantization (natively supported by H100 Tensor Cores):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># FP8 E4M3: 1 sign + 4 exponent + 3 mantissa (weights)</span><br><span class="hljs-comment"># FP8 E5M2: 1 sign + 5 exponent + 2 mantissa (gradients/activations)</span><br><span class="hljs-comment"># Range: E4M3 → [-448, 448], E5M2 → [-57344, 57344]</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">quantize_to_fp8</span>(<span class="hljs-params">tensor, dtype=<span class="hljs-string">"e4m3"</span></span>):<br>    <span class="hljs-comment"># Per-tensor or per-channel scaling</span><br>    scale = tensor.<span class="hljs-built_in">abs</span>().<span class="hljs-built_in">max</span>() / fp8_max(dtype)<br>    quantized = (tensor / scale).to(torch.float8_e4m3fn)<br>    <span class="hljs-keyword">return</span> quantized, scale<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fp8_matmul</span>(<span class="hljs-params">x_fp8, w_fp8, x_scale, w_scale</span>):<br>    <span class="hljs-comment"># H100 can directly perform FP8 matrix multiply; throughput is 2× that of FP16</span><br>    result = torch._scaled_mm(x_fp8, w_fp8.T,<br>                              scale_a=x_scale, scale_b=w_scale,<br>                              out_dtype=torch.bfloat16)<br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
+
+<p>Mixed precision strategy. Not all layers are well-suited for quantization. A typical approach:</p>
+<ul>
+<li><strong>Attention QKV/O projections</strong>: suitable for FP8 quantization</li>
+<li><strong>FFN layers</strong>: suitable for INT4 weight quantization (large parameter count)</li>
+<li><strong>LayerNorm</strong>: keep at FP32 (precision-sensitive)</li>
+<li><strong>First and last layers</strong>: typically kept at high precision</li>
+</ul>
+<h2 id="4-6-Speculative-Decoding"><a href="#4-6-Speculative-Decoding" class="headerlink" title="4.6 Speculative Decoding"></a>4.6 Speculative Decoding</h2><p>The core idea of speculative decoding: use a small, fast <strong>draft model</strong> to generate multiple candidate tokens, then use the large <strong>target model</strong> to verify those tokens in parallel. Because verifying N tokens costs roughly the same as generating 1 token (both require one forward pass), sufficiently high acceptance rates yield significant speedups.</p>
+<p>The animation below shows the draft model generating 5 candidates, the target model verifying them in parallel, accepting 3 tokens plus 1 corrected token:</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/ch4/speculative.html" loading="lazy" style="width:100%;height:420px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h3 id="Verification-Algorithm"><a href="#Verification-Algorithm" class="headerlink" title="Verification Algorithm"></a>Verification Algorithm</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">speculative_decode</span>(<span class="hljs-params">target_model, draft_model, prompt, gamma=<span class="hljs-number">5</span></span>):<br>    <span class="hljs-string">"""</span><br><span class="hljs-string">    gamma: number of draft steps (tokens speculatively generated per round)</span><br><span class="hljs-string">    """</span><br>    generated = []<br><br>    <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> is_finished(generated):<br>        <span class="hljs-comment"># Step 1: Draft model quickly generates gamma tokens</span><br>        draft_tokens = []<br>        draft_probs = []<br>        <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(gamma):<br>            p_draft = draft_model.forward(prompt + generated + draft_tokens)<br>            token = sample(p_draft)<br>            draft_tokens.append(token)<br>            draft_probs.append(p_draft)<br><br>        <span class="hljs-comment"># Step 2: Target model verifies all draft tokens in parallel</span><br>        <span class="hljs-comment"># One forward pass to verify all positions!</span><br>        target_probs = target_model.forward_batch(<br>            prompt + generated + draft_tokens  <span class="hljs-comment"># process gamma positions in parallel</span><br>        )<br><br>        <span class="hljs-comment"># Step 3: Verify token-by-token using rejection sampling</span><br>        accepted = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(gamma):<br>            <span class="hljs-comment"># Acceptance probability: min(1, p_target / p_draft)</span><br>            accept_prob = <span class="hljs-built_in">min</span>(<span class="hljs-number">1.0</span>, target_probs[i][draft_tokens[i]] /<br>                                     draft_probs[i][draft_tokens[i]])<br>            <span class="hljs-keyword">if</span> random() &lt; accept_prob:<br>                generated.append(draft_tokens[i])<br>                accepted += <span class="hljs-number">1</span><br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-comment"># Rejected: sample from the corrected distribution</span><br>                adjusted_dist = normalize(<br>                    <span class="hljs-built_in">max</span>(<span class="hljs-number">0</span>, target_probs[i] - draft_probs[i])<br>                )<br>                generated.append(sample(adjusted_dist))<br>                <span class="hljs-keyword">break</span>  <span class="hljs-comment"># subsequent draft tokens are discarded</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># All draft tokens accepted; bonus: sample one more</span><br>            bonus_token = sample(target_probs[gamma])<br>            generated.append(bonus_token)<br><br>    <span class="hljs-keyword">return</span> generated<br></code></pre></td></tr></table></figure>
+
+<h3 id="Speedup-Analysis"><a href="#Speedup-Analysis" class="headerlink" title="Speedup Analysis"></a>Speedup Analysis</h3><p>Let acceptance rate be <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.448ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 640 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g></g></g></svg></mjx-container>, draft steps <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.489ex;" xmlns="http://www.w3.org/2000/svg" width="1.229ex" height="1.486ex" role="img" focusable="false" viewBox="0 -441 543 657"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FE" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g></g></g></svg></mjx-container>, and draft model speed be <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="0.98ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 433 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g></g></g></svg></mjx-container> times that of the target:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Expected accepted tokens: E[accepted] = (1 - α^(γ+1)) / (1 - α)</span><br><span class="hljs-comment"># Cost per round: γ * cost_draft + 1 * cost_target</span><br><span class="hljs-comment"># Speedup ≈ E[accepted] / (γ * c + 1)</span><br><br><span class="hljs-comment"># Example: α=0.8, γ=5, c=0.1 (draft is 10× faster than target)</span><br><span class="hljs-comment"># E[accepted] = (1 - 0.8^6) / (1 - 0.8) = 3.36 tokens</span><br><span class="hljs-comment"># Cost = 5 * 0.1 + 1 = 1.5 (relative to one target step)</span><br><span class="hljs-comment"># Speedup = 3.36 / 1.5 = 2.24×</span><br></code></pre></td></tr></table></figure>
+
+<p>Closed-form formula for expected accepted tokens:</p>
+<p><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -1.738ex;" xmlns="http://www.w3.org/2000/svg" width="23.99ex" height="5.154ex" role="img" focusable="false" viewBox="0 -1509.9 10603.6 2277.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mo" transform="translate(764,0)"><path data-c="5B" d="M118 -250V750H255V710H158V-210H255V-250H118Z"></path></g><g data-mml-node="mtext" transform="translate(1042,0)"><path data-c="61" d="M137 305T115 305T78 320T63 359Q63 394 97 421T218 448Q291 448 336 416T396 340Q401 326 401 309T402 194V124Q402 76 407 58T428 40Q443 40 448 56T453 109V145H493V106Q492 66 490 59Q481 29 455 12T400 -6T353 12T329 54V58L327 55Q325 52 322 49T314 40T302 29T287 17T269 6T247 -2T221 -8T190 -11Q130 -11 82 20T34 107Q34 128 41 147T68 188T116 225T194 253T304 268H318V290Q318 324 312 340Q290 411 215 411Q197 411 181 410T156 406T148 403Q170 388 170 359Q170 334 154 320ZM126 106Q126 75 150 51T209 26Q247 26 276 49T315 109Q317 116 318 175Q318 233 317 233Q309 233 296 232T251 223T193 203T147 166T126 106Z"></path><path data-c="63" d="M370 305T349 305T313 320T297 358Q297 381 312 396Q317 401 317 402T307 404Q281 408 258 408Q209 408 178 376Q131 329 131 219Q131 137 162 90Q203 29 272 29Q313 29 338 55T374 117Q376 125 379 127T395 129H409Q415 123 415 120Q415 116 411 104T395 71T366 33T318 2T249 -11Q163 -11 99 53T34 214Q34 318 99 383T250 448T370 421T404 357Q404 334 387 320Z" transform="translate(500,0)"></path><path data-c="63" d="M370 305T349 305T313 320T297 358Q297 381 312 396Q317 401 317 402T307 404Q281 408 258 408Q209 408 178 376Q131 329 131 219Q131 137 162 90Q203 29 272 29Q313 29 338 55T374 117Q376 125 379 127T395 129H409Q415 123 415 120Q415 116 411 104T395 71T366 33T318 2T249 -11Q163 -11 99 53T34 214Q34 318 99 383T250 448T370 421T404 357Q404 334 387 320Z" transform="translate(944,0)"></path><path data-c="65" d="M28 218Q28 273 48 318T98 391T163 433T229 448Q282 448 320 430T378 380T406 316T415 245Q415 238 408 231H126V216Q126 68 226 36Q246 30 270 30Q312 30 342 62Q359 79 369 104L379 128Q382 131 395 131H398Q415 131 415 121Q415 117 412 108Q393 53 349 21T250 -11Q155 -11 92 58T28 218ZM333 275Q322 403 238 411H236Q228 411 220 410T195 402T166 381T143 340T127 274V267H333V275Z" transform="translate(1388,0)"></path><path data-c="70" d="M36 -148H50Q89 -148 97 -134V-126Q97 -119 97 -107T97 -77T98 -38T98 6T98 55T98 106Q98 140 98 177T98 243T98 296T97 335T97 351Q94 370 83 376T38 385H20V408Q20 431 22 431L32 432Q42 433 61 434T98 436Q115 437 135 438T165 441T176 442H179V416L180 390L188 397Q247 441 326 441Q407 441 464 377T522 216Q522 115 457 52T310 -11Q242 -11 190 33L182 40V-45V-101Q182 -128 184 -134T195 -145Q216 -148 244 -148H260V-194H252L228 -193Q205 -192 178 -192T140 -191Q37 -191 28 -194H20V-148H36ZM424 218Q424 292 390 347T305 402Q234 402 182 337V98Q222 26 294 26Q345 26 384 80T424 218Z" transform="translate(1832,0)"></path><path data-c="74" d="M27 422Q80 426 109 478T141 600V615H181V431H316V385H181V241Q182 116 182 100T189 68Q203 29 238 29Q282 29 292 100Q293 108 293 146V181H333V146V134Q333 57 291 17Q264 -10 221 -10Q187 -10 162 2T124 33T105 68T98 100Q97 107 97 248V385H18V422H27Z" transform="translate(2388,0)"></path><path data-c="65" d="M28 218Q28 273 48 318T98 391T163 433T229 448Q282 448 320 430T378 380T406 316T415 245Q415 238 408 231H126V216Q126 68 226 36Q246 30 270 30Q312 30 342 62Q359 79 369 104L379 128Q382 131 395 131H398Q415 131 415 121Q415 117 412 108Q393 53 349 21T250 -11Q155 -11 92 58T28 218ZM333 275Q322 403 238 411H236Q228 411 220 410T195 402T166 381T143 340T127 274V267H333V275Z" transform="translate(2777,0)"></path><path data-c="64" d="M376 495Q376 511 376 535T377 568Q377 613 367 624T316 637H298V660Q298 683 300 683L310 684Q320 685 339 686T376 688Q393 689 413 690T443 693T454 694H457V390Q457 84 458 81Q461 61 472 55T517 46H535V0Q533 0 459 -5T380 -11H373V44L365 37Q307 -11 235 -11Q158 -11 96 50T34 215Q34 315 97 378T244 442Q319 442 376 393V495ZM373 342Q328 405 260 405Q211 405 173 369Q146 341 139 305T131 211Q131 155 138 120T173 59Q203 26 251 26Q322 26 373 103V342Z" transform="translate(3221,0)"></path></g><g data-mml-node="mo" transform="translate(4819,0)"><path data-c="5D" d="M22 710V750H159V-250H22V-210H119V710H22Z"></path></g><g data-mml-node="mo" transform="translate(5374.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(6430.6,0)"><g data-mml-node="mrow" transform="translate(220,676)"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(722.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="msup" transform="translate(1722.4,0)"><g data-mml-node="mi"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g><g data-mml-node="TeXAtom" transform="translate(673,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="1D6FE" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g><g data-mml-node="mo" transform="translate(543,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(1321,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g><g data-mml-node="mrow" transform="translate(905.3,-686)"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(722.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(1722.4,0)"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g></g><rect width="3933.1" height="60" x="120" y="220"></rect></g></g></g></svg></mjx-container></p>
+<h2 id="4-7-Constraint-Decoding"><a href="#4-7-Constraint-Decoding" class="headerlink" title="4.7 Constraint Decoding"></a>4.7 Constraint Decoding</h2><h3 id="Structured-Output-Generation"><a href="#Structured-Output-Generation" class="headerlink" title="Structured Output Generation"></a>Structured Output Generation</h3><p>In practice we often need an LLM to produce output in a specific format (JSON, SQL, code, etc.). Constraint decoding guarantees that the output always conforms to a given grammar by dynamically masking illegal tokens during generation.</p>
+<p>Core approaches:</p>
+<ul>
+<li><strong>CFG (Context-Free Grammar) guidance</strong>: define grammar rules; only legally next tokens are allowed during decoding</li>
+<li><strong>JSON Schema constraints</strong>: dynamically compute a valid token mask from the JSON Schema</li>
+<li><strong>Regex constraints</strong>: filter tokens using a regular-expression state machine</li>
+<li><strong>FSM (Finite State Machine)</strong>: compile the constraint into an FSM for efficient legal-token lookup</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">JSONConstraintDecoder</span>:<br>    <span class="hljs-string">"""JSON Schema-based constraint decoder"""</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, schema, tokenizer</span>):<br>        <span class="hljs-variable language_">self</span>.schema = schema<br>        <span class="hljs-variable language_">self</span>.tokenizer = tokenizer<br>        <span class="hljs-comment"># Pre-compile schema into an FSM state transition table</span><br>        <span class="hljs-variable language_">self</span>.fsm = <span class="hljs-variable language_">self</span>.compile_schema_to_fsm(schema)<br>        <span class="hljs-comment"># Pre-compute valid token mask for each state</span><br>        <span class="hljs-variable language_">self</span>.token_masks = <span class="hljs-variable language_">self</span>.precompute_masks()<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_valid_tokens</span>(<span class="hljs-params">self, current_state</span>):<br>        <span class="hljs-string">"""Return valid token IDs for the current state"""</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.token_masks[current_state]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">apply_constraint</span>(<span class="hljs-params">self, logits, state</span>):<br>        <span class="hljs-string">"""Set logits of illegal tokens to -inf"""</span><br>        valid_mask = <span class="hljs-variable language_">self</span>.get_valid_tokens(state)<br>        logits[~valid_mask] = <span class="hljs-built_in">float</span>(<span class="hljs-string">'-inf'</span>)<br>        <span class="hljs-keyword">return</span> logits<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">decode_step</span>(<span class="hljs-params">self, model, input_ids, state</span>):<br>        logits = model.forward(input_ids)<br>        constrained_logits = <span class="hljs-variable language_">self</span>.apply_constraint(logits, state)<br>        token = sample(constrained_logits)<br>        new_state = <span class="hljs-variable language_">self</span>.fsm.transition(state, token)<br>        <span class="hljs-keyword">return</span> token, new_state<br></code></pre></td></tr></table></figure>
+
+<p>Optimizations in SGLang: SGLang combines FSM state transitions with the radix cache — requests sharing the same constraint rule share FSM state and precomputed token masks, avoiding redundant compilation. Additionally, through <strong>jump-forward decoding</strong>, when the FSM determines that there is only one legal path ahead (e.g., the quotation marks around a JSON key), model inference can be skipped and the token emitted directly.</p>
+<h2 id="4-8-Model-Loading-Pipeline"><a href="#4-8-Model-Loading-Pipeline" class="headerlink" title="4.8 Model Loading Pipeline"></a>4.8 Model Loading Pipeline</h2><h3 id="The-Complete-Flow-from-Disk-to-GPU"><a href="#The-Complete-Flow-from-Disk-to-GPU" class="headerlink" title="The Complete Flow from Disk to GPU"></a>The Complete Flow from Disk to GPU</h3><p>Loading a large model involves several steps: weight file parsing → weight mapping → tensor-parallel sharding → GPU memory allocation → quantization conversion.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ModelLoader</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">load_model</span>(<span class="hljs-params">self, model_path, tp_size, dtype=<span class="hljs-string">"auto"</span></span>):<br>        <span class="hljs-comment"># 1. Parse model configuration</span><br>        config = load_config(model_path / <span class="hljs-string">"config.json"</span>)<br><br>        <span class="hljs-comment"># 2. Create model skeleton (empty weights)</span><br>        <span class="hljs-keyword">with</span> torch.device(<span class="hljs-string">"meta"</span>):<br>            model = LlamaForCausalLM(config)<br><br>        <span class="hljs-comment"># 3. Determine weight mapping (safetensors index)</span><br>        weight_map = load_weight_map(model_path / <span class="hljs-string">"model.safetensors.index.json"</span>)<br><br>        <span class="hljs-comment"># 4. Tensor parallel sharding plan</span><br>        tp_plan = <span class="hljs-variable language_">self</span>.compute_tp_plan(config, tp_size)<br>        <span class="hljs-comment"># Example: {</span><br>        <span class="hljs-comment">#   "q_proj.weight": ShardDim(0),   # shard along row</span><br>        <span class="hljs-comment">#   "k_proj.weight": ShardDim(0),   # shard along row</span><br>        <span class="hljs-comment">#   "o_proj.weight": ShardDim(1),   # shard along column</span><br>        <span class="hljs-comment">#   "gate_proj.weight": ShardDim(0),</span><br>        <span class="hljs-comment">#   "embed_tokens.weight": Replicate(),  # replicate to all ranks</span><br>        <span class="hljs-comment"># }</span><br><br>        <span class="hljs-comment"># 5. Load shard-by-shard (streaming, avoids CPU memory spikes)</span><br>        <span class="hljs-keyword">for</span> shard_file <span class="hljs-keyword">in</span> weight_map.shard_files:<br>            tensors = load_safetensors(shard_file)<br>            <span class="hljs-keyword">for</span> name, tensor <span class="hljs-keyword">in</span> tensors.items():<br>                <span class="hljs-comment"># Shard according to TP plan</span><br>                <span class="hljs-keyword">if</span> name <span class="hljs-keyword">in</span> tp_plan:<br>                    tensor = <span class="hljs-variable language_">self</span>.shard_tensor(<br>                        tensor, tp_plan[name], tp_rank, tp_size<br>                    )<br>                <span class="hljs-comment"># Quantization conversion (e.g., FP16 → FP8)</span><br>                <span class="hljs-keyword">if</span> dtype != <span class="hljs-string">"auto"</span>:<br>                    tensor = <span class="hljs-variable language_">self</span>.quantize(tensor, dtype)<br>                <span class="hljs-comment"># Transfer to GPU</span><br>                model.load_weight(name, tensor.to(<span class="hljs-string">"cuda"</span>))<br><br>        <span class="hljs-keyword">return</span> model<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">shard_tensor</span>(<span class="hljs-params">self, tensor, plan, rank, world_size</span>):<br>        <span class="hljs-string">"""Shard tensor according to TP plan"""</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(plan, ShardDim):<br>            chunks = tensor.chunk(world_size, dim=plan.dim)<br>            <span class="hljs-keyword">return</span> chunks[rank].contiguous()<br>        <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(plan, Replicate):<br>            <span class="hljs-keyword">return</span> tensor  <span class="hljs-comment"># full copy</span><br></code></pre></td></tr></table></figure>
+
+<p>Key optimizations:</p>
+<ul>
+<li><strong>Streaming load</strong>: load one shard file at a time to avoid CPU memory peaks</li>
+<li><strong>Async H2D transfer</strong>: overlap CPU → GPU transfer with CPU loading of the next shard</li>
+<li><strong>Safetensors format</strong>: zero-copy memory-mapped files, load specific tensors on demand</li>
+<li><strong>Pre-computed sharding</strong>: TP plan determined upfront to avoid runtime allocations</li>
+</ul>
+<h2 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h2><div class="exercise">
+<details>
+<summary><strong>Exercise 1: Computing KV Cache Memory</strong></summary>
+
+<p>Given model parameters (Llama-70B, num_layers=80, num_kv_heads=8 GQA, head_dim=128, seq_len=4096, batch_size=32, FP16), compute KV cache memory. Questions: (a) KV cache size for a single request? (b) KV cache size for the entire batch? (c) With an 80 GB GPU and model weights of 140 GB (TP=2, 70 GB per GPU), how much remains for KV cache? What is the maximum batch size?</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs text"># (a) Single request KV cache<br>single = 2 * 80 * 8 * 128 * 4096 * 2 bytes<br>  K or V per layer: 8 * 128 * 4096 * 2 = 8 MB<br>  K and V per layer: 16 MB<br>  All layers: 16 MB * 80 = 1,280 MB ≈ 1.25 GB<br><br># (b) Entire batch<br>batch_total = 1.25 GB * 32 = 40 GB<br><br># (c) TP=2, 70 GB weights per GPU, 80 GB total<br>available = 80 - 70 = 10 GB per GPU<br>per_request_per_gpu = 1.25 / 2 = 0.625 GB  # KV heads also split across 2 GPUs<br>max_batch = 10 / 0.625 = 16 requests<br># After reserving activation memory, realistically ~7–8 GB usable → realistic_max_batch ≈ 12 requests<br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Exercise 2: Scheduler Policy Design</strong></summary>
+
+<p>Scenario: H100 (80 GB) TP=1, 7B model (14 GB), KV cache pool with 50 GB remaining, running batch of 20 decode requests (average seq_len=2000), waiting queue of 5 prefill requests (prompt_len 100/500/2000/8000/32000), SLOs: TTFT &lt; 2s, TPOT &lt; 50 ms. (a) Prefill order? (b) Chunk size? (c) Is preemption necessary?</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (a) SJF + memory-aware</span><br>order = [<span class="hljs-number">100</span>, <span class="hljs-number">500</span>, <span class="hljs-number">2000</span>, <span class="hljs-number">8000</span>, <span class="hljs-number">32000</span>]  <span class="hljs-comment"># sorted by prompt length ascending</span><br><br><span class="hljs-comment"># (b) Chunked prefill</span><br><span class="hljs-comment"># 7B prefill speed ≈ 30K tok/s on H100, TPOT 50ms</span><br><span class="hljs-comment"># max_chunk_size = 30000 * 0.05 = 1500 tokens</span><br><span class="hljs-comment"># 100/500: 1 chunk; 2000: 2 chunks; 8000: 6 chunks; 32000: 22 chunks</span><br>chunk_size = <span class="hljs-number">1500</span><br><br><span class="hljs-comment"># (c) Preemption analysis</span><br><span class="hljs-comment"># Current decode: 20 * 2000 * 0.5MB ≈ 20 GB</span><br><span class="hljs-comment"># New prefill total: (100+500+2000+8000+32000) * 0.5MB ≈ 21.3 GB</span><br><span class="hljs-comment"># Total demand: 41.3 GB &lt; 50 GB (sufficient)</span><br><span class="hljs-comment"># But decode sequences grow to 4096: 20 * 4096 * 0.5MB = 40 GB → exceeds budget!</span><br><span class="hljs-comment"># Strategy: do not preempt now, but assign low priority to the 32000-token request</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Exercise 3: Speculative Decoding Speedup Analysis</strong></summary>
+
+<p>Target model 70B single forward 50 ms, draft model 7B single forward 8 ms, <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.489ex;" xmlns="http://www.w3.org/2000/svg" width="5.377ex" height="1.995ex" role="img" focusable="false" viewBox="0 -666 2376.6 882"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FE" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g><g data-mml-node="mo" transform="translate(820.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1876.6,0)"><path data-c="35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z"></path></g></g></g></svg></mjx-container>, <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="8.488ex" height="1.715ex" role="img" focusable="false" viewBox="0 -676 3751.6 758"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g><g data-mml-node="mo" transform="translate(917.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1973.6,0)"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path data-c="2E" d="M78 60Q78 84 95 102T138 120Q162 120 180 104T199 61Q199 36 182 18T139 0T96 17T78 60Z" transform="translate(500,0)"></path><path data-c="37" d="M55 458Q56 460 72 567L88 674Q88 676 108 676H128V672Q128 662 143 655T195 646T364 644H485V605L417 512Q408 500 387 472T360 435T339 403T319 367T305 330T292 284T284 230T278 162T275 80Q275 66 275 52T274 28V19Q270 2 255 -10T221 -22Q210 -22 200 -19T179 0T168 40Q168 198 265 368Q285 400 349 489L395 552H302Q128 552 119 546Q113 543 108 522T98 479L95 458V455H55V458Z" transform="translate(778,0)"></path><path data-c="35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z" transform="translate(1278,0)"></path></g></g></g></svg></mjx-container>. (a) Expected accepted tokens per round. (b) Total latency per round. (c) Speedup. (d) What if <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="7.356ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 3251.6 748"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FC" d="M34 156Q34 270 120 356T309 442Q379 442 421 402T478 304Q484 275 485 237V208Q534 282 560 374Q564 388 566 390T582 393Q603 393 603 385Q603 376 594 346T558 261T497 161L486 147L487 123Q489 67 495 47T514 26Q528 28 540 37T557 60Q559 67 562 68T577 70Q597 70 597 62Q597 56 591 43Q579 19 556 5T512 -10H505Q438 -10 414 62L411 69L400 61Q390 53 370 41T325 18T267 -2T203 -11Q124 -11 79 39T34 156ZM208 26Q257 26 306 47T379 90L403 112Q401 255 396 290Q382 405 304 405Q235 405 183 332Q156 292 139 224T121 120Q121 71 146 49T208 26Z"></path></g><g data-mml-node="mo" transform="translate(917.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1973.6,0)"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path data-c="2E" d="M78 60Q78 84 95 102T138 120Q162 120 180 104T199 61Q199 36 182 18T139 0T96 17T78 60Z" transform="translate(500,0)"></path><path data-c="35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z" transform="translate(778,0)"></path></g></g></g></svg></mjx-container>?</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (a) E[tokens] = (1 - α^(γ+1)) / (1 - α)</span><br>E_tokens = (<span class="hljs-number">1</span> - <span class="hljs-number">0.75</span>**<span class="hljs-number">6</span>) / (<span class="hljs-number">1</span> - <span class="hljs-number">0.75</span>) = <span class="hljs-number">0.822</span> / <span class="hljs-number">0.25</span> = <span class="hljs-number">3.29</span> tokens<br><br><span class="hljs-comment"># (b) Round latency</span><br>round_latency = <span class="hljs-number">5</span> * 8ms + <span class="hljs-number">1</span> * 50ms = 90ms<br><br><span class="hljs-comment"># (c) Speedup</span><br>speedup = E_tokens * target_latency / round_latency = <span class="hljs-number">3.29</span> * <span class="hljs-number">50</span> / <span class="hljs-number">90</span> = <span class="hljs-number">1.83</span>×<br><br><span class="hljs-comment"># (d) α = 0.5</span><br>E_tokens_05 = (<span class="hljs-number">1</span> - <span class="hljs-number">0.5</span>**<span class="hljs-number">6</span>) / (<span class="hljs-number">1</span> - <span class="hljs-number">0.5</span>) = <span class="hljs-number">1.97</span> tokens<br>speedup_05 = <span class="hljs-number">1.97</span> * <span class="hljs-number">50</span> / <span class="hljs-number">90</span> = <span class="hljs-number">1.09</span>×  <span class="hljs-comment"># almost no benefit!</span><br><span class="hljs-comment"># Break-even point: E_tokens = 1.8 → α ≈ 0.47</span><br><span class="hljs-comment"># In practice, α &gt; 0.6 is needed for meaningful gains</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Exercise 4: Radix Cache Hit Rate Calculation</strong></summary>
+
+<p>A chatbot shares a system prompt (1000 tokens). 60% of requests share a prefix of 1200 tokens, 25% share 1150, and 15% share only 1000; average user query is 300 tokens. (a) Average cache hit token count. (b) Average newly computed prefill tokens. (c) How much is saved?</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (a) Average cache hit tokens</span><br>avg_hit = <span class="hljs-number">0.60</span> * <span class="hljs-number">1200</span> + <span class="hljs-number">0.25</span> * <span class="hljs-number">1150</span> + <span class="hljs-number">0.15</span> * <span class="hljs-number">1000</span> = <span class="hljs-number">1157.5</span> tokens<br><br><span class="hljs-comment"># (b) Average newly computed tokens</span><br>avg_new_compute = <span class="hljs-number">0.60</span> * <span class="hljs-number">300</span> + <span class="hljs-number">0.25</span> * <span class="hljs-number">300</span> + <span class="hljs-number">0.15</span> * <span class="hljs-number">300</span> = <span class="hljs-number">300</span> tokens<br><br><span class="hljs-comment"># (c) Savings ratio</span><br>avg_total = <span class="hljs-number">0.60</span> * <span class="hljs-number">1500</span> + <span class="hljs-number">0.25</span> * <span class="hljs-number">1450</span> + <span class="hljs-number">0.15</span> * <span class="hljs-number">1300</span> = <span class="hljs-number">1457.5</span> tokens<br>savings = <span class="hljs-number">1</span> - <span class="hljs-number">300</span> / <span class="hljs-number">1457.5</span> = <span class="hljs-number">79.4</span>%<br><span class="hljs-comment"># Radix cache saves ~79% of prefill computation; TTFT is nearly 5× faster</span><br><span class="hljs-comment"># The system prompt (1.0 * 1000 = 1000 tokens) is shared by all requests and is the best candidate to cache</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Coding Exercise A: Implement a Simple Continuous Batching Scheduler</strong></summary>
+
+<p>Implement a continuous batching scheduler that supports dynamically inserting and completing requests; on each step, remove <code>is_done</code> requests and fill empty slots from the waiting queue.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> random<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Request</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, req_id, prompt_tokens, max_len</span>):<br>        <span class="hljs-variable language_">self</span>.req_id = req_id<br>        <span class="hljs-variable language_">self</span>.prompt_tokens = prompt_tokens<br>        <span class="hljs-variable language_">self</span>.generated_tokens = <span class="hljs-number">0</span><br>        <span class="hljs-variable language_">self</span>.max_len = max_len<br>        <span class="hljs-variable language_">self</span>.is_done = <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">step</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-variable language_">self</span>.generated_tokens += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.generated_tokens &gt;= <span class="hljs-variable language_">self</span>.max_len:<br>            <span class="hljs-variable language_">self</span>.is_done = <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ContinuousBatchingScheduler</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, max_batch_size</span>):<br>        <span class="hljs-variable language_">self</span>.max_batch_size = max_batch_size<br>        <span class="hljs-variable language_">self</span>.running = []<br>        <span class="hljs-variable language_">self</span>.waiting = []<br>        <span class="hljs-variable language_">self</span>.completed = []<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">add_request</span>(<span class="hljs-params">self, request</span>):<br>        <span class="hljs-variable language_">self</span>.waiting.append(request)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">step</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-comment"># (1) Each running request generates one token</span><br>        <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.running:<br>            req.step()<br><br>        <span class="hljs-comment"># (2) Remove completed requests</span><br>        done = [r <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.running <span class="hljs-keyword">if</span> r.is_done]<br>        <span class="hljs-variable language_">self</span>.completed.extend(done)<br>        <span class="hljs-variable language_">self</span>.running = [r <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.running <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> r.is_done]<br><br>        <span class="hljs-comment"># (3) Fill empty slots from waiting queue</span><br>        free_slots = <span class="hljs-variable language_">self</span>.max_batch_size - <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.running)<br>        <span class="hljs-keyword">while</span> free_slots &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-variable language_">self</span>.waiting:<br>            req = <span class="hljs-variable language_">self</span>.waiting.pop(<span class="hljs-number">0</span>)<br>            <span class="hljs-variable language_">self</span>.running.append(req)<br>            free_slots -= <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_utilization</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.running) / <span class="hljs-variable language_">self</span>.max_batch_size<br><br><span class="hljs-comment"># ======== Test ========</span><br>random.seed(<span class="hljs-number">42</span>)<br>scheduler = ContinuousBatchingScheduler(max_batch_size=<span class="hljs-number">4</span>)<br><br>requests = []<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    req = Request(<br>        req_id=i,<br>        prompt_tokens=random.randint(<span class="hljs-number">50</span>, <span class="hljs-number">200</span>),<br>        max_len=random.randint(<span class="hljs-number">3</span>, <span class="hljs-number">8</span>)  <span class="hljs-comment"># short generation for easy observation</span><br>    )<br>    requests.append(req)<br><br><span class="hljs-comment"># First 5 arrive immediately, next 5 arrive at step 5</span><br><span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> requests[:<span class="hljs-number">5</span>]:<br>    scheduler.add_request(req)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">"Step | Running | Waiting | Completed | Utilization"</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">"-"</span> * <span class="hljs-number">55</span>)<br><br><span class="hljs-keyword">for</span> step <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">20</span>):<br>    <span class="hljs-keyword">if</span> step == <span class="hljs-number">5</span>:<br>        <span class="hljs-keyword">for</span> req <span class="hljs-keyword">in</span> requests[<span class="hljs-number">5</span>:]:<br>            scheduler.add_request(req)<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"  -- [Step <span class="hljs-subst">{step}</span>] 5 new requests arrived --"</span>)<br><br>    scheduler.step()<br>    util = scheduler.get_utilization()<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f"  <span class="hljs-subst">{step:2d}</span>  |    <span class="hljs-subst">{<span class="hljs-built_in">len</span>(scheduler.running)}</span>    |    <span class="hljs-subst">{<span class="hljs-built_in">len</span>(scheduler.waiting)}</span>    |"</span><br>          <span class="hljs-string">f"     <span class="hljs-subst">{<span class="hljs-built_in">len</span>(scheduler.completed)}</span>     |   <span class="hljs-subst">{util:<span class="hljs-number">.0</span>%}</span>"</span>)<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scheduler.running <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> scheduler.waiting:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">"  -- All requests completed! --"</span>)<br>        <span class="hljs-keyword">break</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Coding Exercise B: Implement the Verification Logic for Speculative Decoding</strong></summary>
+
+<p>Given <code>draft_probs</code> and <code>target_probs</code>, implement token-by-token verification. Accept condition: <code>rand() &lt; min(1, target_p[x] / draft_p[x])</code>; on rejection, sample from the normalized distribution <code>max(0, target_p - draft_p)</code>. Theoretical per-token acceptance rate = <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.663ex;" xmlns="http://www.w3.org/2000/svg" width="18.694ex" height="2.36ex" role="img" focusable="false" viewBox="0 -750 8262.8 1043.1"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="munder"><g data-mml-node="mo"><path data-c="2211" d="M61 748Q64 750 489 750H913L954 640Q965 609 976 579T993 533T999 516H979L959 517Q936 579 886 621T777 682Q724 700 655 705T436 710H319Q183 710 183 709Q186 706 348 484T511 259Q517 250 513 244L490 216Q466 188 420 134T330 27L149 -187Q149 -188 362 -188Q388 -188 436 -188T506 -189Q679 -189 778 -162T936 -43Q946 -27 959 6H999L913 -249L489 -250Q65 -250 62 -248Q56 -246 56 -239Q56 -234 118 -161Q186 -81 245 -11L428 206Q428 207 242 462L57 717L56 728Q56 744 61 748Z"></path></g><g data-mml-node="mi" transform="translate(1089,-285.4) scale(0.707)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g></g><g data-mml-node="mo" transform="translate(1710.1,0)"><path data-c="6D" d="M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q351 442 364 440T387 434T406 426T421 417T432 406T441 395T448 384T452 374T455 366L457 361L460 365Q463 369 466 373T475 384T488 397T503 410T523 422T546 432T572 439T603 442Q729 442 740 329Q741 322 741 190V104Q741 66 743 59T754 49Q775 46 803 46H819V0H811L788 1Q764 2 737 2T699 3Q596 3 587 0H579V46H595Q656 46 656 62Q657 64 657 200Q656 335 655 343Q649 371 635 385T611 402T585 404Q540 404 506 370Q479 343 472 315T464 232V168V108Q464 78 465 68T468 55T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z"></path><path data-c="69" d="M69 609Q69 637 87 653T131 669Q154 667 171 652T188 609Q188 579 171 564T129 549Q104 549 87 564T69 609ZM247 0Q232 3 143 3Q132 3 106 3T56 1L34 0H26V46H42Q70 46 91 49Q100 53 102 60T104 102V205V293Q104 345 102 359T88 378Q74 385 41 385H30V408Q30 431 32 431L42 432Q52 433 70 434T106 436Q123 437 142 438T171 441T182 442H185V62Q190 52 197 50T232 46H255V0H247Z" transform="translate(833,0)"></path><path data-c="6E" d="M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q450 438 463 329Q464 322 464 190V104Q464 66 466 59T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z" transform="translate(1111,0)"></path></g><g data-mml-node="mo" transform="translate(3377.1,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(3766.1,0)"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mo" transform="translate(4269.1,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(4658.1,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(5230.1,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(5619.1,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(6063.8,0)"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g><g data-mml-node="mo" transform="translate(6523.8,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(6912.8,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(7484.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(7873.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">speculative_verify</span>(<span class="hljs-params">draft_tokens, draft_probs, target_probs, vocab_size</span>):<br>    <span class="hljs-string">"""</span><br><span class="hljs-string">    Speculative Decoding verification algorithm.</span><br><span class="hljs-string">    Returns: accepted_tokens, bonus_token</span><br><span class="hljs-string">    """</span><br>    accepted_tokens = []<br><br>    <span class="hljs-keyword">for</span> i, token <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(draft_tokens):<br>        q_x = draft_probs[i][token]    <span class="hljs-comment"># draft prob of chosen token</span><br>        p_x = target_probs[i][token]   <span class="hljs-comment"># target prob of chosen token</span><br><br>        <span class="hljs-comment"># Acceptance probability</span><br>        accept_prob = <span class="hljs-built_in">min</span>(<span class="hljs-number">1.0</span>, p_x / <span class="hljs-built_in">max</span>(q_x, <span class="hljs-number">1e-10</span>))<br><br>        <span class="hljs-keyword">if</span> np.random.random() &lt; accept_prob:<br>            accepted_tokens.append(token)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># Reject: sample from corrected distribution</span><br>            corrected = np.maximum(target_probs[i] - draft_probs[i], <span class="hljs-number">0</span>)<br>            corrected_sum = corrected.<span class="hljs-built_in">sum</span>()<br>            <span class="hljs-keyword">if</span> corrected_sum &gt; <span class="hljs-number">0</span>:<br>                corrected /= corrected_sum<br>            <span class="hljs-keyword">else</span>:<br>                corrected = target_probs[i]  <span class="hljs-comment"># fallback</span><br>            bonus_token = np.random.choice(vocab_size, p=corrected)<br>            <span class="hljs-keyword">return</span> accepted_tokens, bonus_token<br><br>    <span class="hljs-comment"># All draft tokens accepted; sample from target at the next position</span><br>    bonus_token = np.random.choice(vocab_size, p=target_probs[-<span class="hljs-number">1</span>])<br>    <span class="hljs-keyword">return</span> accepted_tokens, bonus_token<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">theoretical_acceptance_rate</span>(<span class="hljs-params">p, q</span>):<br>    <span class="hljs-string">"""Theoretical acceptance rate = sum_x min(p(x), q(x))"""</span><br>    <span class="hljs-keyword">return</span> np.minimum(p, q).<span class="hljs-built_in">sum</span>()<br><br><span class="hljs-comment"># ======== Test ========</span><br>np.random.seed(<span class="hljs-number">42</span>)<br>vocab_size = <span class="hljs-number">100</span><br>K = <span class="hljs-number">5</span>  <span class="hljs-comment"># draft generates 5 tokens</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">make_distribution</span>(<span class="hljs-params">vocab_size, temperature</span>):<br>    logits = np.random.randn(vocab_size)<br>    probs = np.exp(logits / temperature)<br>    <span class="hljs-keyword">return</span> probs / probs.<span class="hljs-built_in">sum</span>()<br><br>num_trials = <span class="hljs-number">5000</span><br>total_accepted = <span class="hljs-number">0</span><br>theoretical_rates = []<br><br><span class="hljs-keyword">for</span> trial <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_trials):<br>    draft_probs = []<br>    target_probs = []<br>    draft_tokens = []<br><br>    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(K):<br>        q = make_distribution(vocab_size, temperature=<span class="hljs-number">1.5</span>)  <span class="hljs-comment"># draft: flatter</span><br>        p = make_distribution(vocab_size, temperature=<span class="hljs-number">0.8</span>)  <span class="hljs-comment"># target: sharper</span><br>        draft_probs.append(q)<br>        target_probs.append(p)<br>        draft_tokens.append(np.random.choice(vocab_size, p=q))<br><br>    accepted, bonus = speculative_verify(draft_tokens, draft_probs, target_probs, vocab_size)<br>    total_accepted += <span class="hljs-built_in">len</span>(accepted)<br><br>    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(K):<br>        theoretical_rates.append(theoretical_acceptance_rate(target_probs[k], draft_probs[k]))<br><br>avg_accepted = total_accepted / num_trials<br>avg_theoretical_rate = np.mean(theoretical_rates)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">f"Draft length K = <span class="hljs-subst">{K}</span>"</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f"Empirical average accepted tokens: <span class="hljs-subst">{avg_accepted:<span class="hljs-number">.2</span>f}</span>"</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f"Theoretical per-token acceptance rate: <span class="hljs-subst">{avg_theoretical_rate:<span class="hljs-number">.3</span>f}</span>"</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f"Effective speedup ≈ (avg_accepted + 1) / 1 = <span class="hljs-subst">{avg_accepted + <span class="hljs-number">1</span>:<span class="hljs-number">.2</span>f}</span>×"</span>)<br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<h3 id="System-Design-Interview-Questions-Anthropic-OpenAI-Style"><a href="#System-Design-Interview-Questions-Anthropic-OpenAI-Style" class="headerlink" title="System Design Interview Questions (Anthropic/OpenAI Style)"></a>System Design Interview Questions (Anthropic/OpenAI Style)</h3><p>The following questions simulate system design and performance analysis questions from AI infrastructure interviews. Requirement: provide numerical derivations, not just qualitative answers.</p>
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 1: Capacity Planning — Serving Cluster for a 405B Model</strong></summary>
+
+<p>Deploy a 405B model (FP8, 405 GB), SLOs: P99 TPOT ≤ 100 ms / TTFT ≤ 2 s, QPS 200, average input 2000 / output 500, GPU H100 80 GB.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (1) Model placement</span><br>min_gpus = <span class="hljs-number">405</span> / <span class="hljs-number">80</span>  <span class="hljs-comment"># = 5.06 → minimum 6, recommended TP=8 (node-aligned)</span><br><br><span class="hljs-comment"># (2) TPOT</span><br>tpot_theory = <span class="hljs-number">50.6</span> / <span class="hljs-number">3350</span> * <span class="hljs-number">1000</span>  <span class="hljs-comment"># = 15.1 ms</span><br>tpot_actual = tpot_theory / <span class="hljs-number">0.65</span>    <span class="hljs-comment"># ≈ 23 ms &lt;&lt; 100ms SLO ✓</span><br><br><span class="hljs-comment"># (3) Prefill speed</span><br>prefill_speed = <span class="hljs-number">8</span> * <span class="hljs-number">1979e12</span> * <span class="hljs-number">0.55</span> / (<span class="hljs-number">810e9</span>)  <span class="hljs-comment"># ≈ 10,750 tok/s</span><br>ttft_2000 = <span class="hljs-number">2000</span> / <span class="hljs-number">10750</span>  <span class="hljs-comment"># = 186 ms → P99 ~500ms–1s, meets 2s ✓</span><br><br><span class="hljs-comment"># (4) Decode throughput</span><br><span class="hljs-comment"># Concurrent decode requests = 200 × (500/43) ≈ 2326</span><br><span class="hljs-comment"># Each TP group handles batch 64 → need 2326/64 ≈ 37 TP groups</span><br>num_replicas = <span class="hljs-number">37</span><br><br><span class="hljs-comment"># (5) Total GPUs and cost</span><br>total_gpus = <span class="hljs-number">37</span> * <span class="hljs-number">8</span>  <span class="hljs-comment"># = 296 H100s</span><br>annual_cost = <span class="hljs-number">296</span> * <span class="hljs-number">2</span> * <span class="hljs-number">24</span> * <span class="hljs-number">365</span>  <span class="hljs-comment"># = $5.19M / year</span><br><span class="hljs-comment"># Add 20–30% buffer → ~380 GPUs, ~$6.7M/year</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 2: What Is the Ceiling for Decode Batching?</strong></summary>
+
+<p>LLaMA-70B (BF16) on 1×H100 — derive the three upper bounds on batch size.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Upper bound 1: Memory (KV cache does not fit)</span><br><span class="hljs-comment"># Single GPU cannot hold model → TP=2: 70 GB model per GPU, 10 GB for KV</span><br>kv_per_seq = <span class="hljs-number">0.32</span> * <span class="hljs-number">4096</span>  <span class="hljs-comment"># = 1.28 GB per request</span><br>max_batch_memory = <span class="hljs-number">10</span> / <span class="hljs-number">1.28</span>  <span class="hljs-comment"># ≈ 7–8 requests ← tightest constraint!</span><br><br><span class="hljs-comment"># Upper bound 2: Compute (becomes compute-bound)</span><br><span class="hljs-comment"># B_critical = FLOPS / (Bandwidth × 2) = 989e12 / (3.35e12 × 2) ≈ 148</span><br><br><span class="hljs-comment"># Upper bound 3: Latency SLO</span><br><span class="hljs-comment"># 100ms = 2×70e9×B / 989e12 → B = 706 (far exceeds memory limit)</span><br><br><span class="hljs-comment"># Conclusion: max batch ≈ 7 (hard-limited by KV cache memory)</span><br><span class="hljs-comment"># TPOT vs batch:</span><br><span class="hljs-comment"># B=1:   TPOT=35ms,  throughput=28 tok/s   (memory-bound)</span><br><span class="hljs-comment"># B=4:   TPOT=35ms,  throughput=114 tok/s</span><br><span class="hljs-comment"># B=148: TPOT=35ms,  throughput=4229 tok/s (theoretical limit, memory runs out first)</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 3: Trade-offs of Prefill-Decode Disaggregation</strong></summary>
+
+<p>Mooncake/DistServe places prefill and decode on separate GPU clusters; analyze the KV cache transfer cost.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (1) KV cache transfer latency (70B GQA, IB 400 Gbps = 50 GB/s)</span><br>kv_size = <span class="hljs-number">2000</span> * <span class="hljs-number">320</span> / <span class="hljs-number">1024</span>  <span class="hljs-comment"># = 625 MB</span><br>transfer_time = <span class="hljs-number">625</span> / (<span class="hljs-number">50</span> * <span class="hljs-number">1024</span>) * <span class="hljs-number">1000</span>  <span class="hljs-comment"># = 12.2 ms (+ RDMA ~14ms)</span><br><br><span class="hljs-comment"># (2) Impact on TTFT</span><br><span class="hljs-comment"># co-located TTFT = 2000 / 4300 = 465 ms (70B TP=8)</span><br><span class="hljs-comment"># Disaggregated = 465 + 14 = 479 ms (+3%, acceptable)</span><br><br><span class="hljs-comment"># (3) When is it worth it?</span><br><span class="hljs-comment"># ✓ Many decode requests competing with prefill for SMs; large prefill length variance; decode benefits from higher-bandwidth GPUs</span><br><span class="hljs-comment"># ✗ Large KV cache (MHA + long sequences); low QPS; predominantly short requests</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 4: Why Does Speculative Decoding Yield Diminishing Returns at High Batch Sizes?</strong></summary>
+
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Core: spec decoding increases compute while reducing decode steps</span><br><span class="hljs-comment"># But the verify phase (K tokens in parallel) is compute → becomes the bottleneck at high batch</span><br><br><span class="hljs-comment"># (1) Verify compute: [B×K, h] × [h, 4h] → compute grows K× larger</span><br><span class="hljs-comment"># (2) effective B' = B × K &gt; B_critical → verify becomes compute-bound</span><br><span class="hljs-comment">#     Example: B=64, K=5 → B'=320 &gt; 148</span><br><span class="hljs-comment">#     Crossover batch size = B_critical / K = 148 / 5 ≈ 30</span><br><br><span class="hljs-comment"># (3) Adaptive strategy</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">should_use_spec_decoding</span>(<span class="hljs-params">current_batch_size, draft_k, b_critical</span>):<br>    <span class="hljs-keyword">if</span> current_batch_size * draft_k &gt; b_critical:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">if</span> current_batch_size &lt; b_critical * <span class="hljs-number">0.3</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>, <span class="hljs-built_in">max</span>(<span class="hljs-number">1</span>, b_critical // current_batch_size)<br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 5: Design a KV Cache Strategy for Multi-turn Chat</strong></summary>
+
+<p>70B GQA (KV per token 320 KB), 4×H100 (TP=4, 30 GB/GPU for KV), average 8 conversation turns, each turn: 200 user + 500 assistant tokens.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># (1) Per-session KV cache</span><br>tokens_8_rounds = <span class="hljs-number">8</span> * (<span class="hljs-number">200</span> + <span class="hljs-number">500</span>)  <span class="hljs-comment"># = 5600 tokens</span><br>kv_per_session = <span class="hljs-number">5600</span> * <span class="hljs-number">320</span> / <span class="hljs-number">1024</span> / <span class="hljs-number">1024</span>  <span class="hljs-comment"># = 1.71 GB</span><br><span class="hljs-comment"># TP=4 → 0.43 GB/session per GPU → max sessions = 30/0.43 ≈ 70</span><br><br><span class="hljs-comment"># (2) Eviction: LRU + session-value weighting</span><br><span class="hljs-comment">#   expected_cost = cost_to_evict × probability_of_return</span><br><span class="hljs-comment">#   Prefer evicting short sessions + those idle for longest time</span><br><br><span class="hljs-comment"># (3) Re-prefill cost</span><br><span class="hljs-comment"># 5600 tokens at 4300 tok/s = 1.3s TTFT (unacceptable)</span><br><span class="hljs-comment"># Optimization: swap to CPU = 1.71 GB / 64 GB/s = 27ms (far better than re-prefill)</span><br><br><span class="hljs-comment"># (4) Prefix caching (system prompt 1000 tokens)</span><br><span class="hljs-comment"># Saves 312 MB per session; 70 sessions save 5.25 GB/GPU total → fits 12 more sessions</span><br><span class="hljs-comment"># Saves 17.5% memory; reduces new-session TTFT by 233ms</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 6: Impact of Quantization on Serving Performance</strong></summary>
+
+<p>Compare BF16 / FP8 / INT4 deployment of LLaMA-70B.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Model sizes:</span><br><span class="hljs-comment"># BF16: 140 GB → TP=2;  FP8: 70 GB → TP=1;  INT4: 35 GB → TP=1</span><br><br><span class="hljs-comment"># TPOT (batch=1, H100 3.35 TB/s):</span><br><span class="hljs-comment"># BF16 TP=2: 70/3.35 = 20.9ms → ~32ms (MBU 65%)</span><br><span class="hljs-comment"># FP8 TP=1:  70/3.35 = 20.9ms → ~32ms  ← same as BF16!</span><br><span class="hljs-comment"># INT4 TP=1: 35/3.35 = 10.4ms → ~16ms</span><br><span class="hljs-comment"># ⚠ Decode is memory-bound; FP8's 2× compute advantage does not help here</span><br><span class="hljs-comment">#   FP8's real benefit: TP=1 (saves GPUs) + larger KV cache space</span><br><br><span class="hljs-comment"># Max batch (seq_len=4096, KV=320KB/token, 1.31 GB/request):</span><br><span class="hljs-comment"># BF16 TP=2: 10/1.31 ≈ 7;  FP8 TP=1: 7;  INT4 TP=1: 45/1.31 ≈ 34 (4.8×)</span><br><br><span class="hljs-comment"># Cost-per-quality:</span><br><span class="hljs-comment"># FP8: $0.0046/1K tokens ← sweet spot for quality-sensitive scenarios</span><br><span class="hljs-comment"># INT4: $0.0005/1K tokens (quality≈95%) ← high-throughput scenarios / draft model</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Interview Question 7: Graceful Degradation Under Traffic Spike</strong></summary>
+
+<p>Normal 100 QPS suddenly spikes to 500 QPS (5× spike) for 2 minutes, with no auto-scaling. Design a graceful degradation plan.</p>
+<p><strong>Full Solution:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Immediate actions (&lt; 1s):</span><br><span class="hljs-comment"># 1. Reduce max_output_tokens (2048 → 512): KV cache freed faster</span><br><span class="hljs-comment"># 2. Increase chunked prefill chunk_size: prioritize draining current decode</span><br><span class="hljs-comment"># 3. Admission control: return 429 for long requests, still admit short ones</span><br><br><span class="hljs-comment"># Short-term measures (10–30s):</span><br><span class="hljs-comment"># 4. Dynamic quantization: some replicas BF16 → FP8 (frees KV cache memory)</span><br><span class="hljs-comment"># 5. Reduce speculative decoding K (K=5 → K=2 or disable entirely)</span><br><span class="hljs-comment"># 6. Early stopping for low-value requests</span><br><br><span class="hljs-comment"># Request tiers:</span><br><span class="hljs-comment"># Tier 1 (protected): paying users, intermediate turns of multi-turn sessions</span><br><span class="hljs-comment"># Tier 2 (degraded): new sessions, long prompts, non-paying users</span><br><span class="hljs-comment"># Tier 3 (dropped): retry requests, requests that have been queued &gt; 5s</span><br><br><span class="hljs-comment"># Recovery after the spike:</span><br><span class="hljs-comment"># 1. Do not immediately restore max_output_tokens → wait for queue to drain</span><br><span class="hljs-comment"># 2. Gradually increase admission rate (analogous to TCP slow start)</span><br><span class="hljs-comment"># 3. Re-prefill preempted sessions with priority</span><br><span class="hljs-comment"># 4. Switch back to normal mode only after P99 TPOT returns within SLO</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+</div>
+
+<hr>
+<blockquote>
+<p>This post is Chapter 4 of the ML Systems series. The body is rendered as markdown; the 5 interactive animations are embedded as isolated iframes via the custom <code>{% anim %}</code> tag, sourced from the <a target="_blank" rel="noopener" href="https://github.com/dreamyang-liu/TC">Arkive</a> tutorial.</p>
+</blockquote>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

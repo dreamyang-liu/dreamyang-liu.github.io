@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Heap / Priority Queue | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-%E2%80%94-A-Complete-Binary-Tree-Expressed-as-an-Array"><span class="toc-text">Intuition — A Complete Binary Tree Expressed as an Array</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Template-%E2%80%94-Python-heapq-Basic-Operations"><span class="toc-text">Template — Python heapq Basic Operations</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Canonical-Use-Cases"><span class="toc-text">4 Canonical Use Cases</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Top-K-%E2%80%94-Min-Heap-for-Largest-Max-Heap-for-Smallest"><span class="toc-text">1. Top-K — Min-Heap for Largest, Max-Heap for Smallest</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Streaming-Median-%E2%80%94-Two-Heaps-Back-to-Back"><span class="toc-text">2. Streaming Median — Two Heaps Back to Back</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Merge-K-Sorted-Lists-%E2%80%94-Store-a-Pointer-per-List-in-the-Heap"><span class="toc-text">3. Merge K Sorted Lists — Store a Pointer per List in the Heap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Dijkstra-%E2%80%94-Heap-Optimized-Shortest-Path"><span class="toc-text">4. Dijkstra — Heap-Optimized Shortest Path</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-Problems"><span class="toc-text">Classic Problems</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory-Aids"><span class="toc-text">Memory Aids</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-Practice"><span class="toc-text">LeetCode Practice</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Data Structures</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Heap</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Heap / Priority Queue.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Heap / Priority Queue</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Data Structures</span>
+                  
+                    <span class="tag-item-post">Heap</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>In one sentence: <strong>a heap is a complete binary tree expressed implicitly via array indices</strong>. It looks like a tree; in memory it is flat. Each operation gets you the current min&#x2F;max in O(log n); building the heap takes only O(n).</p>
+<span id="more"></span>
+
+<h2 id="Intuition-—-A-Complete-Binary-Tree-Expressed-as-an-Array"><a href="#Intuition-—-A-Complete-Binary-Tree-Expressed-as-an-Array" class="headerlink" title="Intuition — A Complete Binary Tree Expressed as an Array"></a>Intuition — A Complete Binary Tree Expressed as an Array</h2><p>The essence of a heap is not “a special kind of tree” — it is an <strong>array</strong> plus one index rule:</p>
+<ul>
+<li>The parent of node <code>i</code> is at <code>(i-1)//2</code></li>
+<li>The left and right children of node <code>i</code> are at <code>2i+1</code> and <code>2i+2</code></li>
+</ul>
+<p>No pointers, no node objects. <strong>The tree structure is computed entirely from indices.</strong> The cost is that a heap must be a complete binary tree (packed tightly from left to right), so the array has no holes.</p>
+<p>This rule gives three properties that map directly to all heap operations:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>How it works</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>push</td>
+<td>Append to the end of the array, float up toward the parent (sift-up)</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>pop</td>
+<td>Remove <code>heap[0]</code>, move the last element to position 0, sink down toward children (sift-down)</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>heapify</td>
+<td>sift-down from the last non-leaf node backward, Floyd’s algorithm</td>
+<td><strong>O(n)</strong> not O(n log n)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Min-heap invariant: every node ≤ its two children. Note this only orders parent–child pairs — <strong>siblings are unordered</strong> — so you cannot use a heap to retrieve the k-th element after sorting; you have to pop repeatedly.</p>
+</blockquote>
+<p>The animation below uses a Top-K scenario to demonstrate push &#x2F; sift-up &#x2F; pop &#x2F; sift-down simultaneously. The left side shows the tree view; the right side shows the same data as an array. Focus on how <strong>both views stay in sync</strong> — that is the entirety of “array-simulated tree.”</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/heap.html" loading="lazy" style="width:100%;height:460px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="Template-—-Python-heapq-Basic-Operations"><a href="#Template-—-Python-heapq-Basic-Operations" class="headerlink" title="Template — Python heapq Basic Operations"></a>Template — Python heapq Basic Operations</h2><p>Python’s standard library <code>heapq</code> <strong>is a min-heap only</strong>. Want a max-heap? Store <code>-x</code>. This is the most common gotcha in interview problems.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> heapq<br><br>heap = []<br>heapq.heappush(heap, x)        <span class="hljs-comment"># push              O(log n)</span><br>top = heap[<span class="hljs-number">0</span>]                  <span class="hljs-comment"># peek min value    O(1)</span><br>mn  = heapq.heappop(heap)      <span class="hljs-comment"># pop min value     O(log n)</span><br><br><span class="hljs-comment"># Max-heap: negate trick</span><br>heapq.heappush(heap, -x)<br>mx = -heapq.heappop(heap)<br><br><span class="hljs-comment"># Floyd heapify: in-place O(n), faster than pushing one by one O(n log n)</span><br>arr = [<span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]<br>heapq.heapify(arr)<br><br><span class="hljs-comment"># Push and pop atomically — twice as fast as separate calls</span><br>heapq.heapreplace(heap, x)     <span class="hljs-comment"># pop then push</span><br>heapq.heappushpop(heap, x)     <span class="hljs-comment"># push then pop</span><br></code></pre></td></tr></table></figure>
+
+<p>If heap elements are tuples, they are compared lexicographically. For objects that are not directly comparable (e.g., linked-list nodes), add a monotonically increasing counter to break ties: <code>(val, idx, node)</code>.</p>
+<h2 id="4-Canonical-Use-Cases"><a href="#4-Canonical-Use-Cases" class="headerlink" title="4 Canonical Use Cases"></a>4 Canonical Use Cases</h2><p>Heaps in algorithm problems almost exclusively solve these four things. Recognizing the pattern matters more than writing the code.</p>
+<h3 id="1-Top-K-—-Min-Heap-for-Largest-Max-Heap-for-Smallest"><a href="#1-Top-K-—-Min-Heap-for-Largest-Max-Heap-for-Smallest" class="headerlink" title="1. Top-K — Min-Heap for Largest, Max-Heap for Smallest"></a>1. Top-K — Min-Heap for Largest, Max-Heap for Smallest</h3><p>To find the <strong>K largest</strong> elements, use a <strong>min-heap</strong> of size K; the heap top is the “threshold.” A new element enters only if it exceeds the threshold. Conversely, to find the K smallest, use a max-heap.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">top_k_largest</span>(<span class="hljs-params">nums, k</span>):<br>    heap = []<br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        heapq.heappush(heap, x)<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(heap) &gt; k:<br>            heapq.heappop(heap)   <span class="hljs-comment"># discard the smallest, keep the k largest</span><br>    <span class="hljs-keyword">return</span> heap                   <span class="hljs-comment"># heap[0] = k-th largest</span><br></code></pre></td></tr></table></figure>
+
+<p>Time O(n log k), space O(k). Better than sorting O(n log n) for data streams.</p>
+<h3 id="2-Streaming-Median-—-Two-Heaps-Back-to-Back"><a href="#2-Streaming-Median-—-Two-Heaps-Back-to-Back" class="headerlink" title="2. Streaming Median — Two Heaps Back to Back"></a>2. Streaming Median — Two Heaps Back to Back</h3><p><code>lo</code> is a max-heap (holds the smaller half), <code>hi</code> is a min-heap (holds the larger half). Maintain <code>|len(lo) - len(hi)| ≤ 1</code>; the median is always at the two heap tops.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">add_num</span>(<span class="hljs-params">num, lo, hi</span>):<br>    heapq.heappush(lo, -num)                     <span class="hljs-comment"># put in lo first</span><br>    heapq.heappush(hi, -heapq.heappop(lo))       <span class="hljs-comment"># move lo&#x27;s max to hi</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(hi) &gt; <span class="hljs-built_in">len</span>(lo):                        <span class="hljs-comment"># rebalance</span><br>        heapq.heappush(lo, -heapq.heappop(hi))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">median</span>(<span class="hljs-params">lo, hi</span>):<br>    <span class="hljs-keyword">return</span> -lo[<span class="hljs-number">0</span>] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(lo) &gt; <span class="hljs-built_in">len</span>(hi) <span class="hljs-keyword">else</span> (-lo[<span class="hljs-number">0</span>] + hi[<span class="hljs-number">0</span>]) / <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<p>Key trick: <strong>blindly push to lo first, then move one element to hi</strong> — this guarantees the invariant <code>lo ≤ hi</code>.</p>
+<h3 id="3-Merge-K-Sorted-Lists-—-Store-a-Pointer-per-List-in-the-Heap"><a href="#3-Merge-K-Sorted-Lists-—-Store-a-Pointer-per-List-in-the-Heap" class="headerlink" title="3. Merge K Sorted Lists — Store a Pointer per List in the Heap"></a>3. Merge K Sorted Lists — Store a Pointer per List in the Heap</h3><p>Take the smallest current element from each of the K lists&#x2F;arrays and push them into the heap. Pop the minimum, then push the next element from that list. Each step is O(log K).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">merge_k_sorted</span>(<span class="hljs-params">lists</span>):<br>    heap = [(lst[<span class="hljs-number">0</span>], i, <span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> i, lst <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(lists) <span class="hljs-keyword">if</span> lst]<br>    heapq.heapify(heap)<br>    res = []<br>    <span class="hljs-keyword">while</span> heap:<br>        val, i, j = heapq.heappop(heap)<br>        res.append(val)<br>        <span class="hljs-keyword">if</span> j + <span class="hljs-number">1</span> &lt; <span class="hljs-built_in">len</span>(lists[i]):<br>            heapq.heappush(heap, (lists[i][j+<span class="hljs-number">1</span>], i, j+<span class="hljs-number">1</span>))<br>    <span class="hljs-keyword">return</span> res<br></code></pre></td></tr></table></figure>
+
+<p>Total time O(N log K), where N is the total number of elements.</p>
+<h3 id="4-Dijkstra-—-Heap-Optimized-Shortest-Path"><a href="#4-Dijkstra-—-Heap-Optimized-Shortest-Path" class="headerlink" title="4. Dijkstra — Heap-Optimized Shortest Path"></a>4. Dijkstra — Heap-Optimized Shortest Path</h3><p>Naive Dijkstra is O(V²). Using a min-heap keyed by distance to pick the next node brings it down to O((V+E) log V). Store <code>(dist, node)</code> in the heap; when popping, skip the entry if <code>dist &gt; dist[node]</code> (lazy deletion).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">dijkstra</span>(<span class="hljs-params">graph, src</span>):<br>    dist = &#123;src: <span class="hljs-number">0</span>&#125;<br>    heap = [(<span class="hljs-number">0</span>, src)]<br>    <span class="hljs-keyword">while</span> heap:<br>        d, u = heapq.heappop(heap)<br>        <span class="hljs-keyword">if</span> d &gt; dist[u]:           <span class="hljs-comment"># stale record, discard</span><br>            <span class="hljs-keyword">continue</span><br>        <span class="hljs-keyword">for</span> v, w <span class="hljs-keyword">in</span> graph[u]:<br>            nd = d + w<br>            <span class="hljs-keyword">if</span> nd &lt; dist.get(v, <span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)):<br>                dist[v] = nd<br>                heapq.heappush(heap, (nd, v))<br>    <span class="hljs-keyword">return</span> dist<br></code></pre></td></tr></table></figure>
+
+<p>Lazy deletion keeps the amortized complexity at O(log n): each element is pushed at most once and skipped at most once, each O(log n).</p>
+<h2 id="Classic-Problems"><a href="#Classic-Problems" class="headerlink" title="Classic Problems"></a>Classic Problems</h2><ul>
+<li><strong>215. Kth Largest Element in an Array</strong> — Top-K template, min-heap of capacity K.</li>
+<li><strong>295. Find Median from Data Stream</strong> — Dual-heap back-to-back.</li>
+<li><strong>23. Merge K Sorted Lists</strong> — Push nodes into the heap, use a counter to break ties.</li>
+<li><strong>347. Top K Frequent Elements</strong> — Use Counter first, then a min-heap.</li>
+<li><strong>502. IPO</strong> — Dual heap: min-heap by capital, max-heap by profit.</li>
+<li><strong>857. Minimum Cost to Hire K Workers</strong> — Sort + max-heap to maintain the sum of current K wages.</li>
+<li><strong>703. Kth Largest Element in a Stream</strong> — Online Top-K.</li>
+<li><strong>1046. Last Stone Weight</strong> — Max-heap simulation.</li>
+</ul>
+<h2 id="Memory-Aids"><a href="#Memory-Aids" class="headerlink" title="Memory Aids"></a>Memory Aids</h2><p>Think of a heap in two layers and you will never forget it:</p>
+<ol>
+<li><strong>Physical layer</strong>: heap &#x3D; array + index rule <code>parent=(i-1)//2, children=2i+1, 2i+2</code>. All “tree” operations ultimately reduce to arithmetic on array indices.</li>
+<li><strong>Invariant layer</strong>: a min-heap only guarantees <code>parent ≤ children</code> — <strong>siblings are unordered</strong>. So a heap can only repeatedly give you the extremum; it cannot give you the “second largest.”</li>
+<li><strong>Pattern layer</strong>: reflexively reach for a heap when you see these keywords:<ul>
+<li>“Top K &#x2F; K-th largest &#x2F; K-th smallest” → Top-K (one heap)</li>
+<li>“Streaming median &#x2F; sliding window median” → dual-heap back-to-back</li>
+<li>“K-way &#x2F; K sorted” → K-way merge</li>
+<li>“Shortest path &#x2F; minimum-cost expansion” → Dijkstra &#x2F; weighted BFS variant</li>
+</ul>
+</li>
+</ol>
+<p>On the Python side, just remember three calls: <code>heappush / heappop / heap[0]</code>, negate for a max-heap, and <code>heapify</code> is O(n).</p>
+<h2 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h2><div class="exercise">
+<details>
+<summary><strong>Why does Top-K use a min-heap rather than a max-heap?</strong></summary>
+
+<p>A min-heap’s top is the minimum value, so you can quickly tell whether a new element is larger than the current K-th largest. With a max-heap the top is the maximum, and you have no efficient way to evict the smallest element. The min-heap guarantees the heap always contains the K largest elements, with the top acting as the “threshold.”</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>In the dual-heap approach, why does "push to lo first, then move to hi" guarantee lo ≤ hi?</strong></summary>
+
+<p>We push to lo (max-heap) first, then move lo’s maximum to hi (min-heap). This guarantees the element transferred from lo to hi is greater than or equal to all remaining elements in lo. Therefore lo’s maximum ≤ hi’s minimum, i.e., every element in lo ≤ every element in hi.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Why is Floyd heapify O(n) rather than O(n log n)?</strong></summary>
+
+<p>Pushing one by one is O(n log n): each sift-up is at most log n. Floyd heapify sifts down from the last non-leaf node backward. The leaf layer (n&#x2F;2 nodes) does nothing; the second-to-last layer sinks at most 1 step; the layer above that at most 2 steps… Summing <code>Σ (n/2^(h+1)) · h</code> converges to O(n). Intuition: <strong>most nodes are near the bottom and barely need to move</strong>.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Why doesn't "lazy deletion" in Dijkstra blow up the complexity?</strong></summary>
+
+<p>Each edge can push its target node into the heap at most once, so the heap holds at most O(E) entries. Each entry is either processed validly or skipped by the <code>d &gt; dist[u]</code> check — both cases cost O(log E). Total complexity O((V+E) log V), consistent with the theoretical bound.</p>
+</details>
+</div>
+
+<h2 id="LeetCode-Practice"><a href="#LeetCode-Practice" class="headerlink" title="LeetCode Practice"></a>LeetCode Practice</h2><p><strong>Warm-up</strong>: 215, 703, 347, 1046.</p>
+<p><strong>Advanced</strong>: 23, 295, 378, 502, 857.</p>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

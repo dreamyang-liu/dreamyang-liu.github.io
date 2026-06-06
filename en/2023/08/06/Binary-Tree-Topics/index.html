@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Binary Tree Topics | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-%E2%80%94-Pre-In-Post-Only-Differ-in-Root-Position"><span class="toc-text">Intuition — Pre&#x2F;In&#x2F;Post Only Differ in Root Position</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Animation-%E2%80%94-Same-7-Node-Tree-Three-Orders"><span class="toc-text">Animation — Same 7-Node Tree, Three Orders</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#All-Four-Traversals-%E2%80%94-Recursive-Iterative"><span class="toc-text">All Four Traversals — Recursive + Iterative</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Recursive-%E2%80%94-One-Line-Apart"><span class="toc-text">Recursive — One Line Apart</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Iterative-%E2%80%94-Using-a-Stack-to-Simulate-the-Call-Stack"><span class="toc-text">Iterative — Using a Stack to Simulate the Call Stack</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Level-Order-BFS-with-a-Queue"><span class="toc-text">Level-Order &#x3D; BFS, with a Queue</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications-%E2%80%94-Three-Must-Knows"><span class="toc-text">Applications — Three Must-Knows</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-BST-In-Order-Ascending-Order"><span class="toc-text">1. BST In-Order &#x3D; Ascending Order</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Pre-Order-In-Order-%E2%86%92-Unique-Construction"><span class="toc-text">2. Pre-Order + In-Order → Unique Construction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Morris-Traversal-%E2%80%94-O-1-Space"><span class="toc-text">3. Morris Traversal — O(1) Space</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-Problems"><span class="toc-text">Classic Problems</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory-Aids"><span class="toc-text">Memory Aids</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Binary Tree</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Binary Tree Topics.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Binary Tree Topics</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2023-08-06
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Binary Tree</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>Pre&#x2F;in&#x2F;post-order traversal are not three separate algorithms — they are <strong>the same recursive skeleton with the “print root” line placed at different positions</strong>. Recursion handles it in one line; iteration uses a stack to manually simulate the call stack. BFS swaps in a queue for level-order. Remember this and binary-tree traversal problems will never confuse you again.</p>
+<span id="more"></span>
+
+<h2 id="Intuition-—-Pre-In-Post-Only-Differ-in-Root-Position"><a href="#Intuition-—-Pre-In-Post-Only-Differ-in-Root-Position" class="headerlink" title="Intuition — Pre&#x2F;In&#x2F;Post Only Differ in Root Position"></a>Intuition — Pre&#x2F;In&#x2F;Post Only Differ in Root Position</h2><p>Write the standard binary-tree recursive skeleton:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>    <span class="hljs-keyword">if</span> node <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    <span class="hljs-comment"># (A) visit here → pre-order</span><br>    dfs(node.left)<br>    <span class="hljs-comment"># (B) visit here → in-order</span><br>    dfs(node.right)<br>    <span class="hljs-comment"># (C) visit here → post-order</span><br></code></pre></td></tr></table></figure>
+
+<p>Where the <strong>root-visit statement</strong> sits relative to the two recursive calls (<code>left</code>, <code>right</code>) determines the traversal name:</p>
+<table>
+<thead>
+<tr>
+<th>Traversal</th>
+<th>Order</th>
+<th>Root position</th>
+<th>Good for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pre-order</td>
+<td>Root → Left → Right</td>
+<td><strong>Before</strong> both recursive calls</td>
+<td>Top-down parameter passing (path &#x2F; prefix)</td>
+</tr>
+<tr>
+<td>In-order</td>
+<td>Left → Root → Right</td>
+<td><strong>Between</strong> both recursive calls</td>
+<td>BST sorted output</td>
+</tr>
+<tr>
+<td>Post-order</td>
+<td>Left → Right → Root</td>
+<td><strong>After</strong> both recursive calls</td>
+<td>Bottom-up aggregation (height &#x2F; diameter)</td>
+</tr>
+</tbody></table>
+<p>Level-order is a different category: <strong>no recursion, use a queue instead</strong>, spreading outward layer by layer. It is fundamentally BFS.</p>
+<h2 id="Animation-—-Same-7-Node-Tree-Three-Orders"><a href="#Animation-—-Same-7-Node-Tree-Three-Orders" class="headerlink" title="Animation — Same 7-Node Tree, Three Orders"></a>Animation — Same 7-Node Tree, Three Orders</h2><p>The complete binary tree below has 1 as the root and 4, 5, 6, 7 as leaves. Use the buttons on the animation to switch traversal modes and observe the visit order: pre-order dives left from the root, in-order starts from the bottom-left, and post-order reaches the root last. The difference in “root position” is immediately visible.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/tree-traversal.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<blockquote>
+<p>Key observation: the first node in pre-order is always the root; the last node in post-order is always the root; in in-order, the root’s position depends on the size of the left subtree. This is the foundation of why “pre-order + in-order uniquely determines a tree.”</p>
+</blockquote>
+<h2 id="All-Four-Traversals-—-Recursive-Iterative"><a href="#All-Four-Traversals-—-Recursive-Iterative" class="headerlink" title="All Four Traversals — Recursive + Iterative"></a>All Four Traversals — Recursive + Iterative</h2><h3 id="Recursive-—-One-Line-Apart"><a href="#Recursive-—-One-Line-Apart" class="headerlink" title="Recursive — One Line Apart"></a>Recursive — One Line Apart</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">preorder</span>(<span class="hljs-params">node</span>):<br>    <span class="hljs-keyword">if</span> node <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    <span class="hljs-built_in">print</span>(node.val)            <span class="hljs-comment"># root</span><br>    preorder(node.left)        <span class="hljs-comment"># left</span><br>    preorder(node.right)       <span class="hljs-comment"># right</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">inorder</span>(<span class="hljs-params">node</span>):<br>    <span class="hljs-keyword">if</span> node <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    inorder(node.left)<br>    <span class="hljs-built_in">print</span>(node.val)            <span class="hljs-comment"># root in the middle</span><br>    inorder(node.right)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">postorder</span>(<span class="hljs-params">node</span>):<br>    <span class="hljs-keyword">if</span> node <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    postorder(node.left)<br>    postorder(node.right)<br>    <span class="hljs-built_in">print</span>(node.val)            <span class="hljs-comment"># root at the end</span><br></code></pre></td></tr></table></figure>
+
+<p>All three functions differ only in where the <code>print</code> line sits. That is the whole secret.</p>
+<h3 id="Iterative-—-Using-a-Stack-to-Simulate-the-Call-Stack"><a href="#Iterative-—-Using-a-Stack-to-Simulate-the-Call-Stack" class="headerlink" title="Iterative — Using a Stack to Simulate the Call Stack"></a>Iterative — Using a Stack to Simulate the Call Stack</h3><p><strong>Why do we need a stack?</strong> The reason recursion can “descend into the left subtree and come back to handle the right subtree” is that the system call stack saves the current position for you. When rewriting as iteration, you must maintain an explicit stack yourself to record “what to do when we come back.”</p>
+<p>Pre-order is simplest (the root can be popped immediately after visiting):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">preorder_iter</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">if</span> root <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    stack = [root]<br>    <span class="hljs-keyword">while</span> stack:<br>        node = stack.pop()<br>        <span class="hljs-built_in">print</span>(node.val)<br>        <span class="hljs-comment"># push right first, left second → left pops first, matching &quot;root-left-right&quot;</span><br>        <span class="hljs-keyword">if</span> node.right: stack.append(node.right)<br>        <span class="hljs-keyword">if</span> node.left:  stack.append(node.left)<br></code></pre></td></tr></table></figure>
+
+<p>In-order is trickier — you must push the entire left chain first, then process:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">inorder_iter</span>(<span class="hljs-params">root</span>):<br>    stack, node = [], root<br>    <span class="hljs-keyword">while</span> stack <span class="hljs-keyword">or</span> node:<br>        <span class="hljs-keyword">while</span> node:                  <span class="hljs-comment"># push all the way left</span><br>            stack.append(node)<br>            node = node.left<br>        node = stack.pop()           <span class="hljs-comment"># pop = time to visit &quot;root&quot;</span><br>        <span class="hljs-built_in">print</span>(node.val)<br>        node = node.right            <span class="hljs-comment"># then go to right subtree</span><br></code></pre></td></tr></table></figure>
+
+<p>Post-order is the most convoluted. The cleanest approach: <strong>do a pre-order traversal in “root-right-left” order, then reverse</strong>, giving “left-right-root”:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">postorder_iter</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">if</span> root <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span> []<br>    stack, out = [root], []<br>    <span class="hljs-keyword">while</span> stack:<br>        node = stack.pop()<br>        out.append(node.val)<br>        <span class="hljs-keyword">if</span> node.left:  stack.append(node.left)   <span class="hljs-comment"># note reversed order</span><br>        <span class="hljs-keyword">if</span> node.right: stack.append(node.right)<br>    <span class="hljs-keyword">return</span> out[::-<span class="hljs-number">1</span>]                              <span class="hljs-comment"># reverse → left-right-root</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Level-Order-BFS-with-a-Queue"><a href="#Level-Order-BFS-with-a-Queue" class="headerlink" title="Level-Order &#x3D; BFS, with a Queue"></a>Level-Order &#x3D; BFS, with a Queue</h3><p>Swap the stack for a queue; depth-first becomes breadth-first:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">level_order</span>(<span class="hljs-params">root</span>):<br>    <span class="hljs-keyword">if</span> root <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span><br>    q = deque([root])<br>    <span class="hljs-keyword">while</span> q:<br>        n = <span class="hljs-built_in">len</span>(q)                   <span class="hljs-comment"># lock in this layer&#x27;s size to slice by layer</span><br>        <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>            node = q.popleft()<br>            <span class="hljs-built_in">print</span>(node.val, end=<span class="hljs-string">&#x27; &#x27;</span>)<br>            <span class="hljs-keyword">if</span> node.left:  q.append(node.left)<br>            <span class="hljs-keyword">if</span> node.right: q.append(node.right)<br>        <span class="hljs-built_in">print</span>()                       <span class="hljs-comment"># newline after each layer</span><br></code></pre></td></tr></table></figure>
+
+<p>The line <code>n = len(q)</code> is the soul of level-order — without it you get plain BFS; with it you get true layer-by-layer processing.</p>
+<h2 id="Applications-—-Three-Must-Knows"><a href="#Applications-—-Three-Must-Knows" class="headerlink" title="Applications — Three Must-Knows"></a>Applications — Three Must-Knows</h2><h3 id="1-BST-In-Order-Ascending-Order"><a href="#1-BST-In-Order-Ascending-Order" class="headerlink" title="1. BST In-Order &#x3D; Ascending Order"></a>1. BST In-Order &#x3D; Ascending Order</h3><p>BST definition: all left subtree values &lt; root &lt; all right subtree values. In-order “left-root-right” unfolds this partial order into a total order. Validating a BST, finding the k-th smallest, range sum queries — all of these rely on this single fact.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">is_valid_bst</span>(<span class="hljs-params">root</span>):<br>    prev = [-<span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)]<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">node</span>):<br>        <span class="hljs-keyword">if</span> node <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> dfs(node.left): <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">if</span> node.val &lt;= prev[<span class="hljs-number">0</span>]: <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>     <span class="hljs-comment"># in-order must be strictly increasing</span><br>        prev[<span class="hljs-number">0</span>] = node.val<br>        <span class="hljs-keyword">return</span> dfs(node.right)<br>    <span class="hljs-keyword">return</span> dfs(root)<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-Pre-Order-In-Order-→-Unique-Construction"><a href="#2-Pre-Order-In-Order-→-Unique-Construction" class="headerlink" title="2. Pre-Order + In-Order → Unique Construction"></a>2. Pre-Order + In-Order → Unique Construction</h3><p>The first element of pre-order is the root. Use that root to split in-order: everything to the left is the left subtree’s in-order, everything to the right is the right subtree’s in-order. Recurse and the tree is built.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">buildTree</span>(<span class="hljs-params">preorder, inorder</span>):<br>    idx = &#123;v: i <span class="hljs-keyword">for</span> i, v <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(inorder)&#125;  <span class="hljs-comment"># O(1) lookup</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">build</span>(<span class="hljs-params">pl, pr, il, ir</span>):<br>        <span class="hljs-keyword">if</span> pl &gt; pr: <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>        root = TreeNode(preorder[pl])<br>        m = idx[preorder[pl]]<br>        left_size = m - il<br>        root.left  = build(pl+<span class="hljs-number">1</span>, pl+left_size, il, m-<span class="hljs-number">1</span>)<br>        root.right = build(pl+left_size+<span class="hljs-number">1</span>, pr, m+<span class="hljs-number">1</span>, ir)<br>        <span class="hljs-keyword">return</span> root<br>    <span class="hljs-keyword">return</span> build(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(preorder)-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(inorder)-<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+
+<p>Note: <strong>pre-order alone, in-order alone, or post-order alone cannot uniquely determine a tree</strong>. You need in-order paired with either pre-order or post-order.</p>
+<h3 id="3-Morris-Traversal-—-O-1-Space"><a href="#3-Morris-Traversal-—-O-1-Space" class="headerlink" title="3. Morris Traversal — O(1) Space"></a>3. Morris Traversal — O(1) Space</h3><p>Recursive traversal uses O(h) stack space; iterative also uses O(h). Morris traversal reduces extra space to O(1) — at the cost of temporarily modifying the tree.</p>
+<p>Core idea: when the current node <code>cur</code> has a left subtree, find the rightmost node of that left subtree (the in-order predecessor) and point its <code>right</code> pointer at <code>cur</code> (the “thread”), so we can “fly back” to <code>cur</code> from the deepest point of the left subtree. After visiting <code>cur</code>, remove the thread and restore the tree.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">morris_inorder</span>(<span class="hljs-params">root</span>):<br>    cur = root<br>    <span class="hljs-keyword">while</span> cur:<br>        <span class="hljs-keyword">if</span> cur.left <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-built_in">print</span>(cur.val)            <span class="hljs-comment"># no left subtree: visit and go right</span><br>            cur = cur.right<br>        <span class="hljs-keyword">else</span>:<br>            pre = cur.left            <span class="hljs-comment"># find rightmost node of left subtree</span><br>            <span class="hljs-keyword">while</span> pre.right <span class="hljs-keyword">and</span> pre.right <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> cur:<br>                pre = pre.right<br>            <span class="hljs-keyword">if</span> pre.right <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:     <span class="hljs-comment"># first visit to cur: create thread</span><br>                pre.right = cur<br>                cur = cur.left<br>            <span class="hljs-keyword">else</span>:                     <span class="hljs-comment"># second visit to cur: remove thread</span><br>                pre.right = <span class="hljs-literal">None</span><br>                <span class="hljs-built_in">print</span>(cur.val)<br>                cur = cur.right<br></code></pre></td></tr></table></figure>
+
+<p>Interview problems rarely ask you to code this, but they often ask “how do you traverse in O(1) space?” — answer: Morris.</p>
+<h2 id="Classic-Problems"><a href="#Classic-Problems" class="headerlink" title="Classic Problems"></a>Classic Problems</h2><table>
+<thead>
+<tr>
+<th>LC</th>
+<th>Problem</th>
+<th>Which traversal</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>104</td>
+<td>Maximum Depth of Binary Tree</td>
+<td>Post-order (get subtree depth)</td>
+</tr>
+<tr>
+<td>226</td>
+<td>Invert Binary Tree</td>
+<td>Pre- or post-order both work</td>
+</tr>
+<tr>
+<td>98</td>
+<td>Validate BST</td>
+<td>In-order (check ascending)</td>
+</tr>
+<tr>
+<td>543</td>
+<td>Diameter of Binary Tree</td>
+<td>Post-order (left depth + right depth)</td>
+</tr>
+<tr>
+<td>124</td>
+<td>Binary Tree Maximum Path Sum</td>
+<td>Post-order + two values: “through me vs. give to parent”</td>
+</tr>
+<tr>
+<td>236</td>
+<td>Lowest Common Ancestor</td>
+<td>Post-order (search left and right, then check root)</td>
+</tr>
+<tr>
+<td>105</td>
+<td>Construct Tree from Pre- and In-order</td>
+<td>Pre-order pins root, in-order cuts left&#x2F;right</td>
+</tr>
+<tr>
+<td>102</td>
+<td>Level Order Traversal</td>
+<td>BFS + <code>len(q)</code> for layer separation</td>
+</tr>
+<tr>
+<td>297</td>
+<td>Serialize and Deserialize Binary Tree</td>
+<td>Pre-order (with nulls) is most natural</td>
+</tr>
+</tbody></table>
+<p>Quick rule for choosing: <strong>if the answer at the current node needs return values from subtrees → post-order; needs top-down parameter passing → pre-order; BST property → in-order; process layer by layer → level-order.</strong></p>
+<h2 id="Memory-Aids"><a href="#Memory-Aids" class="headerlink" title="Memory Aids"></a>Memory Aids</h2><ul>
+<li><strong>The only difference among the three traversals is one line</strong>: where you place the print-root call — <strong>before &#x2F; between &#x2F; after</strong> the two <code>dfs(left)</code> and <code>dfs(right)</code> calls.</li>
+<li><strong>Recursion in one line, iteration needs a stack</strong>: the stack manually simulates the call stack, explicitly saving “what to do next.”</li>
+<li><strong>Stack ↔ DFS, Queue ↔ BFS</strong>: swap the data structure and depth becomes breadth. Level-order’s <code>len(q)</code> is what makes it truly “layer-by-layer.”</li>
+<li><strong>Pre-order + In-order &#x3D; unique tree</strong>: pre-order pins the root, in-order cuts left and right, recurse.</li>
+<li><strong>BST in-order &#x3D; ascending</strong>: whenever BST sorted order is involved, think in-order first.</li>
+<li><strong>O(1) space traversal &#x3D; Morris</strong>: use the empty right pointer of the leaf as a temporary thread; remove it after visiting.</li>
+</ul>
+<p>One-line summary: <strong>binary-tree traversal &#x3D; recursive skeleton + one line for root position; iteration unrolls the recursive stack; level-order swaps the stack for a queue.</strong></p>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

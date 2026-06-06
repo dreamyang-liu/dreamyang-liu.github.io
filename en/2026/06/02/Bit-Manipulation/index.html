@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Bit Manipulation | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Must-Know-Operations"><span class="toc-text">5 Must-Know Operations</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Three-Core-Properties-of-XOR"><span class="toc-text">Three Core Properties of XOR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Must-Memorize-Tricks"><span class="toc-text">6 Must-Memorize Tricks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Check-Power-of-Two"><span class="toc-text">1. Check Power of Two</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Popcount-Count-Set-Bits"><span class="toc-text">2. Popcount (Count Set Bits)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Enumerate-Subsets-bitmask"><span class="toc-text">3. Enumerate Subsets (bitmask)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Enumerate-Subsets-of-a-Subset"><span class="toc-text">4. Enumerate Subsets of a Subset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Swap-Two-Numbers-trivia-only-%E2%80%94-don%E2%80%99t-use-in-interviews"><span class="toc-text">5. Swap Two Numbers (trivia only — don’t use in interviews)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-Find-Two-Numbers-That-Appear-Only-Once"><span class="toc-text">6. Find Two Numbers That Appear Only Once</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State-Compression-DP-Template-n"><span class="toc-text">State Compression DP Template (n&lt;&#x3D;20)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Animation-Bit-Operation-Visualizer"><span class="toc-text">Animation: Bit Operation Visualizer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Think-It-Through-Questions"><span class="toc-text">Think-It-Through Questions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-Problems"><span class="toc-text">LeetCode Problems</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Algorithm</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Bit Manipulation</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Bit Manipulation.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Bit Manipulation</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Algorithm</span>
+                  
+                    <span class="tag-item-post">Bit Manipulation</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>Rarely shows up in interviews, but when it does, it’s pure memorization. Learn these cold and they’re free points.</p>
+<span id="more"></span>
+
+<h2 id="5-Must-Know-Operations"><a href="#5-Must-Know-Operations" class="headerlink" title="5 Must-Know Operations"></a>5 Must-Know Operations</h2><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>n &amp; 1</code></td>
+<td>Get the lowest bit (check odd&#x2F;even)</td>
+</tr>
+<tr>
+<td><code>n &gt;&gt; 1</code></td>
+<td>Right-shift by one (divide by 2)</td>
+</tr>
+<tr>
+<td><code>n &amp; (n-1)</code></td>
+<td>Clear the lowest set bit</td>
+</tr>
+<tr>
+<td><code>n &amp; -n</code></td>
+<td>Extract the lowest set bit (lowbit)</td>
+</tr>
+<tr>
+<td><code>n ^ n == 0</code></td>
+<td>XOR of a number with itself is 0</td>
+</tr>
+</tbody></table>
+<h2 id="Three-Core-Properties-of-XOR"><a href="#Three-Core-Properties-of-XOR" class="headerlink" title="Three Core Properties of XOR"></a>Three Core Properties of XOR</h2><ul>
+<li><code>a ^ 0 = a</code> — any number XOR 0 equals itself</li>
+<li><code>a ^ a = 0</code> — any number XOR itself equals 0</li>
+<li>Commutative and associative — order doesn’t matter, grouping is flexible</li>
+</ul>
+<p>Put these three together: XOR a bunch of numbers and all pairs cancel out, leaving only the unpaired one.</p>
+<h2 id="6-Must-Memorize-Tricks"><a href="#6-Must-Memorize-Tricks" class="headerlink" title="6 Must-Memorize Tricks"></a>6 Must-Memorize Tricks</h2><h3 id="1-Check-Power-of-Two"><a href="#1-Check-Power-of-Two" class="headerlink" title="1. Check Power of Two"></a>1. Check Power of Two</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">isPowerOfTwo</span>(<span class="hljs-params">n</span>):<br>    <span class="hljs-keyword">return</span> n &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (n &amp; (n-<span class="hljs-number">1</span>)) == <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<p>A power of two has exactly one set bit. After <code>n&amp;(n-1)</code> clears it, the result is 0.</p>
+<h3 id="2-Popcount-Count-Set-Bits"><a href="#2-Popcount-Count-Set-Bits" class="headerlink" title="2. Popcount (Count Set Bits)"></a>2. Popcount (Count Set Bits)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">popcount</span>(<span class="hljs-params">n</span>):<br>    count = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">while</span> n:<br>        n &amp;= n - <span class="hljs-number">1</span>  <span class="hljs-comment"># clear one set bit each iteration</span><br>        count += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> count<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-Enumerate-Subsets-bitmask"><a href="#3-Enumerate-Subsets-bitmask" class="headerlink" title="3. Enumerate Subsets (bitmask)"></a>3. Enumerate Subsets (bitmask)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Enumerate all subsets of n elements</span><br><span class="hljs-keyword">for</span> mask <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span> &lt;&lt; n):<br>    <span class="hljs-comment"># the binary representation of mask indicates which elements are selected</span><br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-Enumerate-Subsets-of-a-Subset"><a href="#4-Enumerate-Subsets-of-a-Subset" class="headerlink" title="4. Enumerate Subsets of a Subset"></a>4. Enumerate Subsets of a Subset</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Enumerate all non-empty subsets of mask</span><br>sub = mask<br><span class="hljs-keyword">while</span> sub:<br>    <span class="hljs-comment"># process sub</span><br>    sub = (sub - <span class="hljs-number">1</span>) &amp; mask<br></code></pre></td></tr></table></figure>
+
+<p>Decrement by 1 then AND with mask — automatically jumps to the next valid subset.</p>
+<h3 id="5-Swap-Two-Numbers-trivia-only-—-don’t-use-in-interviews"><a href="#5-Swap-Two-Numbers-trivia-only-—-don’t-use-in-interviews" class="headerlink" title="5. Swap Two Numbers (trivia only — don’t use in interviews)"></a>5. Swap Two Numbers (trivia only — don’t use in interviews)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">a ^= b<br>b ^= a<br>a ^= b<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-Find-Two-Numbers-That-Appear-Only-Once"><a href="#6-Find-Two-Numbers-That-Appear-Only-Once" class="headerlink" title="6. Find Two Numbers That Appear Only Once"></a>6. Find Two Numbers That Appear Only Once</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">singleNumbers</span>(<span class="hljs-params">nums</span>):<br>    xor_all = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        xor_all ^= x  <span class="hljs-comment"># xor_all = a ^ b</span><br><br>    lowbit = xor_all &amp; (-xor_all)  <span class="hljs-comment"># extract the lowest set bit</span><br><br>    a, b = <span class="hljs-number">0</span>, <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums:<br>        <span class="hljs-keyword">if</span> x &amp; lowbit:<br>            a ^= x<br>        <span class="hljs-keyword">else</span>:<br>            b ^= x<br>    <span class="hljs-keyword">return</span> a, b<br></code></pre></td></tr></table></figure>
+
+<p>At the lowbit position, a and b must differ (otherwise XOR at that bit would not be 1), so they end up in different groups.</p>
+<h2 id="State-Compression-DP-Template-n"><a href="#State-Compression-DP-Template-n" class="headerlink" title="State Compression DP Template (n&lt;&#x3D;20)"></a>State Compression DP Template (n&lt;&#x3D;20)</h2><p>Use an integer <code>mask</code> to represent which elements in a set have been selected. A 1 at bit i means element i is included.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Classic template: TSP / subset partition</span><br>n = <span class="hljs-built_in">len</span>(nums)<br>dp = [<span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)] * (<span class="hljs-number">1</span> &lt;&lt; n)<br>dp[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>  <span class="hljs-comment"># empty set</span><br><br><span class="hljs-keyword">for</span> mask <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span> &lt;&lt; n):<br>    <span class="hljs-comment"># enumerate the next element to add</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>        <span class="hljs-keyword">if</span> mask &amp; (<span class="hljs-number">1</span> &lt;&lt; i):<br>            <span class="hljs-keyword">continue</span>  <span class="hljs-comment"># already selected</span><br>        new_mask = mask | (<span class="hljs-number">1</span> &lt;&lt; i)<br>        dp[new_mask] = <span class="hljs-built_in">min</span>(dp[new_mask], dp[mask] + cost(mask, i))<br><br><span class="hljs-comment"># Or enumerate subsets for transitions</span><br><span class="hljs-keyword">for</span> mask <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span> &lt;&lt; n):<br>    sub = mask<br>    <span class="hljs-keyword">while</span> sub:<br>        dp[mask] = <span class="hljs-built_in">min</span>(dp[mask], dp[mask ^ sub] + f(sub))<br>        sub = (sub - <span class="hljs-number">1</span>) &amp; mask<br></code></pre></td></tr></table></figure>
+
+<p>Time complexity is O(2^n * n) or O(3^n), so n is generally capped at 20.</p>
+<h2 id="Animation-Bit-Operation-Visualizer"><a href="#Animation-Bit-Operation-Visualizer" class="headerlink" title="Animation: Bit Operation Visualizer"></a>Animation: Bit Operation Visualizer</h2><p>Using <code>n = 13</code> (binary <code>1101</code>) as an example, follow the animation to see two things: <code>n &amp; (n-1)</code> clears the lowest set bit entirely, while <code>n &amp; -n</code> leaves only the lowest set bit. After watching, come back and re-read the 6 tricks above — muscle memory will kick in.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/bit-manipulation.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="Think-It-Through-Questions"><a href="#Think-It-Through-Questions" class="headerlink" title="Think-It-Through Questions"></a>Think-It-Through Questions</h2><div class="exercise">
+<details>
+<summary><strong>Why does n&(n-1) clear the lowest set bit? Explain from a binary perspective.</strong></summary>
+
+<p>Say the lowest set bit of n is at position k. Then bits 0 through k-1 of n are all 0, and bit k is 1.</p>
+<p>What n-1 does: bit k becomes 0, and bits 0 through k-1 all become 1 (due to borrowing).</p>
+<p>So <code>n &amp; (n-1)</code>: bit k gives <code>1&amp;0=0</code> (cleared!), bits 0 through k-1 give <code>0&amp;1=0</code>, and all higher bits are unchanged.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Why is state compression DP only suitable for n<=20?</strong></summary>
+
+<p>The number of states is 2^n. At n&#x3D;20 that’s 1 million states — just barely manageable. At n&#x3D;25 it’s 33 million, at n&#x3D;30 it’s 1 billion — both memory and time blow up. In practice, interview problems usually cap at n&lt;&#x3D;16; n&#x3D;20 is the extreme limit.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>In "find two numbers that appear only once," why does lowbit split the two numbers into different groups?</strong></summary>
+
+<p><code>xor_all = a ^ b</code>. The lowbit extracts the first bit where a and b differ. At that bit, a is 1 and b is 0 (or vice versa). Partitioning by that bit guarantees a and b end up in different groups. All the other paired numbers have both copies in the same group, so they XOR away.</p>
+</details>
+</div>
+
+<h2 id="LeetCode-Problems"><a href="#LeetCode-Problems" class="headerlink" title="LeetCode Problems"></a>LeetCode Problems</h2><p><strong>Warm-up</strong>: 136. Single Number, 191. Number of 1 Bits, 338. Counting Bits.</p>
+<p><strong>Advanced</strong>: 137. Single Number II, 260. Single Number III, 421. Maximum XOR, 847. Shortest Path Visiting All Nodes, 698. Partition to K Equal Sum Subsets.</p>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

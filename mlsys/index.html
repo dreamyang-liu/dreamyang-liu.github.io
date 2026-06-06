@@ -47,7 +47,8 @@
       <div class="mobile-menu-toggle">
         <i class="fas fa-bars"></i>
       </div>
-      <header class="vs-header">
+      
+<header class="vs-header">
   <nav class="vs-nav">
     <div class="nav-left">
       <a href="/" class="nav-brand">
@@ -55,39 +56,48 @@
         Mengyang Liu&#39;s Blog
       </a>
     </div>
-    
+
     <div class="nav-right">
-      <a href="/" class="nav-item ">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </a>
-      <a href="/mlsys/" class="nav-item active">
-        <i class="fas fa-microchip"></i>
-        <span>ML Systems</span>
-      </a>
-      <a href="/algorithms/" class="nav-item ">
-        <i class="fas fa-code"></i>
-        <span>算法</span>
-      </a>
-      <a href="/archives/" class="nav-item ">
-        <i class="fas fa-archive"></i>
-        <span>Archives</span>
-      </a>
-      <a href="/categories/" class="nav-item ">
-        <i class="fas fa-folder"></i>
-        <span>Categories</span>
-      </a>
-      <a href="/tags/" class="nav-item ">
-        <i class="fas fa-tags"></i>
-        <span>Tags</span>
-      </a>
-      <a href="/search/" class="nav-item ">
-        <i class="fas fa-search"></i>
-        <span>Search</span>
-      </a>
-      <a href="/about/" class="nav-item ">
-        <i class="fas fa-info-circle"></i>
-        <span>About</span>
+      
+        <a href="/" class="nav-item ">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="/mlsys/" class="nav-item active">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/algorithms/" class="nav-item ">
+          <i class="fas fa-code"></i>
+          <span>算法</span>
+        </a>
+        <a href="/archives/" class="nav-item ">
+          <i class="fas fa-archive"></i>
+          <span>Archives</span>
+        </a>
+        <a href="/categories/" class="nav-item ">
+          <i class="fas fa-folder"></i>
+          <span>Categories</span>
+        </a>
+        <a href="/tags/" class="nav-item ">
+          <i class="fas fa-tags"></i>
+          <span>Tags</span>
+        </a>
+        <a href="/search/" class="nav-item ">
+          <i class="fas fa-search"></i>
+          <span>Search</span>
+        </a>
+        <a href="/about/" class="nav-item ">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="zh"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>EN</span>
       </a>
     </div>
   </nav>
@@ -138,6 +148,25 @@
       ripple.style.top = `${y}px`;
       
       setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
     });
   });
 </script>

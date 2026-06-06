@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Sliding Window | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-%E2%80%94-Monotonic-Advancement-of-Two-Pointers"><span class="toc-text">Intuition — Monotonic Advancement of Two Pointers</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#When-Can-You-Use-Sliding-Window"><span class="toc-text">When Can You Use Sliding Window</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Animation-%E2%80%94-Two-Templates-Side-by-Side"><span class="toc-text">Animation — Two Templates Side by Side</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Two-Templates-%E2%80%94-Longest-Valid-vs-Shortest-Cover"><span class="toc-text">Two Templates — Longest Valid vs. Shortest Cover</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Template-A-Longest-Valid-Window-shrink-while-invalid"><span class="toc-text">Template A: Longest Valid Window (shrink while invalid)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Template-B-Shortest-Cover-Window-record-while-valid"><span class="toc-text">Template B: Shortest Cover Window (record while valid)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mapping-to-Problem-Types"><span class="toc-text">Mapping to Problem Types</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-Problems"><span class="toc-text">Classic Problems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LC-3-Longest-Substring-Without-Repeating-Characters-Template-A"><span class="toc-text">LC 3. Longest Substring Without Repeating Characters (Template A)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LC-209-Minimum-Size-Subarray-Sum-Template-B"><span class="toc-text">LC 209. Minimum Size Subarray Sum (Template B)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LC-76-Minimum-Window-Substring-Template-B-counter"><span class="toc-text">LC 76. Minimum Window Substring (Template B + counter)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9CExactly-K%E2%80%9D-%E2%80%9CAt-Most-K%E2%80%9D-%E2%80%9CAt-Most-K-1%E2%80%9D-LC-992"><span class="toc-text">“Exactly K” &#x3D; “At Most K” - “At Most K-1” (LC 992)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Three-Rules-to-Write-It-Right"><span class="toc-text">Three Rules to Write It Right</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory-Aid"><span class="toc-text">Memory Aid</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-Practice"><span class="toc-text">LeetCode Practice</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Sliding Window</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Two Pointers</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>String</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Sliding Window.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Sliding Window</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Sliding Window</span>
+                  
+                    <span class="tag-item-post">Two Pointers</span>
+                  
+                    <span class="tag-item-post">String</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>Two pointers <code>l</code> and <code>r</code>: <code>r</code> keeps expanding to the right; when the window becomes “invalid”, <code>l</code> shrinks from the right; once valid again, update the answer. Each pointer moves at most N steps, so <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.495ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2429 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(2040,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> crushes the <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.606ex" height="2.452ex" role="img" focusable="false" viewBox="0 -833.9 2919.8 1083.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1152,0)"><g data-mml-node="mi"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mn" transform="translate(975.3,363) scale(0.707)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g><g data-mml-node="mo" transform="translate(2530.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> brute-force enumeration.</p>
+<span id="more"></span>
+
+<h2 id="Intuition-—-Monotonic-Advancement-of-Two-Pointers"><a href="#Intuition-—-Monotonic-Advancement-of-Two-Pointers" class="headerlink" title="Intuition — Monotonic Advancement of Two Pointers"></a>Intuition — Monotonic Advancement of Two Pointers</h2><p>Think of brute-force enumeration of all subarrays as a 2D grid <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.461ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 1971.7 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(389,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mo" transform="translate(687,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(1131.7,0)"><path data-c="1D45F" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1582.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> with <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.606ex" height="2.452ex" role="img" focusable="false" viewBox="0 -833.9 2919.8 1083.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1152,0)"><g data-mml-node="mi"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mn" transform="translate(975.3,363) scale(0.707)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g><g data-mml-node="mo" transform="translate(2530.8,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> cells. Sliding window only walks one <strong>monotone path</strong>: <code>r</code> only ever increases, <code>l</code> only ever increases. Together the two pointers take at most <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="3.14ex" height="1.545ex" role="img" focusable="false" viewBox="0 -683 1388 683"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mi" transform="translate(500,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g></g></g></svg></mjx-container> steps, giving <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.495ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2429 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path></g><g data-mml-node="mo" transform="translate(2040,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>.</p>
+<p>Why doesn’t <code>l</code> retreat? Because moving <code>r</code> one step to the right only makes the window “more invalid” (more elements, larger sum, more duplicates). An <code>l</code> that has already been moved right to restore validity has no reason to go left again — that would only make the window invalid again.</p>
+<h3 id="When-Can-You-Use-Sliding-Window"><a href="#When-Can-You-Use-Sliding-Window" class="headerlink" title="When Can You Use Sliding Window"></a>When Can You Use Sliding Window</h3><p><strong>Key criterion: monotonicity.</strong> You must have:</p>
+<ul>
+<li>Window expands → condition moves in one direction (more invalid / more valid)</li>
+<li>Window shrinks → condition moves in the opposite direction</li>
+</ul>
+<p>For example, “subarray sum <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.312ex;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.751ex" role="img" focusable="false" viewBox="0 -636 778 774"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="2265" d="M83 616Q83 624 89 630T99 636Q107 636 253 568T543 431T687 361Q694 356 694 346T687 331Q685 329 395 192L107 56H101Q83 58 83 76Q83 77 83 79Q82 86 98 95Q117 105 248 167Q326 204 378 228L626 346L360 472Q291 505 200 548Q112 589 98 597T83 616ZM84 -118Q84 -108 99 -98H678Q694 -104 694 -118Q694 -130 679 -138H98Q84 -131 84 -118Z"></path></g></g></g></svg></mjx-container> target”: adding elements only increases the sum, removing them only decreases it — the validity is monotone, sliding works. For “exactly K distinct characters”: expanding or shrinking can both break the “exactly K” condition, <strong>there is no monotonicity, so you can’t slide directly</strong> (convert to “at most K minus at most K-1”, see below).</p>
+<p>Get this wrong and you’re stuck: when you see a problem, ask first — “does expanding the window push the condition in only one direction?” Yes → you can slide.</p>
+<h2 id="Animation-—-Two-Templates-Side-by-Side"><a href="#Animation-—-Two-Templates-Side-by-Side" class="headerlink" title="Animation — Two Templates Side by Side"></a>Animation — Two Templates Side by Side</h2><p>The animation below has two parts. <strong>Top half</strong> demonstrates “longest substring without repeating characters” (<code>"abcabcbb"</code>): watch how <code>l</code> shrinks when <code>r</code> encounters a duplicate, and <code>ans</code> is updated <strong>outside</strong> the while loop. <strong>Bottom half</strong> compares the same pointer logic side by side for two <code>ans</code> update positions: left side shows “longest valid” (shrink while invalid, update outside while), right side shows “shortest cover” (record while valid, update inside while).</p>
+<p><strong>Focus on two things</strong>: (1) <code>l</code> never retreats; (2) the position of the <code>ans</code> update determines whether you’re computing longest or shortest.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/sliding-window.html" loading="lazy" style="width:100%;height:620px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="Two-Templates-—-Longest-Valid-vs-Shortest-Cover"><a href="#Two-Templates-—-Longest-Valid-vs-Shortest-Cover" class="headerlink" title="Two Templates — Longest Valid vs. Shortest Cover"></a>Two Templates — Longest Valid vs. Shortest Cover</h2><h3 id="Template-A-Longest-Valid-Window-shrink-while-invalid"><a href="#Template-A-Longest-Valid-Window-shrink-while-invalid" class="headerlink" title="Template A: Longest Valid Window (shrink while invalid)"></a>Template A: Longest Valid Window (shrink while invalid)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">longest_valid</span>(<span class="hljs-params">s</span>):<br>    <span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>    window = Counter()<br>    left = <span class="hljs-number">0</span><br>    ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> right, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(s):<br>        window[c] += <span class="hljs-number">1</span>                 <span class="hljs-comment"># r enters window</span><br>        <span class="hljs-keyword">while</span> not_valid(window):       <span class="hljs-comment"># invalid — shrink</span><br>            window[s[left]] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> window[s[left]] == <span class="hljs-number">0</span>:<br>                <span class="hljs-keyword">del</span> window[s[left]]<br>            left += <span class="hljs-number">1</span><br>        ans = <span class="hljs-built_in">max</span>(ans, right - left + <span class="hljs-number">1</span>)  <span class="hljs-comment"># update outside while (window is valid here)</span><br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<p>Intuition: exiting the while loop means the window just became valid again — this is the largest valid window with <code>right</code> as the right endpoint, so record it.</p>
+<h3 id="Template-B-Shortest-Cover-Window-record-while-valid"><a href="#Template-B-Shortest-Cover-Window-record-while-valid" class="headerlink" title="Template B: Shortest Cover Window (record while valid)"></a>Template B: Shortest Cover Window (record while valid)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">shortest_cover</span>(<span class="hljs-params">s, t</span>):<br>    <span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>    need = Counter(t)<br>    window = Counter()<br>    left = <span class="hljs-number">0</span><br>    ans = <span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>)<br>    <span class="hljs-keyword">for</span> right, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(s):<br>        window[c] += <span class="hljs-number">1</span>                 <span class="hljs-comment"># r enters window</span><br>        <span class="hljs-keyword">while</span> is_valid(window, need):  <span class="hljs-comment"># valid — keep shrinking</span><br>            ans = <span class="hljs-built_in">min</span>(ans, right - left + <span class="hljs-number">1</span>)  <span class="hljs-comment"># update inside while</span><br>            window[s[left]] -= <span class="hljs-number">1</span><br>            left += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<p>Intuition: entering the while loop means the window is already valid; every step of shrinking is a valid window, so greedily record the shortest. Once <code>l</code> has shrunk to the point where going further would make it invalid, exit and wait for <code>r</code> to expand more.</p>
+<h3 id="Mapping-to-Problem-Types"><a href="#Mapping-to-Problem-Types" class="headerlink" title="Mapping to Problem Types"></a>Mapping to Problem Types</h3><table>
+<thead>
+<tr>
+<th>Problem characteristic</th>
+<th>Which template</th>
+<th><code>ans</code> update position</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Find longest X subarray</td>
+<td>A: longest valid</td>
+<td><strong>outside</strong> while</td>
+</tr>
+<tr>
+<td>Find shortest X subarray</td>
+<td>B: shortest cover</td>
+<td><strong>inside</strong> while</td>
+</tr>
+<tr>
+<td>Count how many X subarrays</td>
+<td>Variant of A: <code>ans += right - left + 1</code></td>
+<td><strong>outside</strong> while</td>
+</tr>
+</tbody></table>
+<p>The third variant is a high-frequency trick: after exiting the while loop, <code>[left..right]</code> is the largest valid window ending at <code>right</code>, so there are exactly <code>right - left + 1</code> valid subarrays ending at <code>right</code>.</p>
+<h2 id="Classic-Problems"><a href="#Classic-Problems" class="headerlink" title="Classic Problems"></a>Classic Problems</h2><h3 id="LC-3-Longest-Substring-Without-Repeating-Characters-Template-A"><a href="#LC-3-Longest-Substring-Without-Repeating-Characters-Template-A" class="headerlink" title="LC 3. Longest Substring Without Repeating Characters (Template A)"></a>LC 3. Longest Substring Without Repeating Characters (Template A)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">lengthOfLongestSubstring</span>(<span class="hljs-params">s</span>):<br>    window = {}<br>    left = ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> right, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(s):<br>        window[c] = window.get(c, <span class="hljs-number">0</span>) + <span class="hljs-number">1</span><br>        <span class="hljs-keyword">while</span> window[c] &gt; <span class="hljs-number">1</span>:           <span class="hljs-comment"># invalid only when the newly added c is a duplicate</span><br>            window[s[left]] -= <span class="hljs-number">1</span><br>            left += <span class="hljs-number">1</span><br>        ans = <span class="hljs-built_in">max</span>(ans, right - left + <span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<p>Small optimization: the window becomes invalid only when the newly added <code>c</code> is a duplicate, so <code>while window[c] &gt; 1</code> is faster than scanning the entire window.</p>
+<h3 id="LC-209-Minimum-Size-Subarray-Sum-Template-B"><a href="#LC-209-Minimum-Size-Subarray-Sum-Template-B" class="headerlink" title="LC 209. Minimum Size Subarray Sum (Template B)"></a>LC 209. Minimum Size Subarray Sum (Template B)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">minSubArrayLen</span>(<span class="hljs-params">target, nums</span>):<br>    left = total = <span class="hljs-number">0</span><br>    ans = <span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>)<br>    <span class="hljs-keyword">for</span> right, x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(nums):<br>        total += x<br>        <span class="hljs-keyword">while</span> total &gt;= target:          <span class="hljs-comment"># valid</span><br>            ans = <span class="hljs-built_in">min</span>(ans, right - left + <span class="hljs-number">1</span>)<br>            total -= nums[left]<br>            left += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> ans <span class="hljs-keyword">if</span> ans &lt; <span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>) <span class="hljs-keyword">else</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="LC-76-Minimum-Window-Substring-Template-B-counter"><a href="#LC-76-Minimum-Window-Substring-Template-B-counter" class="headerlink" title="LC 76. Minimum Window Substring (Template B + counter)"></a>LC 76. Minimum Window Substring (Template B + counter)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">minWindow</span>(<span class="hljs-params">s, t</span>):<br>    <span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>    need = Counter(t)<br>    window = Counter()<br>    have = <span class="hljs-number">0</span>                            <span class="hljs-comment"># number of character types satisfied</span><br>    required = <span class="hljs-built_in">len</span>(need)<br>    left = <span class="hljs-number">0</span><br>    ans = (<span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>), <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">for</span> right, c <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(s):<br>        window[c] += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">if</span> c <span class="hljs-keyword">in</span> need <span class="hljs-keyword">and</span> window[c] == need[c]:<br>            have += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">while</span> have == required:         <span class="hljs-comment"># valid</span><br>            <span class="hljs-keyword">if</span> right - left + <span class="hljs-number">1</span> &lt; ans[<span class="hljs-number">0</span>]:<br>                ans = (right - left + <span class="hljs-number">1</span>, left, right)<br>            window[s[left]] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> s[left] <span class="hljs-keyword">in</span> need <span class="hljs-keyword">and</span> window[s[left]] &lt; need[s[left]]:<br>                have -= <span class="hljs-number">1</span><br>            left += <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> s[ans[<span class="hljs-number">1</span>]:ans[<span class="hljs-number">2</span>]+<span class="hljs-number">1</span>] <span class="hljs-keyword">if</span> ans[<span class="hljs-number">0</span>] &lt; <span class="hljs-built_in">float</span>(<span class="hljs-string">'inf'</span>) <span class="hljs-keyword">else</span> <span class="hljs-string">""</span><br></code></pre></td></tr></table></figure>
+
+<p>Key: use <code>have</code> to track the number of satisfied character types, avoiding a full Counter scan each time for validity — making validity checks truly <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.618ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2041 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mn" transform="translate(1152,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(1652,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>.</p>
+<h3 id="“Exactly-K”-“At-Most-K”-“At-Most-K-1”-LC-992"><a href="#“Exactly-K”-“At-Most-K”-“At-Most-K-1”-LC-992" class="headerlink" title="“Exactly K” = “At Most K” - “At Most K-1” (LC 992)"></a>“Exactly K” = “At Most K” - “At Most K-1” (LC 992)</h3><p>“Exactly K” has no monotonicity → convert to two “at most” problems that do:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">exactly_k</span>(<span class="hljs-params">nums, k</span>):<br>    <span class="hljs-keyword">return</span> at_most(nums, k) - at_most(nums, k - <span class="hljs-number">1</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">at_most</span>(<span class="hljs-params">nums, k</span>):<br>    <span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br>    cnt = Counter()<br>    left = ans = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> right, x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(nums):<br>        cnt[x] += <span class="hljs-number">1</span><br>        <span class="hljs-keyword">while</span> <span class="hljs-built_in">len</span>(cnt) &gt; k:<br>            cnt[nums[left]] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> cnt[nums[left]] == <span class="hljs-number">0</span>:<br>                <span class="hljs-keyword">del</span> cnt[nums[left]]<br>            left += <span class="hljs-number">1</span><br>        ans += right - left + <span class="hljs-number">1</span>         <span class="hljs-comment"># subarrays ending at right that are valid</span><br>    <span class="hljs-keyword">return</span> ans<br></code></pre></td></tr></table></figure>
+
+<h2 id="Three-Rules-to-Write-It-Right"><a href="#Three-Rules-to-Write-It-Right" class="headerlink" title="Three Rules to Write It Right"></a>Three Rules to Write It Right</h2><ul>
+<li><strong>Symmetric enter/exit</strong>: whatever operation <code>right</code> does entering the window, <code>left</code> must undo on exit. Don’t forget to <code>del</code> from Counter when it reaches zero, otherwise <code>len(cnt)</code> will be wrong.</li>
+<li><strong><code>left</code> only moves inside while</strong>: moving <code>left</code> outside the while breaks the amortized analysis.</li>
+<li><strong><code>ans</code> position = problem intent</strong>: outside while → longest / count; inside while → shortest.</li>
+</ul>
+<h2 id="Memory-Aid"><a href="#Memory-Aid" class="headerlink" title="Memory Aid"></a>Memory Aid</h2><p>One sentence: <strong>r expands until invalid → l shrinks until valid</strong>.</p>
+<p>Three-question checklist:</p>
+<ol>
+<li>Does expanding the window push the condition in one direction (monotone)? No → can’t slide directly (or convert).</li>
+<li>Looking for longest or shortest? Longest → shrink while invalid, update outside while; Shortest → record while valid, update inside while.</li>
+<li>Are enter/exit operations symmetric? Counter zeroed out → delete; sum added → subtract.</li>
+</ol>
+<p>When you see “contiguous subarray/substring + longest/shortest/count”, reflexively write two pointers with a while loop. You won’t go wrong.</p>
+<h2 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h2><div class="exercise">
+<details>
+<summary><strong>Why does the left pointer only move right and never retreat? What complexity does this guarantee?</strong></summary>
+
+<p>After <code>r</code> moves right, the window can only become “more invalid”. An <code>l</code> that has already been moved right to restore validity has no reason to go left again — that would only make the window invalid again. Each of the two pointers moves at most <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.357ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 600 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></svg></mjx-container> steps, for a total of <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="13.836ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 6115.6 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mn" transform="translate(1152,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mi" transform="translate(1652,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(2252,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(2918.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(3974.6,0)"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(4737.6,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(5126.6,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(5726.6,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>. This is a classic example of amortized analysis: even though there are two loops (for + while), the total number of while iterations is bounded by the total displacement of <code>l</code>.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Why can't "exactly K distinct characters" be solved with a direct sliding window? How do you convert it?</strong></summary>
+
+<p>With exactly K, expanding can jump to K+1 (invalid) and shrinking can jump to K-1 (also invalid) — neither direction has monotonicity, so the while loop can’t maintain a clean invariant.</p>
+<p>Conversion: exactly K = at most K minus at most (K-1). “At most K” is monotone (the larger the window, the more likely it exceeds K), so standard sliding window applies.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>In Template A, why must `ans` be updated outside the while loop?</strong></summary>
+
+<p>Inside the while loop, the window is in the middle of “shrinking from invalid back to valid” — intermediate states are all invalid. Exiting the while loop guarantees that <code>[left..right]</code> is a valid window, and specifically the <strong>largest</strong> valid window with <code>right</code> as the right endpoint. Updating <code>ans</code> while invalid would corrupt the answer.</p>
+</details>
+</div>
+
+<h2 id="LeetCode-Practice"><a href="#LeetCode-Practice" class="headerlink" title="LeetCode Practice"></a>LeetCode Practice</h2><p><strong>Warmup:</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-substring-without-repeating-characters/">3. Longest Substring Without Repeating Characters</a> — Template A bare problem</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209. Minimum Size Subarray Sum</a> — Template B bare problem</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-all-anagrams-in-a-string/">438. Find All Anagrams in a String</a> — fixed-length window variant</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/max-consecutive-ones-iii/">1004. Max Consecutive Ones III</a> — Template A, “invalid = count of 0s &gt; K”</li>
+</ul>
+<p><strong>Advanced:</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-window-substring/">76. Minimum Window Substring</a> — Template B + <code>have</code> counter optimization</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/subarrays-with-k-different-integers/">992. Subarrays with K Different Integers</a> — exactly K = at most K minus at most K-1</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sliding-window-maximum/">239. Sliding Window Maximum</a> — fixed-length + monotone deque, a clever variation</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-substring-with-at-least-k-repeating-characters/">395. Longest Substring with At Least K Repeating Characters</a> — no monotonicity, requires divide-and-conquer or enumerate distinct character counts</li>
+</ul>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

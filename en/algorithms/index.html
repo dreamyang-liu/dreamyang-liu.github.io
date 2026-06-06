@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Algorithms | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Arrays-Two-Pointers-Sliding-Window"><span class="toc-text">Arrays &#x2F; Two Pointers &#x2F; Sliding Window</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stacks-Queues"><span class="toc-text">Stacks &#x2F; Queues</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hash-Heap-Linked-List"><span class="toc-text">Hash &#x2F; Heap &#x2F; Linked List</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sorting-Selection"><span class="toc-text">Sorting &#x2F; Selection</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dynamic-Programming"><span class="toc-text">Dynamic Programming</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Greedy-Backtracking"><span class="toc-text">Greedy &#x2F; Backtracking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Graph-Theory"><span class="toc-text">Graph Theory</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trees-String-Structures"><span class="toc-text">Trees &#x2F; String Structures</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bit-Manipulation-Math"><span class="toc-text">Bit Manipulation &#x2F; Math</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Advanced-Data-Structures"><span class="toc-text">Advanced Data Structures</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Algorithms.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Algorithms</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-04
+            </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>Algorithms and data structures topics. Most entries come with interactive animations (step through button-by-button to watch the algorithm execute). Organized by topic below.</p>
+<h2 id="Arrays-Two-Pointers-Sliding-Window"><a href="#Arrays-Two-Pointers-Sliding-Window" class="headerlink" title="Arrays &#x2F; Two Pointers &#x2F; Sliding Window"></a>Arrays &#x2F; Two Pointers &#x2F; Sliding Window</h2><ul>
+<li><a href="/en/2026/06/02/Two-Pointers/">Two-Pointer Techniques</a> — collision pointers, fast&#x2F;slow pointers, Floyd’s cycle detection</li>
+<li><a href="/en/2026/06/02/Sliding-Window/">Sliding Window</a> — longest &#x2F; shortest substring templates</li>
+<li><a href="/en/2026/06/02/Difference-Array/">Difference Arrays and Prefix Sums</a> — batch range updates</li>
+<li><a href="/en/2023/08/06/Binary-Search-Templates/">Binary Search Templates</a> — boundary handling, rotated arrays</li>
+</ul>
+<h2 id="Stacks-Queues"><a href="#Stacks-Queues" class="headerlink" title="Stacks &#x2F; Queues"></a>Stacks &#x2F; Queues</h2><ul>
+<li><a href="/en/2026/06/02/Monotonic-Stack/">Monotonic Stack</a> — next greater element</li>
+<li><a href="/en/2026/06/02/Monotonic-Queue/">Monotonic Deque</a> — sliding window maximum</li>
+<li><a href="/en/2023/09/17/Parentheses-Problems/">Parentheses Problems</a> — classic stack applications</li>
+</ul>
+<h2 id="Hash-Heap-Linked-List"><a href="#Hash-Heap-Linked-List" class="headerlink" title="Hash &#x2F; Heap &#x2F; Linked List"></a>Hash &#x2F; Heap &#x2F; Linked List</h2><ul>
+<li><a href="/en/2026/06/02/Hash-Table/">Hash Tables</a> — two-sum and other lookup problems</li>
+<li><a href="/en/2026/06/02/Heap-Priority-Queue/">Heap &#x2F; Priority Queue</a> — Top-K, heapify</li>
+<li><a href="/en/2026/06/02/Linked-List/">Core Linked List Operations</a> — reverse, cycle, merge</li>
+</ul>
+<h2 id="Sorting-Selection"><a href="#Sorting-Selection" class="headerlink" title="Sorting &#x2F; Selection"></a>Sorting &#x2F; Selection</h2><ul>
+<li><a href="/en/2026/06/02/Quickselect/">Quickselect</a> — Kth largest &#x2F; smallest element</li>
+<li><a href="/en/2023/08/06/Patience-Sorting/">Patience Sorting</a> — longest increasing subsequence</li>
+<li><a href="/en/2023/08/08/Random-Algorithm/">Randomized Algorithms</a> — shuffle, reservoir sampling</li>
+</ul>
+<h2 id="Dynamic-Programming"><a href="#Dynamic-Programming" class="headerlink" title="Dynamic Programming"></a>Dynamic Programming</h2><ul>
+<li><a href="/en/2026/06/02/Dynamic-Programming/">Dynamic Programming</a> — LCS, knapsack</li>
+<li><a href="/en/2026/06/02/Interval-DP/">Interval DP</a> — stone merging</li>
+<li><a href="/en/2026/06/02/Tree-DP/">Tree DP</a> — tree diameter, etc.</li>
+</ul>
+<h2 id="Greedy-Backtracking"><a href="#Greedy-Backtracking" class="headerlink" title="Greedy &#x2F; Backtracking"></a>Greedy &#x2F; Backtracking</h2><ul>
+<li><a href="/en/2026/06/02/Greedy/">Greedy Algorithms</a> — interval scheduling, regret greedy</li>
+<li><a href="/en/2023/09/02/Backtracking-Template/">Backtracking Template</a> — subsets, permutations, combinations</li>
+</ul>
+<h2 id="Graph-Theory"><a href="#Graph-Theory" class="headerlink" title="Graph Theory"></a>Graph Theory</h2><ul>
+<li><a href="/en/2026/06/02/BFS/">BFS Breadth-First Search</a> — grid BFS, multi-source BFS</li>
+<li><a href="/en/2026/06/02/Dijkstra/">Dijkstra’s Shortest Path</a> — single-source shortest path</li>
+<li><a href="/en/2026/06/02/Topological-Sort/">Topological Sort</a> — DAG ordering, cycle detection</li>
+<li><a href="/en/2023/08/06/Union-Find/">Union-Find (DSU)</a> — connectivity, path compression</li>
+</ul>
+<h2 id="Trees-String-Structures"><a href="#Trees-String-Structures" class="headerlink" title="Trees &#x2F; String Structures"></a>Trees &#x2F; String Structures</h2><ul>
+<li><a href="/en/2023/08/06/Binary-Tree-Topics/">Binary Tree Topics</a> — traversals and common problem types</li>
+<li><a href="/en/2026/06/02/Trie/">Trie (Prefix Tree)</a> — insert, search, prefix matching</li>
+</ul>
+<h2 id="Bit-Manipulation-Math"><a href="#Bit-Manipulation-Math" class="headerlink" title="Bit Manipulation &#x2F; Math"></a>Bit Manipulation &#x2F; Math</h2><ul>
+<li><a href="/en/2026/06/02/Bit-Manipulation/">Bit Manipulation</a> — <code>n&amp;(n-1)</code>, <code>n&amp;-n</code>, and other tricks</li>
+<li><a href="/en/2023/08/06/Binary-Exponentiation/">Binary Exponentiation</a> — fast power</li>
+</ul>
+<h2 id="Advanced-Data-Structures"><a href="#Advanced-Data-Structures" class="headerlink" title="Advanced Data Structures"></a>Advanced Data Structures</h2><ul>
+<li><a href="/en/2023/08/06/Segment-Tree/">Segment Tree</a> — range queries &#x2F; updates</li>
+<li><a href="/en/2023/08/06/Fenwick-Tree/">Fenwick Tree (BIT)</a> — efficient prefix sum maintenance</li>
+</ul>
+<hr>
+<blockquote>
+<p>Looking for ML Systems content? See the <a href="/en/mlsys/">ML Systems index</a>.</p>
+</blockquote>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

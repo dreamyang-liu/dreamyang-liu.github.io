@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>CUDA Graph: A Deep Dive | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-The-Problem-Death-by-a-Thousand-Kernel-Launches"><span class="toc-text">1. The Problem: Death by a Thousand Kernel Launches</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-How-CUDA-Graph-Works-Three-Phases"><span class="toc-text">2. How CUDA Graph Works: Three Phases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Graph-Friendly-vs-Non-Graph-Friendly-Code"><span class="toc-text">3. Graph-Friendly vs. Non-Graph-Friendly Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Memory-Model-Why-Addresses-Matter"><span class="toc-text">4. Memory Model: Why Addresses Matter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Strategies-for-Efficient-Use"><span class="toc-text">5. Strategies for Efficient Use</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Strategy-1-Graph-Pool-Cache"><span class="toc-text">Strategy 1: Graph Pool &#x2F; Cache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Strategy-2-Segmented-Pipeline"><span class="toc-text">Strategy 2: Segmented Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Strategy-3-LLM-Decode-Mode-Best-Use-Case"><span class="toc-text">Strategy 3: LLM Decode Mode (Best Use Case)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-When-Does-CUDA-Graph-Actually-Help"><span class="toc-text">6. When Does CUDA Graph Actually Help?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Refactoring-Patterns-Before-After"><span class="toc-text">7. Refactoring Patterns: Before &amp; After</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Pattern-1-Dynamic-Shapes-%E2%86%92-Padded-Static-Shapes"><span class="toc-text">Pattern 1: Dynamic Shapes → Padded Static Shapes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pattern-2-Conditional-Logic-%E2%86%92-Multiple-Graphs"><span class="toc-text">Pattern 2: Conditional Logic → Multiple Graphs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pattern-3-Internal-Allocation-%E2%86%92-Pre-allocated-Pool"><span class="toc-text">Pattern 3: Internal Allocation → Pre-allocated Pool</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Decision-Flowchart-Should-You-Use-CUDA-Graph"><span class="toc-text">8. Decision Flowchart: Should You Use CUDA Graph?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-Common-Pitfalls-and-Solutions"><span class="toc-text">9. Common Pitfalls and Solutions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-Quick-Reference-Card"><span class="toc-text">10. Quick Reference Card</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>cuda</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>cuda-graph</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>gpu</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>pytorch</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>mlsys</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>CUDA Graph: A Deep Dive.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>CUDA Graph: A Deep Dive</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-03
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">cuda</span>
+                  
+                    <span class="tag-item-post">cuda-graph</span>
+                  
+                    <span class="tag-item-post">gpu</span>
+                  
+                    <span class="tag-item-post">pytorch</span>
+                  
+                    <span class="tag-item-post">mlsys</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>An interactive visualization guide to understanding GPU execution optimization. Every GPU kernel launch carries CPU overhead; CUDA Graph records an entire kernel sequence into a graph and replays it with a single launch. This post is written in Markdown, with interactive animations illustrating the key mechanisms.</p>
+<span id="more"></span>
+
+<h2 id="1-The-Problem-Death-by-a-Thousand-Kernel-Launches"><a href="#1-The-Problem-Death-by-a-Thousand-Kernel-Launches" class="headerlink" title="1. The Problem: Death by a Thousand Kernel Launches"></a>1. The Problem: Death by a Thousand Kernel Launches</h2><p>Every GPU kernel launch carries CPU overhead. For large kernels this is negligible, but modern deep learning runs hundreds of small kernels per step.</p>
+<p>The animation below compares the CPU&#x2F;GPU timeline with and without Graph. Without it, the CPU spends most of its time on driver overhead (red gaps) while the GPU idles waiting for the next launch instruction. With Graph, a single launch triggers the entire kernel sequence.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/extra/cudagraph-timeline.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="2-How-CUDA-Graph-Works-Three-Phases"><a href="#2-How-CUDA-Graph-Works-Three-Phases" class="headerlink" title="2. How CUDA Graph Works: Three Phases"></a>2. How CUDA Graph Works: Three Phases</h2><p>CUDA Graph operates in three phases:</p>
+<ol>
+<li><p><strong>Capture</strong>: All GPU operations are recorded into a graph structure. No actual computation happens during this phase.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">with</span> torch.cuda.graph(g):<br>    out = model(<span class="hljs-built_in">input</span>)<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Instantiate</strong>: The graph is compiled into an executable form. Dependencies are validated and resources are allocated. This usually happens automatically when capture ends.</p>
+</li>
+<li><p><strong>Replay</strong>: The entire graph is executed via a single CPU launch. This is the fast path.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">input</span>.copy_(new_data)<br>g.replay()<br></code></pre></td></tr></table></figure></li>
+</ol>
+<p>The captured graph records all operations and their dependencies as a DAG — for example: <code>Input Buffer → &#123;LayerNorm, Attention&#125; → MatMul → GELU → Output Buffer</code>.</p>
+<h2 id="3-Graph-Friendly-vs-Non-Graph-Friendly-Code"><a href="#3-Graph-Friendly-vs-Non-Graph-Friendly-Code" class="headerlink" title="3. Graph-Friendly vs. Non-Graph-Friendly Code"></a>3. Graph-Friendly vs. Non-Graph-Friendly Code</h2><p>The basic rule: <strong>everything captured must be identical on every replay</strong> — same operations, same shapes, same memory addresses.</p>
+<p>The interactive checker below lets you click each line of code to determine whether it is Graph-Friendly:</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/extra/cudagraph-checker.html" loading="lazy" style="width:100%;height:480px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<table>
+<thead>
+<tr>
+<th>Operations That Break Graph Capture</th>
+<th>Graph-Friendly Patterns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Data-dependent control flow</td>
+<td>Fixed-shape tensor ops (matmul, conv)</td>
+</tr>
+<tr>
+<td>Dynamic tensor shapes</td>
+<td>In-place buffer updates (<code>.copy_()</code>)</td>
+</tr>
+<tr>
+<td>Memory allocation &#x2F; deallocation</td>
+<td>Static control flow (no runtime branches)</td>
+</tr>
+<tr>
+<td>CPU-GPU sync (<code>.item()</code>, <code>.cpu()</code>)</td>
+<td>Pre-allocated memory pools</td>
+</tr>
+<tr>
+<td><code>print</code> on GPU tensors</td>
+<td>Fixed kernel grid dimensions</td>
+</tr>
+<tr>
+<td>Variable-length loops</td>
+<td>cuDNN&#x2F;cuBLAS with fixed parameters</td>
+</tr>
+<tr>
+<td><code>cudaMalloc</code> &#x2F; <code>cudaFree</code></td>
+<td>Pad to max shape + masking</td>
+</tr>
+<tr>
+<td><code>cudaStreamSynchronize</code></td>
+<td>Condition checks performed outside the graph</td>
+</tr>
+</tbody></table>
+<h2 id="4-Memory-Model-Why-Addresses-Matter"><a href="#4-Memory-Model-Why-Addresses-Matter" class="headerlink" title="4. Memory Model: Why Addresses Matter"></a>4. Memory Model: Why Addresses Matter</h2><p><strong>During Capture</strong> the GPU memory layout is recorded:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">0x7f00_0000 → input_buffer  [4, 512]<br>0x7f00_2000 → weight_1      [512, 512]<br>0x7f01_0000 → intermediate  [4, 512]<br>0x7f01_2000 → output_buffer [4, 512]<br></code></pre></td></tr></table></figure>
+
+<p><strong>During Replay</strong> the same addresses must be used — only the data can change. If a tensor gets reallocated to a new address (e.g., <code>0x7f02_0000 → new_alloc [8, 512]</code>), the replay will fail.</p>
+<blockquote>
+<p><strong>Key rule</strong>: You can modify the <em>data</em> at a recorded address (via <code>.copy_()</code>), but you cannot change the address itself. This means: no reallocating memory, no changing shapes, no creating new tensors during replay.</p>
+</blockquote>
+<h2 id="5-Strategies-for-Efficient-Use"><a href="#5-Strategies-for-Efficient-Use" class="headerlink" title="5. Strategies for Efficient Use"></a>5. Strategies for Efficient Use</h2><h3 id="Strategy-1-Graph-Pool-Cache"><a href="#Strategy-1-Graph-Pool-Cache" class="headerlink" title="Strategy 1: Graph Pool &#x2F; Cache"></a>Strategy 1: Graph Pool &#x2F; Cache</h3><p>Cache graphs for known batch sizes:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Cache graphs for known batch sizes</span><br>graph_cache = &#123;&#125;<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_or_capture_graph</span>(<span class="hljs-params">batch_size</span>):<br>    <span class="hljs-keyword">if</span> batch_size <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> graph_cache:<br>        <span class="hljs-comment"># Round up to the nearest power of 2</span><br>        padded = next_power_of_2(batch_size)<br>        static_input = torch.zeros(padded, <span class="hljs-number">512</span>, device=<span class="hljs-string">&#x27;cuda&#x27;</span>)<br>        g = torch.cuda.CUDAGraph()<br>        <span class="hljs-keyword">with</span> torch.cuda.graph(g):<br>            static_output = model(static_input)<br>        graph_cache[padded] = (g, static_input, static_output)<br>    <span class="hljs-keyword">return</span> graph_cache[next_power_of_2(batch_size)]<br><br><span class="hljs-comment"># Usage: batches 1-32 only need ~5 graphs</span><br><span class="hljs-comment"># Sizes: 1, 2, 4, 8, 16, 32</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Strategy-2-Segmented-Pipeline"><a href="#Strategy-2-Segmented-Pipeline" class="headerlink" title="Strategy 2: Segmented Pipeline"></a>Strategy 2: Segmented Pipeline</h3><p>Only use Graph for the static, repeated core; let dynamic pre&#x2F;post-processing run normally:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">Dynamic Tokenize → Dynamic Pad/Batch → ⚡ CUDA Graph (Transformer Layers) → Dynamic Decode → Dynamic Output<br></code></pre></td></tr></table></figure>
+
+<h3 id="Strategy-3-LLM-Decode-Mode-Best-Use-Case"><a href="#Strategy-3-LLM-Decode-Mode-Best-Use-Case" class="headerlink" title="Strategy 3: LLM Decode Mode (Best Use Case)"></a>Strategy 3: LLM Decode Mode (Best Use Case)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># LLM inference: prefill is dynamic, decode is static</span><br><br><span class="hljs-comment"># Phase 1: Prefill (variable sequence length - no graph)</span><br>kv_cache = model.prefill(prompt_tokens)  <span class="hljs-comment"># dynamic shape</span><br><br><span class="hljs-comment"># Phase 2: Decode (1 token in, 1 token out - use graph)</span><br>decode_graph = capture_decode_step(model, kv_cache)<br><br><span class="hljs-keyword">for</span> step <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_new_tokens):<br>    <span class="hljs-comment"># Every step executes exactly the same operations!</span><br>    token_input.copy_(last_token)<br>    decode_graph.replay()  <span class="hljs-comment"># ⚡ single launch executes the entire layer stack</span><br>    next_token = sample(logits_output)<br>    <span class="hljs-keyword">if</span> next_token == eos:<br>        <span class="hljs-keyword">break</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Why this scenario works so well</strong>: Every decode step executes exactly the same operations and shapes (1 token). The only thing that changes is the data content. This is the perfect use case for CUDA Graph.</p>
+</blockquote>
+<h2 id="6-When-Does-CUDA-Graph-Actually-Help"><a href="#6-When-Does-CUDA-Graph-Actually-Help" class="headerlink" title="6. When Does CUDA Graph Actually Help?"></a>6. When Does CUDA Graph Actually Help?</h2><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Without Graph</th>
+<th>With Graph</th>
+<th>Speedup</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLM Decode (small model)</td>
+<td>~2.1ms&#x2F;token</td>
+<td>~0.7ms&#x2F;token</td>
+<td>3x</td>
+</tr>
+<tr>
+<td>ResNet-50 inference</td>
+<td>~4.2ms</td>
+<td>~2.8ms</td>
+<td>1.5x</td>
+</tr>
+<tr>
+<td>Large matmul (4096×4096)</td>
+<td>~12ms</td>
+<td>~11.5ms</td>
+<td>1.04x</td>
+</tr>
+<tr>
+<td>Training step (many small kernels)</td>
+<td>~8ms</td>
+<td>~5ms</td>
+<td>1.6x</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Rules of thumb</strong>:</p>
+<ul>
+<li><strong>Many small kernels (each &lt;100μs)</strong> → huge gains (2–5x)</li>
+<li><strong>Medium kernels (100μs – 1ms)</strong> → moderate gains (1.3–2x)</li>
+<li><strong>Few large kernels (each &gt;10ms)</strong> → almost no gain (&lt;1.1x)</li>
+</ul>
+</blockquote>
+<h2 id="7-Refactoring-Patterns-Before-After"><a href="#7-Refactoring-Patterns-Before-After" class="headerlink" title="7. Refactoring Patterns: Before &amp; After"></a>7. Refactoring Patterns: Before &amp; After</h2><h3 id="Pattern-1-Dynamic-Shapes-→-Padded-Static-Shapes"><a href="#Pattern-1-Dynamic-Shapes-→-Padded-Static-Shapes" class="headerlink" title="Pattern 1: Dynamic Shapes → Padded Static Shapes"></a>Pattern 1: Dynamic Shapes → Padded Static Shapes</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Before (dynamic): batch size changes every iteration</span><br><span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> loader:<br>    out = model(batch)  <span class="hljs-comment"># batch.shape[0] varies!</span><br><br><span class="hljs-comment"># After (Graph-Friendly): fixed buffer, pad smaller batches</span><br>static_input = torch.zeros(MAX_BATCH, DIM)<br><span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> loader:<br>    static_input[:<span class="hljs-built_in">len</span>(batch)].copy_(batch)<br>    graph.replay()<br>    out = static_output[:<span class="hljs-built_in">len</span>(batch)]<br></code></pre></td></tr></table></figure>
+
+<h3 id="Pattern-2-Conditional-Logic-→-Multiple-Graphs"><a href="#Pattern-2-Conditional-Logic-→-Multiple-Graphs" class="headerlink" title="Pattern 2: Conditional Logic → Multiple Graphs"></a>Pattern 2: Conditional Logic → Multiple Graphs</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Before (data-dependent branching)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-keyword">if</span> x.mean() &gt; <span class="hljs-number">0</span>:  <span class="hljs-comment"># GPU sync!</span><br>        <span class="hljs-keyword">return</span> path_a(x)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> path_b(x)<br><br><span class="hljs-comment"># After (Graph-Friendly): capture each path as a separate graph</span><br>graph_a = capture(path_a, static_input)<br>graph_b = capture(path_b, static_input)<br><br><span class="hljs-comment"># Check the condition outside the graph</span><br><span class="hljs-keyword">if</span> condition:  <span class="hljs-comment"># decide before replay</span><br>    graph_a.replay()<br><span class="hljs-keyword">else</span>:<br>    graph_b.replay()<br></code></pre></td></tr></table></figure>
+
+<h3 id="Pattern-3-Internal-Allocation-→-Pre-allocated-Pool"><a href="#Pattern-3-Internal-Allocation-→-Pre-allocated-Pool" class="headerlink" title="Pattern 3: Internal Allocation → Pre-allocated Pool"></a>Pattern 3: Internal Allocation → Pre-allocated Pool</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Before (allocates memory on every call)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">x</span>):<br>    tmp = torch.empty_like(x)  <span class="hljs-comment"># new allocation every call!</span><br>    tmp = x * <span class="hljs-number">2</span><br>    <span class="hljs-keyword">return</span> tmp + <span class="hljs-number">1</span><br><br><span class="hljs-comment"># After (Graph-Friendly): allocate once</span><br><span class="hljs-variable language_">self</span>.tmp = torch.empty(FIXED_SHAPE)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-comment"># Reuse the existing buffer</span><br>    <span class="hljs-variable language_">self</span>.tmp.mul_(<span class="hljs-number">0</span>).add_(x).mul_(<span class="hljs-number">2</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.tmp + <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="8-Decision-Flowchart-Should-You-Use-CUDA-Graph"><a href="#8-Decision-Flowchart-Should-You-Use-CUDA-Graph" class="headerlink" title="8. Decision Flowchart: Should You Use CUDA Graph?"></a>8. Decision Flowchart: Should You Use CUDA Graph?</h2><p>Answer each question in order; all must be “yes” to recommend it:</p>
+<ol>
+<li>Does the workload execute repeatedly with the same shapes? (No → skip)</li>
+<li>Are the kernels small (each &lt;1ms)? (No → probably not worth it)</li>
+<li>Can all memory be pre-allocated? (No → refactor first)</li>
+<li>No data-dependent branches inside? (No → split into multiple segments)</li>
+<li>Will it be replayed many times (&gt;100)? (No → skip)</li>
+</ol>
+<blockquote>
+<p>All satisfied → <strong>Use CUDA Graph!</strong> Expect 1.5–5x speedup.</p>
+</blockquote>
+<h2 id="9-Common-Pitfalls-and-Solutions"><a href="#9-Common-Pitfalls-and-Solutions" class="headerlink" title="9. Common Pitfalls and Solutions"></a>9. Common Pitfalls and Solutions</h2><p><strong>Pitfall: Forgetting to Warm Up Before Capture</strong>. CUDA lazily initializes its context, cuDNN algorithm selection, and JIT compilation. If you capture before warming up, these one-time operations get baked into the graph.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Always warm up 3+ iterations before capture</span><br><span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">11</span>):  <span class="hljs-comment"># NVIDIA recommends 11</span><br>    _ = model(static_input)<br>torch.cuda.synchronize()<br><span class="hljs-comment"># Now start capture</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>Pitfall: Forgetting <code>.clone()</code> When Using Graph Output</strong>. The output tensor is a fixed buffer; if you don’t clone it before the next replay, the data will be overwritten.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">graph.replay()<br>result = static_output.clone()  <span class="hljs-comment"># must clone if you need to keep the reference</span><br>graph.replay()  <span class="hljs-comment"># static_output now holds new data</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>Pitfall: cuDNN Benchmark Mode</strong>. cuDNN benchmark mode selects different algorithms across runs; the graph may capture a suboptimal one.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Disable before capture, or do enough warmup to let it stabilize</span><br>torch.backends.cudnn.benchmark = <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>Pitfall: Graph Pool Memory Fragmentation</strong>. Each graph captures its own memory pool; too many graphs leads to GPU memory fragmentation. Use a shared pool instead.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Share a memory pool across multiple graphs</span><br>pool = torch.cuda.graph_pool_handle()<br><span class="hljs-keyword">with</span> torch.cuda.graph(g1, pool=pool):<br>    ...<br><span class="hljs-keyword">with</span> torch.cuda.graph(g2, pool=pool):<br>    ...<br></code></pre></td></tr></table></figure>
+
+<p><strong>Pitfall: Gradient Accumulation Inside a Graph</strong>. If you graph a training step, gradients accumulate in the same buffer — be careful about where you zero gradients (inside or outside the graph).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Include zero_grad inside the captured graph</span><br><span class="hljs-keyword">with</span> torch.cuda.graph(g):<br>    optimizer.zero_grad(set_to_none=<span class="hljs-literal">True</span>)<br>    loss = model(static_input)<br>    loss.backward()<br>    <span class="hljs-comment"># Don&#x27;t include optimizer.step() if it has dynamic behavior</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="10-Quick-Reference-Card"><a href="#10-Quick-Reference-Card" class="headerlink" title="10. Quick Reference Card"></a>10. Quick Reference Card</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Basic capture</span><br>g = torch.cuda.CUDAGraph()<br><span class="hljs-keyword">with</span> torch.cuda.graph(g):<br>    out = model(inp)<br>g.replay()<br><br><span class="hljs-comment"># With shared memory pool</span><br>pool = torch.cuda.graph_pool_handle()<br><span class="hljs-keyword">with</span> torch.cuda.graph(g, pool=pool):<br>    ...<br><br><span class="hljs-comment"># High-level helper</span><br>model = torch.cuda.make_graphed_callables(model, (sample_input,))<br></code></pre></td></tr></table></figure>
+
+<p><strong>Pre-graph Checklist</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> All tensor shapes are fixed</li>
+<li><input disabled="" type="checkbox"> No <code>.item()</code> &#x2F; <code>.cpu()</code> &#x2F; print inside</li>
+<li><input disabled="" type="checkbox"> No dynamic memory allocation inside</li>
+<li><input disabled="" type="checkbox"> No data-dependent branches</li>
+<li><input disabled="" type="checkbox"> Warmup iterations completed</li>
+<li><input disabled="" type="checkbox"> <code>cudnn.benchmark</code> disabled or stabilized</li>
+<li><input disabled="" type="checkbox"> Outputs cloned before next replay</li>
+<li><input disabled="" type="checkbox"> Will replay &gt;100 times</li>
+</ul>
+<hr>
+<blockquote>
+<p>This post’s body is rendered Markdown, with 2 interactive animations embedded as isolated iframes via the custom {% anim %} tag, sourced from the <a target="_blank" rel="noopener" href="https://github.com/dreamyang-liu/TC">Arkive</a> tutorial.</p>
+</blockquote>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

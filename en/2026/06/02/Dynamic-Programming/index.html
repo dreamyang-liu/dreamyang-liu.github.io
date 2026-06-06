@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Dynamic Programming | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-%E2%80%94-Non-overlapping-Subproblems"><span class="toc-text">Intuition — Non-overlapping Subproblems</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Three-Paradigms"><span class="toc-text">Three Paradigms</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linear-DP-%E2%80%94-Climbing-Stairs-Style"><span class="toc-text">Linear DP — Climbing Stairs Style</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LIS-%E2%80%94-Picking-a-Subsequence"><span class="toc-text">LIS — Picking a Subsequence</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Knapsack-%E2%80%94-Multi-stage-Decision-Making"><span class="toc-text">Knapsack — Multi-stage Decision Making</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Template-%E2%80%94-Python"><span class="toc-text">Template — Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Space-Optimization-%E2%80%94-Rolling-Array"><span class="toc-text">Space Optimization — Rolling Array</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mnemonics-Common-Pitfalls"><span class="toc-text">Mnemonics &#x2F; Common Pitfalls</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exercises"><span class="toc-text">Exercises</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode-Practice"><span class="toc-text">LeetCode Practice</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Dynamic Programming</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Dynamic Programming.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Dynamic Programming</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Dynamic Programming</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>DP = subproblems + no redundant computation. It compresses exponential search into polynomial time — all by “never recomputing what you’ve already computed.”</p>
+<span id="more"></span>
+
+<h2 id="Intuition-—-Non-overlapping-Subproblems"><a href="#Intuition-—-Non-overlapping-Subproblems" class="headerlink" title="Intuition — Non-overlapping Subproblems"></a>Intuition — Non-overlapping Subproblems</h2><p>DP really boils down to two steps. Memorize them:</p>
+<ol>
+<li><strong>State definition</strong>: <code>dp[i][j]</code> represents some property of “the first i / first j” elements (length, count, feasibility, optimal value). Get the state right and the problem is halfway solved.</li>
+<li><strong>Transition equation</strong>: how to build the current <code>dp[i][j]</code> from smaller subproblems.</li>
+</ol>
+<p><strong>Two hallmarks of a DP problem</strong>:</p>
+<ul>
+<li><strong>Optimal substructure</strong>: the optimal solution to the large problem is built from optimal solutions to smaller subproblems.</li>
+<li><strong>No aftereffect</strong>: once the current state is determined, how you got there has no bearing on future decisions.</li>
+</ul>
+<p>Two equivalent implementations — pick whichever feels natural:</p>
+<ul>
+<li><strong>Memoized recursion (top-down)</strong>: looks like brute-force search; slap <code>@cache</code> on it and it becomes DP. No need to reason about traversal order; only computes visited subproblems.</li>
+<li><strong>Iterative table-filling (bottom-up)</strong>: compute small before large; loop order mirrors dependency order. No recursion stack, easier to optimize space.</li>
+</ul>
+<p>The animation below fills the LCS table cell by cell for <code>"ABCDE"</code> vs <code>"ACE"</code>. Green is the current cell; semi-transparent green marks the three cells it depends on (left, above, upper-left). The lower half puts 0/1 knapsack (reverse order) and unbounded knapsack (forward order) side-by-side on the same data. Watch one thing: <strong>the value of the current cell always comes from cells that have already been filled</strong> — that is exactly “no aftereffect.”</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/dp.html" loading="lazy" style="width:100%;height:520px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="Three-Paradigms"><a href="#Three-Paradigms" class="headerlink" title="Three Paradigms"></a>Three Paradigms</h2><p>Master three archetypal problems and 90% of DP questions are just variations of them.</p>
+<h3 id="Linear-DP-—-Climbing-Stairs-Style"><a href="#Linear-DP-—-Climbing-Stairs-Style" class="headerlink" title="Linear DP — Climbing Stairs Style"></a>Linear DP — Climbing Stairs Style</h3><p>State depends on only a fixed number of earlier positions. A one-dimensional array suffices.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 70. Climbing Stairs</span><br>dp[i] = dp[i-<span class="hljs-number">1</span>] + dp[i-<span class="hljs-number">2</span>]<br><span class="hljs-comment"># dp[0] = dp[1] = 1</span><br></code></pre></td></tr></table></figure>
+
+<p>Same pattern: House Robber (<code>dp[i] = max(dp[i-1], dp[i-2]+nums[i])</code>), Maximum Subarray, Minimum Path Sum.</p>
+<h3 id="LIS-—-Picking-a-Subsequence"><a href="#LIS-—-Picking-a-Subsequence" class="headerlink" title="LIS — Picking a Subsequence"></a>LIS — Picking a Subsequence</h3><p><code>dp[i] = length of the longest increasing subsequence ending at nums[i]</code>. Note it’s “ending at i,” not “among the first i” — otherwise you can’t write the transition.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># O(n^2)</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    dp[i] = <span class="hljs-number">1</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(i):<br>        <span class="hljs-keyword">if</span> nums[j] &lt; nums[i]:<br>            dp[i] = <span class="hljs-built_in">max</span>(dp[i], dp[j] + <span class="hljs-number">1</span>)<br>ans = <span class="hljs-built_in">max</span>(dp)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>There is also an <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.847ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4352.3 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D442" d="M740 435Q740 320 676 213T511 42T304 -22Q207 -22 138 35T51 201Q50 209 50 244Q50 346 98 438T227 601Q351 704 476 704Q514 704 524 703Q621 689 680 617T740 435ZM637 476Q637 565 591 615T476 665Q396 665 322 605Q242 542 200 428T157 216Q157 126 200 73T314 19Q404 19 485 98T608 313Q637 408 637 476Z"></path></g><g data-mml-node="mo" transform="translate(763,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(1152,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(1918.7,0)"><path data-c="6C" d="M42 46H56Q95 46 103 60V68Q103 77 103 91T103 124T104 167T104 217T104 272T104 329Q104 366 104 407T104 482T104 542T103 586T103 603Q100 622 89 628T44 637H26V660Q26 683 28 683L38 684Q48 685 67 686T104 688Q121 689 141 690T171 693T182 694H185V379Q185 62 186 60Q190 52 198 49Q219 46 247 46H263V0H255L232 1Q209 2 183 2T145 3T107 3T57 1L34 0H26V46H42Z"></path><path data-c="6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z" transform="translate(278,0)"></path><path data-c="67" d="M329 409Q373 453 429 453Q459 453 472 434T485 396Q485 382 476 371T449 360Q416 360 412 390Q410 404 415 411Q415 412 416 414V415Q388 412 363 393Q355 388 355 386Q355 385 359 381T368 369T379 351T388 325T392 292Q392 230 343 187T222 143Q172 143 123 171Q112 153 112 133Q112 98 138 81Q147 75 155 75T227 73Q311 72 335 67Q396 58 431 26Q470 -13 470 -72Q470 -139 392 -175Q332 -206 250 -206Q167 -206 107 -175Q29 -140 29 -75Q29 -39 50 -15T92 18L103 24Q67 55 67 108Q67 155 96 193Q52 237 52 292Q52 355 102 398T223 442Q274 442 318 416L329 409ZM299 343Q294 371 273 387T221 404Q192 404 171 388T145 343Q142 326 142 292Q142 248 149 227T179 192Q196 182 222 182Q244 182 260 189T283 207T294 227T299 242Q302 258 302 292T299 343ZM403 -75Q403 -50 389 -34T348 -11T299 -2T245 0H218Q151 0 138 -6Q118 -15 107 -34T95 -74Q95 -84 101 -97T122 -127T170 -155T250 -167Q319 -167 361 -139T403 -75Z" transform="translate(778,0)"></path></g><g data-mml-node="mo" transform="translate(3196.7,0)"><path data-c="2061" d=""></path></g><g data-mml-node="mi" transform="translate(3363.3,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(3963.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> greedy + binary search solution (maintain a monotone <code>tails</code> array, binary-search insert). Know both for interviews.</p>
+</blockquote>
+<h3 id="Knapsack-—-Multi-stage-Decision-Making"><a href="#Knapsack-—-Multi-stage-Decision-Making" class="headerlink" title="Knapsack — Multi-stage Decision Making"></a>Knapsack — Multi-stage Decision Making</h3><p>“Include or not / include how many times” for each item — the highest-frequency DP paradigm.</p>
+<p><strong>LCS / Edit Distance</strong> also fall here (“current characters match or not” is a two-way decision):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 1143. LCS</span><br><span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>] + <span class="hljs-number">1</span><br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-built_in">max</span>(dp[i-<span class="hljs-number">1</span>][j], dp[i][j-<span class="hljs-number">1</span>])<br><br><span class="hljs-comment"># 72. Edit Distance</span><br><span class="hljs-keyword">if</span> word1[i-<span class="hljs-number">1</span>] == word2[j-<span class="hljs-number">1</span>]:<br>    dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>]<br><span class="hljs-keyword">else</span>:<br>    dp[i][j] = <span class="hljs-number">1</span> + <span class="hljs-built_in">min</span>(dp[i-<span class="hljs-number">1</span>][j],    <span class="hljs-comment"># delete</span><br>                       dp[i][j-<span class="hljs-number">1</span>],    <span class="hljs-comment"># insert</span><br>                       dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>])  <span class="hljs-comment"># replace</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>0/1 Knapsack</strong>: each item used at most once. 1-D optimization → <strong>reverse capacity order</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(W, w[i]-<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>):   <span class="hljs-comment"># reverse!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j-w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+
+<p><strong>Unbounded Knapsack</strong>: each item used any number of times. 1-D optimization → <strong>forward capacity order</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(w[i], W+<span class="hljs-number">1</span>):       <span class="hljs-comment"># forward!</span><br>        dp[j] = <span class="hljs-built_in">max</span>(dp[j], dp[j-w[i]] + v[i])<br></code></pre></td></tr></table></figure>
+
+<p>Knapsack variant cheat sheet (the animation shows the difference between the two orderings):</p>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Initialization</th>
+<th>Transition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Max value</td>
+<td><code>dp = [0]*(W+1)</code></td>
+<td><code>dp[j] = max(dp[j], dp[j-w]+v)</code></td>
+</tr>
+<tr>
+<td>Count solutions</td>
+<td><code>dp[0]=1</code>, rest 0</td>
+<td><code>dp[j] += dp[j-w]</code></td>
+</tr>
+<tr>
+<td>Feasibility</td>
+<td><code>dp[0]=True</code></td>
+<td><code>dp[j] = dp[j] or dp[j-w]</code></td>
+</tr>
+<tr>
+<td>Combinations vs permutations</td>
+<td>—</td>
+<td>items outer loop = combinations; capacity outer loop = permutations</td>
+</tr>
+</tbody></table>
+<h2 id="Template-—-Python"><a href="#Template-—-Python" class="headerlink" title="Template — Python"></a>Template — Python</h2><p>Memoized recursion (least error-prone):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> cache<br><br><span class="hljs-meta">@cache</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">i, j</span>):<br>    <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> j == <span class="hljs-number">0</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>    <span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>        <span class="hljs-keyword">return</span> dfs(i-<span class="hljs-number">1</span>, j-<span class="hljs-number">1</span>) + <span class="hljs-number">1</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(dfs(i-<span class="hljs-number">1</span>, j), dfs(i, j-<span class="hljs-number">1</span>))<br><br>ans = dfs(m, n)<br>dfs.cache_clear()   <span class="hljs-comment"># clear between test cases</span><br></code></pre></td></tr></table></figure>
+
+<p>Iterative table-filling (no stack risk, easy space optimization):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">dp = [[<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m+<span class="hljs-number">1</span>)]<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, m+<span class="hljs-number">1</span>):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, n+<span class="hljs-number">1</span>):<br>        <span class="hljs-keyword">if</span> text1[i-<span class="hljs-number">1</span>] == text2[j-<span class="hljs-number">1</span>]:<br>            dp[i][j] = dp[i-<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>] + <span class="hljs-number">1</span><br>        <span class="hljs-keyword">else</span>:<br>            dp[i][j] = <span class="hljs-built_in">max</span>(dp[i-<span class="hljs-number">1</span>][j], dp[i][j-<span class="hljs-number">1</span>])<br>ans = dp[m][n]<br></code></pre></td></tr></table></figure>
+
+<h2 id="Space-Optimization-—-Rolling-Array"><a href="#Space-Optimization-—-Rolling-Array" class="headerlink" title="Space Optimization — Rolling Array"></a>Space Optimization — Rolling Array</h2><p>If <code>dp[i][...]</code> depends only on <code>dp[i-1][...]</code>, keep just two rows or even one.</p>
+<p>2-D → two rows (depends on previous row):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">prev = [<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, m+<span class="hljs-number">1</span>):<br>    cur = [<span class="hljs-number">0</span>]*(n+<span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, n+<span class="hljs-number">1</span>):<br>        ...<br>    prev = cur<br></code></pre></td></tr></table></figure>
+
+<p>2-D → one row (knapsack pattern, traversal order preserves semantics):</p>
+<ul>
+<li>0/1 knapsack: <code>j</code> <strong>reverse order</strong> — <code>dp[j-w]</code> still holds the previous round’s value (“item i not yet selected”).</li>
+<li>Unbounded knapsack: <code>j</code> <strong>forward order</strong> — <code>dp[j-w]</code> already reflects the current round’s update (“item i can be selected repeatedly”).</li>
+</ul>
+<p>Get the order wrong and items are either selected multiple times or not at all. This is the most common knapsack bug.</p>
+<h2 id="Mnemonics-Common-Pitfalls"><a href="#Mnemonics-Common-Pitfalls" class="headerlink" title="Mnemonics / Common Pitfalls"></a>Mnemonics / Common Pitfalls</h2><p><strong>Three rules of thumb</strong>:</p>
+<ul>
+<li>Define the state first, then write the transition.</li>
+<li>Cover all base cases; get the traversal order right.</li>
+<li>Roll to one row: 0/1 goes reverse, unbounded goes forward.</li>
+</ul>
+<p><strong>Common mistakes</strong>:</p>
+<ul>
+<li><strong>Off-by-one</strong>: state <code>dp[i]</code> means “first i elements” → index into the array as <code>s[i-1]</code>, not <code>s[i]</code>.</li>
+<li><strong>Missing base cases</strong>: when counting solutions, <code>dp[0]=1</code> (the empty set counts as one); when optimizing, initialize in the direction consistent with max/min.</li>
+<li><strong>Wrong LIS state</strong>: must be “ending at i,” not “among first i” — otherwise the transition cannot be written.</li>
+<li><strong>Knapsack order</strong>: reverse/forward order and which of items/capacity is the outer loop are two independent dimensions — don’t conflate them.</li>
+<li><strong>Stale cache</strong>: <code>@cache</code> leaks data across multiple test cases; call <code>cache_clear()</code> before returning from the function.</li>
+</ul>
+<h2 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h2><div class="exercise">
+<details>
+<summary><strong>Q1: Why does 0/1 knapsack require reverse capacity order? What goes wrong with forward order?</strong></summary>
+
+<p>With forward order, <code>dp[j-w[i]]</code> may already have been updated in the current round, which means item i is used more than once — that is the unbounded knapsack. Reverse order ensures <code>dp[j-w[i]]</code> still holds the previous round’s value (item i not yet selected).</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Q2: When should you choose memoized recursion vs iterative DP?</strong></summary>
+
+<p>Afraid of getting it wrong → memoized recursion (no need to think about order; only computes needed subproblems). Need to save space / large input → iterative table-filling (no stack risk; rolling array is straightforward). Python’s default recursion limit is 1000; for deep state spaces, remember <code>sys.setrecursionlimit</code>.</p>
+</details>
+</div>
+
+<div class="exercise">
+<details>
+<summary><strong>Q3: Why do "combinations" and "permutations" in knapsack require different traversal orders?</strong></summary>
+
+<p>Items as outer loop: each item is considered in a fixed order, so <code>(1,2)</code> and <code>(2,1)</code> count as one = combinations. Capacity as outer loop: every capacity scans all items, so the same set of items can appear in different orders = permutations.</p>
+</details>
+</div>
+
+<h2 id="LeetCode-Practice"><a href="#LeetCode-Practice" class="headerlink" title="LeetCode Practice"></a>LeetCode Practice</h2><p><strong>Warm-up</strong>: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/climbing-stairs/">70. Climbing Stairs</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/house-robber/">198. House Robber</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-subarray/">53. Maximum Subarray</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-subsequence/">300. LIS</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/coin-change/">322. Coin Change</a></p>
+<p><strong>Advanced</strong>: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-common-subsequence/">1143. LCS</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/edit-distance/">72. Edit Distance</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/partition-equal-subset-sum/">416. Partition Equal Subset Sum</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/target-sum/">494. Target Sum</a>, <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/coin-change-ii/">518. Coin Change II</a></p>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>

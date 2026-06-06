@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Topological Sort | Mengyang Liu&#39;s Blog</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+  <!-- 添加代码高亮样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <!-- 添加highlight.js库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- 添加mermaid.js库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="/css/code.css">
+  <link rel="stylesheet" href="/css/code-custom.css">
+  <link rel="stylesheet" href="/css/code-languages.css">
+  <link rel="stylesheet" href="/css/mermaid.css">
+
+  <link rel="stylesheet" href="/css/vscode.css">
+  <link rel="stylesheet" href="/css/post.css">
+  <link rel="stylesheet" href="/css/tag.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/search.css">
+  <link rel="stylesheet" href="/css/mobile.css">  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/elements.css">
+
+  <!-- 添加 JetBrains Mono 字体 -->  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Add any custom head content here -->
+
+  <script src="/js/explorer.js"></script>
+  <script src="/js/code-copy.js"></script>
+  <script src="/js/code-enhance.js"></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+    <div class="wrapper">
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+<header class="vs-header">
+  <nav class="vs-nav">
+    <div class="nav-left">
+      <a href="/en/mlsys/" class="nav-brand">
+        <i class="fas fa-terminal"></i>
+        Mengyang Liu&#39;s Blog
+      </a>
+    </div>
+
+    <div class="nav-right">
+      
+        <a href="/en/mlsys/" class="nav-item">
+          <i class="fas fa-microchip"></i>
+          <span>ML Systems</span>
+        </a>
+        <a href="/en/algorithms/" class="nav-item">
+          <i class="fas fa-code"></i>
+          <span>Algorithms</span>
+        </a>
+      
+
+      <a href="#" class="nav-item lang-toggle"
+         data-lang="en"
+         data-has-counterpart="true">
+        <i class="fas fa-language"></i>
+        <span>中文</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function smoothScroll(event, target) {
+    event.preventDefault();
+    const targetId = target.substring(target.indexOf('#') + 1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 50, // 调整偏移量
+        behavior: 'smooth'
+      });
+    } else {
+      window.location.href = target;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    const header = document.querySelector('.vs-header');
+    const nav = document.querySelector('.vs-nav');
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    nav.style.setProperty('--scroll-percent', `${scrollPercent}%`);
+    
+    if (window.scrollY > 0) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // 添加标签页切换动画
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('nav-ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => ripple.remove(), 1000);
+    });
+  });
+
+  // 语言切换：纯路径前缀切换
+  document.querySelectorAll('.lang-toggle').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = window.location.pathname;
+      var lang = el.getAttribute('data-lang');
+      var hasCounterpart = el.getAttribute('data-has-counterpart') === 'true';
+      var target;
+      if (lang === 'en') {
+        target = path.replace(/^\/en(\/|$)/, '/');
+      } else if (hasCounterpart) {
+        target = '/en' + path;
+      } else {
+        target = '/en/mlsys/';
+      }
+      window.location.href = target;
+    });
+  });
+</script>
+
+
+<div class="vscode-container">
+  <!-- Left explorer sidebar -->
+  <div class="sidebar-explorer">
+    <!-- TOC navigation -->
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <span>TABLE OF CONTENTS</span>
+      </div>
+      <div class="section-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intuition-%E2%80%94-%E2%80%9CFirst-Come-First-Served%E2%80%9D-on-a-DAG"><span class="toc-text">Intuition — “First Come First Served” on a DAG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Two-Implementations-%E2%80%94-Kahn-BFS-and-DFS-Post-Order"><span class="toc-text">Two Implementations — Kahn (BFS) and DFS Post-Order</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kahn%E2%80%99s-Algorithm-%E2%80%94-Push-Zero-In-Degree-Nodes-Into-the-Queue"><span class="toc-text">Kahn’s Algorithm — Push Zero-In-Degree Nodes Into the Queue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DFS-Post-Order-Reversal-%E2%80%94-Stack-Exit-Order-Is-Topological-Order"><span class="toc-text">DFS Post-Order Reversal — Stack-Exit Order Is Topological Order</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Which-One-to-Choose"><span class="toc-text">Which One to Choose</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Free-Cycle-Detection-%E2%80%94-Using-Topological-Sort-to-Validate-a-DAG"><span class="toc-text">Free Cycle Detection — Using Topological Sort to Validate a DAG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-Problems-%E2%80%94-Course-Schedule-Task-Scheduling"><span class="toc-text">Classic Problems — Course Schedule &#x2F; Task Scheduling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory-Aid"><span class="toc-text">Memory Aid</span></a></li></ol>
+      </div>
+    </div>
+
+    <!-- Article tags (plain text, from front-matter array) -->
+    
+    <div class="explorer-section">
+      <div class="section-header">
+        <i class="fas fa-tags"></i>
+        <span>ARTICLE TAGS</span>
+      </div>
+      <div class="section-content">
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Graph Theory</span>
+          </div>
+        
+          <div class="tag-item">
+            <i class="fas fa-tag"></i>
+            <span>Topological Sort</span>
+          </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Main content area -->
+  <div class="editor-content">
+    <div class="tab-bar">
+      <div class="tab active">
+        <i class="fas fa-file-alt"></i>
+        <span>Topological Sort.md</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <article class="post-content">
+        <div class="post-header">
+          <h1>Topological Sort</h1>
+          <div class="post-meta">
+            <span class="date">
+              <i class="fas fa-calendar-alt"></i>
+              2026-06-02
+            </span>
+            
+              <span class="tags">
+                <i class="fas fa-tags"></i>
+                <div class="tags-list">
+                  
+                    <span class="tag-item-post">Graph Theory</span>
+                  
+                    <span class="tag-item-post">Topological Sort</span>
+                  
+                </div>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="post-body vscode-markdown">
+          <p>Order all nodes in a DAG so that <strong>every edge points from an earlier node to a later one</strong>. Know both implementations by heart: Kahn’s algorithm (BFS in-degree method) and DFS post-order reversal. Cycle detection comes for free.</p>
+<span id="more"></span>
+
+<h2 id="Intuition-—-“First-Come-First-Served”-on-a-DAG"><a href="#Intuition-—-“First-Come-First-Served”-on-a-DAG" class="headerlink" title="Intuition — “First Come First Served” on a DAG"></a>Intuition — “First Come First Served” on a DAG</h2><p>Topological sort solves exactly one problem: <strong>given a bunch of tasks with dependencies, find an order that lets you complete them one by one</strong>.</p>
+<p>More formally: given a directed acyclic graph (DAG), arrange all nodes in a line so that for every edge <code>u → v</code>, <code>u</code> appears before <code>v</code>.</p>
+<p>Analogies:</p>
+<ul>
+<li>Course prerequisites: prerequisite courses come before the courses that depend on them.</li>
+<li><code>make</code> build system: targets that are depended on get compiled first.</li>
+<li>Task scheduling: predecessor tasks execute first.</li>
+</ul>
+<p>The critical requirement is <strong>no cycles</strong>. With a cycle it’s impossible to say who comes first, which is why topological sort naturally doubles as a DAG validator.</p>
+<p>The animation below uses a 6-node DAG <code>0→2, 0→3, 1→3, 2→4, 3→4, 3→5</code> to walk through Kahn’s algorithm. <strong>Focus on two things</strong>: how the in-degree array changes on the right, and the order in which nodes are enqueued in the output sequence. Read the template after watching — the code is just the animation’s moves translated into Python.</p>
+
+<script>
+(function () {
+  if (window.__tcAnimInit) return;
+  window.__tcAnimInit = true;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'tc-anim-height') return;
+    var frames = document.querySelectorAll('iframe.tc-anim-frame');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = e.data.height + 'px';
+      }
+    }
+  });
+})();
+</script><iframe class="tc-anim-frame" src="/anim/algo/topological-sort.html" loading="lazy" style="width:100%;height:360px;border:0;display:block;margin:1.5rem 0;background:transparent;overflow:hidden;" scrolling="no"></iframe>
+
+<h2 id="Two-Implementations-—-Kahn-BFS-and-DFS-Post-Order"><a href="#Two-Implementations-—-Kahn-BFS-and-DFS-Post-Order" class="headerlink" title="Two Implementations — Kahn (BFS) and DFS Post-Order"></a>Two Implementations — Kahn (BFS) and DFS Post-Order</h2><h3 id="Kahn’s-Algorithm-—-Push-Zero-In-Degree-Nodes-Into-the-Queue"><a href="#Kahn’s-Algorithm-—-Push-Zero-In-Degree-Nodes-Into-the-Queue" class="headerlink" title="Kahn’s Algorithm — Push Zero-In-Degree Nodes Into the Queue"></a>Kahn’s Algorithm — Push Zero-In-Degree Nodes Into the Queue</h3><p>One sentence: <strong>count in-degrees; push all nodes with in-degree 0 into the queue; each time you pop a node, decrement its neighbors’ in-degrees, and re-enqueue any that hit 0</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">topo_sort_kahn</span>(<span class="hljs-params">n, edges</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    indeg = [<span class="hljs-number">0</span>] * n<br>    <span class="hljs-keyword">for</span> u, v <span class="hljs-keyword">in</span> edges:<br>        g[u].append(v)<br>        indeg[v] += <span class="hljs-number">1</span><br>    q = deque(i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n) <span class="hljs-keyword">if</span> indeg[i] == <span class="hljs-number">0</span>)<br>    order = []<br>    <span class="hljs-keyword">while</span> q:<br>        u = q.popleft()<br>        order.append(u)<br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>            indeg[v] -= <span class="hljs-number">1</span><br>            <span class="hljs-keyword">if</span> indeg[v] == <span class="hljs-number">0</span>:<br>                q.append(v)<br>    <span class="hljs-keyword">return</span> order <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(order) == n <span class="hljs-keyword">else</span> []  <span class="hljs-comment"># empty = cycle exists</span><br></code></pre></td></tr></table></figure>
+
+<p>Intuitive, controllable, easy to adapt. To get the lexicographically smallest topological order, swap <code>deque</code> for a min-heap (<code>heapq</code>).</p>
+<h3 id="DFS-Post-Order-Reversal-—-Stack-Exit-Order-Is-Topological-Order"><a href="#DFS-Post-Order-Reversal-—-Stack-Exit-Order-Is-Topological-Order" class="headerlink" title="DFS Post-Order Reversal — Stack-Exit Order Is Topological Order"></a>DFS Post-Order Reversal — Stack-Exit Order Is Topological Order</h3><p>One sentence: <strong>once DFS finishes a node, push it onto a stack; reversing at the end gives topological order</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">topo_sort_dfs</span>(<span class="hljs-params">n, edges</span>):<br>    g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>    <span class="hljs-keyword">for</span> u, v <span class="hljs-keyword">in</span> edges:<br>        g[u].append(v)<br>    color = [<span class="hljs-number">0</span>] * n  <span class="hljs-comment"># 0=white (unvisited), 1=gray (on stack), 2=black (done)</span><br>    order = []<br>    has_cycle = <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">dfs</span>(<span class="hljs-params">u</span>):<br>        <span class="hljs-keyword">nonlocal</span> has_cycle<br>        color[u] = <span class="hljs-number">1</span><br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>            <span class="hljs-keyword">if</span> color[v] == <span class="hljs-number">1</span>:        <span class="hljs-comment"># gray meets gray → cycle</span><br>                has_cycle = <span class="hljs-literal">True</span><br>            <span class="hljs-keyword">elif</span> color[v] == <span class="hljs-number">0</span>:<br>                dfs(v)<br>        color[u] = <span class="hljs-number">2</span><br>        order.append(u)              <span class="hljs-comment"># post-order push</span><br><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>        <span class="hljs-keyword">if</span> color[i] == <span class="hljs-number">0</span>:<br>            dfs(i)<br>    <span class="hljs-keyword">return</span> [] <span class="hljs-keyword">if</span> has_cycle <span class="hljs-keyword">else</span> order[::-<span class="hljs-number">1</span>]<br></code></pre></td></tr></table></figure>
+
+<p>Why does reversing post-order give topological order? Because before node <code>u</code> exits the stack, all of its successors have already exited. <strong>Nodes that exit later must come earlier in the final order</strong>, so we flip at the end.</p>
+<h3 id="Which-One-to-Choose"><a href="#Which-One-to-Choose" class="headerlink" title="Which One to Choose"></a>Which One to Choose</h3><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Choose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stable, controllable, layer-by-layer processing</td>
+<td>Kahn</td>
+</tr>
+<tr>
+<td>Lexicographically smallest order</td>
+<td>Kahn + min-heap</td>
+</tr>
+<tr>
+<td>Shorter code &#x2F; also need SCC</td>
+<td>DFS</td>
+</tr>
+<tr>
+<td>Reverse topological order (DAG DP from sinks)</td>
+<td>DFS (post-order is already reverse topo)</td>
+</tr>
+<tr>
+<td>Very large graph, worried about recursion stack overflow</td>
+<td>Kahn</td>
+</tr>
+</tbody></table>
+<h2 id="Free-Cycle-Detection-—-Using-Topological-Sort-to-Validate-a-DAG"><a href="#Free-Cycle-Detection-—-Using-Topological-Sort-to-Validate-a-DAG" class="headerlink" title="Free Cycle Detection — Using Topological Sort to Validate a DAG"></a>Free Cycle Detection — Using Topological Sort to Validate a DAG</h2><p>Cycle detection is a byproduct of topological sort — <strong>both implementations include it for free</strong>, no separate algorithm needed.</p>
+<p><strong>Kahn’s method</strong>: after the run, check <code>len(order)</code>. If <code>&lt; n</code>, some nodes have an in-degree that never reached 0 — they’re stuck in a cycle → cycle exists.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">order = topo_sort_kahn(n, edges)<br>is_dag = <span class="hljs-built_in">len</span>(order) == n<br></code></pre></td></tr></table></figure>
+
+<p><strong>DFS method</strong>: <strong>gray meets gray means a cycle</strong> in three-color marking. Gray means “currently on the DFS path”; encountering a gray node again means we’ve walked back to ourselves, forming a back edge.</p>
+<p>Two reminders:</p>
+<ol>
+<li>You can’t use topological sort to detect cycles in an undirected graph (undirected graphs have no “in-degree” concept). Use union-find or DFS checking for non-parent visits instead.</li>
+<li>If you only need to detect a cycle without outputting the order, Kahn’s method can just keep a counter instead of storing <code>order</code>, saving some memory.</li>
+</ol>
+<h2 id="Classic-Problems-—-Course-Schedule-Task-Scheduling"><a href="#Classic-Problems-—-Course-Schedule-Task-Scheduling" class="headerlink" title="Classic Problems — Course Schedule &#x2F; Task Scheduling"></a>Classic Problems — Course Schedule &#x2F; Task Scheduling</h2><p><strong>LC 207. Course Schedule</strong>: given <code>numCourses</code> and prerequisites <code>[[a, b], ...]</code> (you must take <code>b</code> before <code>a</code>), determine whether you can finish all courses. This is essentially just validating a DAG.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">canFinish</span>(<span class="hljs-params">self, n, prerequisites</span>):<br>        g = [[] <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n)]<br>        indeg = [<span class="hljs-number">0</span>] * n<br>        <span class="hljs-keyword">for</span> a, b <span class="hljs-keyword">in</span> prerequisites:<br>            g[b].append(a)            <span class="hljs-comment"># b must come before a, so edge b→a</span><br>            indeg[a] += <span class="hljs-number">1</span><br>        q = deque(i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n) <span class="hljs-keyword">if</span> indeg[i] == <span class="hljs-number">0</span>)<br>        done = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">while</span> q:<br>            u = q.popleft()<br>            done += <span class="hljs-number">1</span><br>            <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> g[u]:<br>                indeg[v] -= <span class="hljs-number">1</span><br>                <span class="hljs-keyword">if</span> indeg[v] == <span class="hljs-number">0</span>:<br>                    q.append(v)<br>        <span class="hljs-keyword">return</span> done == n<br></code></pre></td></tr></table></figure>
+
+<p><strong>LC 210. Course Schedule II</strong>: same graph, output the course order. Replace <code>done += 1</code> with <code>order.append(u)</code>, then <code>return order if len(order) == n else []</code>.</p>
+<p><strong>Classic trap</strong>: edge direction. The problem says “you must take b before a”, meaning b is the prerequisite for a, so the graph edge should be <code>b → a</code> (b before a). Reversing the direction and getting WA is a rite of passage.</p>
+<p>Other must-solve problems:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-eventual-safe-states/">LC 802. Find Eventual Safe States</a> — reverse graph + topological sort; safe &#x3D; all paths terminate</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/alien-dictionary/">LC 269. Alien Dictionary</a> — build edges from the first differing character of adjacent words, run topo sort</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">LC 310. Minimum Height Trees</a> — topo-sort-like, peel leaf nodes (degree&#x3D;1) each round; the last 1–2 nodes are the answer</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-path-in-a-matrix/">LC 329. Longest Increasing Path in a Matrix</a> — DP on a DAG, can use memoized DFS or topological DP</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/">LC 2192. All Ancestors of a Node in a Directed Acyclic Graph</a> — merge ancestor sets in topological order</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/largest-color-value-in-a-directed-graph/">LC 1857. Largest Color Value in a Directed Graph</a> — topological order + color-count DP, cycle detection included</li>
+</ul>
+<h2 id="Memory-Aid"><a href="#Memory-Aid" class="headerlink" title="Memory Aid"></a>Memory Aid</h2><p>One sentence: <strong>zero in-degree goes first; each departure trims one edge</strong>.</p>
+<p>Three contrasts:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Kahn (BFS)</th>
+<th>DFS Post-Order</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Entry</td>
+<td>Nodes with in-degree 0 enqueued</td>
+<td>Any unvisited node, DFS</td>
+</tr>
+<tr>
+<td>Progress</td>
+<td>Dequeue → decrement neighbor in-degrees</td>
+<td>Recurse to bottom → exit stack</td>
+</tr>
+<tr>
+<td>Cycle detection</td>
+<td>Output count &lt; n</td>
+<td>Gray meets gray</td>
+</tr>
+<tr>
+<td>Order</td>
+<td>Topological order falls out naturally</td>
+<td>Reverse the post-order array</td>
+</tr>
+</tbody></table>
+<p>Recognition cheat sheet:</p>
+<ul>
+<li>See “prerequisite”, “dependency”, “predecessor task” → topological sort.</li>
+<li>Problem asks “can you finish?” → cycle check is enough; use Kahn’s counter.</li>
+<li>Problem asks “output the order” → Kahn storing <code>order</code>, or DFS post-order reversed.</li>
+<li>Requires “lexicographically smallest” → swap Kahn’s <code>deque</code> for <code>heapq</code>.</li>
+<li>DP on a DAG → iterate in topological order; predecessors are already computed, just transition.</li>
+</ul>
+<p>One thing to remember: <strong>topological sort is not a sorting algorithm — it’s a dependency resolution algorithm</strong>. The “order” it produces is one valid execution sequence and may not be unique.</p>
+
+        </div>
+
+        <!-- Back to English indexes -->
+        <nav class="post-nav">
+          <a class="prev" href="/en/mlsys/">
+            <i class="fas fa-chevron-left"></i>
+            ML Systems Index
+          </a>
+          <a class="next" href="/en/algorithms/">
+            Algorithms Index
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </article>
+    </div>
+  </div>
+</div>
+
+    </div>
+    <footer class="footer">
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-code-branch"></i>
+      master
+    </div>
+    <div class="status-item">
+      <i class="fas fa-sync"></i>
+      Mengyang Liu
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      2026-06-05
+    </div>
+    <div class="status-item">
+      Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>
+    </div>
+    <div class="status-item github">
+      <a href="#" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    
+    <!-- 全局配置 -->
+    <script>
+      window.HEXO_CONFIG = {
+        language: "en",
+        root: "/"
+      };
+      
+      // 特定于搜索的配置
+      window.VSC4T_SEARCH = {
+        root: "/"
+      };
+    </script>
+    
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- 这里可以放置自定义脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Apply smooth scroll to non-TOC anchor links
+  document.querySelectorAll('a[href^="#"]:not(.toc-link)').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Check if querySelector is valid before using it
+      try {
+        const targetSelector = this.getAttribute('href');
+        // Basic check for potentially invalid selectors (though not exhaustive)
+        if (targetSelector && targetSelector.length > 1) { 
+          const targetElement = document.querySelector(targetSelector);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          } else {
+            console.warn('Smooth scroll target not found:', targetSelector);
+          }
+        } else {
+           console.warn('Invalid href for smooth scroll:', targetSelector);
+        }
+      } catch (error) {
+        console.error('Error during smooth scroll:', error, 'Selector:', this.getAttribute('href'));
+        // Fallback or alternative behavior if needed
+        // For example, try getElementById if it's just an ID
+        const targetId = this.getAttribute('href').slice(1);
+        try {
+            const targetElementById = document.getElementById(decodeURIComponent(targetId));
+            if (targetElementById) {
+                targetElementById.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (idError) {
+             console.error('Fallback getElementById also failed:', idError);
+        }
+      }
+    });
+  });
+});
+</script>
+
+<!-- Scripts -->
+<script>
+  // 将语言文件中的翻译传递给前端
+  window.HEXO_CONFIG = {
+    language: "en",
+    search_placeholder: "Type to search...",
+    search_no_results: "No results found",
+    search_result: "result",
+    search_results: "results",
+    search_results_found: "Found undefined results",
+    search_in: "Search in",
+    search_in_title: "Title",
+    search_in_content: "Content",
+    search_in_tags: "Tags",
+    search_in_categories: "Categories",
+    search_filters: "Search Filters",
+    search_recent: "Recent Searches",
+    search_clear: "Clear",
+    search_loading: "Loading...",
+    search_error: "Error loading search data"
+  };
+</script>
+
+
+
+<!-- 添加所有需要的脚本 -->
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script>
+
+
+<!-- AI chat widget (rendered on every page; gated by the ai_chat config flag) -->
+
+<link rel="stylesheet" href="/ai/chat.css">
+<script>
+  window.__AI_CHAT_CONFIG = {"root":"/","model":"gpt-5.5","embed_model":"text-embedding-3-small","top_k":5};
+</script>
+<script src="/ai/rag.js"></script>
+<script src="/ai/chat.js"></script>
+
+
+
+    <script>
+      // 移动端菜单切换
+      $(document).ready(function() {
+        $('.mobile-menu-toggle').click(function() {
+          $('.sidebar-explorer').toggleClass('show');
+        });
+      });
+    </script>
+  </body>
+</html>
