@@ -309,6 +309,11 @@ mjx-container[display="true"] + br {
         
           <div class="file">
             <i class="fas fa-file-code"></i>
+            <a href="/2026/06/05/Monotone-Threshold-Heap/">单调阈值 + 堆：把 O(N²) 摊成 O(N log N)</a>
+          </div>
+        
+          <div class="file">
+            <i class="fas fa-file-code"></i>
             <a href="/2026/06/02/Bit-Manipulation/">位运算 Bit Manipulation</a>
           </div>
         
@@ -342,11 +347,6 @@ mjx-container[display="true"] + br {
             <a href="/2026/06/02/Monotonic-Stack/">单调栈</a>
           </div>
         
-          <div class="file">
-            <i class="fas fa-file-code"></i>
-            <a href="/2026/06/02/Sliding-Window/">滑动窗口</a>
-          </div>
-        
       </div>
     </div>
     
@@ -363,7 +363,7 @@ mjx-container[display="true"] + br {
           <div class="tag-item">
             <i class="fas fa-tag"></i>
             <a href="/tags/%E8%B4%AA%E5%BF%83/">贪心</a>
-            <span class="count">(1)</span>
+            <span class="count">(2)</span>
           </div>
         
       </div>
@@ -448,7 +448,7 @@ mjx-container[display="true"] + br {
 <p>形式：要在某个预算/容量约束下最大化数量或价值。</p>
 </blockquote>
 <p><strong>关键直觉</strong>：先无脑贪婪地全装下；一旦超出预算，就从已经装的里面<strong>踢掉”最贵的”</strong>——堆顶。被踢的那个一定 ≥ 当前这个，所以总代价单调不增，数量却保住了。</p>
-<p>经典题：课程表 III、最低加油次数、IPO。识别信号：<strong>带 deadline / 容量约束 + 求最多数量</strong>。</p>
+<p>经典题：课程表 III、最低加油次数、IPO。识别信号：<strong>带 deadline / 容量约束 + 求最多数量</strong>。其中 IPO 这类”单调阈值 + 堆”的套路，详见<a href="/2026/06/05/Monotone-Threshold-Heap/">《单调阈值 + 堆：把 O(N²) 摊成 O(N log N)》</a>。</p>
 <h3 id="3-交换论证类-—-排序的正确性靠”两两交换不变差”"><a href="#3-交换论证类-—-排序的正确性靠”两两交换不变差”" class="headerlink" title="3. 交换论证类 — 排序的正确性靠”两两交换不变差”"></a>3. 交换论证类 — 排序的正确性靠”两两交换不变差”</h3><blockquote>
 <p>形式：要给一组对象定一个顺序，使某指标最优（如完成时间总和、字典序、罚款最小）。</p>
 </blockquote>
@@ -537,7 +537,7 @@ mjx-container[display="true"] + br {
     </div>
     <div class="status-item">
       <i class="fas fa-clock"></i>
-      2026-06-06
+      2026-06-08
     </div>
     <div class="status-item">
       Designed By&nbsp; <a href="https://github.com/B143KC47" target="_blank"> BlackCat</a>

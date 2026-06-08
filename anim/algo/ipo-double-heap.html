@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPO 双堆动画</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  padding: 4px;
+}
+code {
+  background: #1a1a2e;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+}
+.animation-container {
+  background: #0a0a1a;
+  border-radius: 10px;
+  padding: 18px;
+  margin: 10px 0;
+  border: 1px solid #76b900;
+}
+.animation-container h3 { margin-top: 0; color: #00d4aa; font-size: 1.15em; margin-bottom: 6px; }
+.topbar {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 10px 0 4px;
+}
+.stat { text-align: center; }
+.stat .label { font-size: 0.72em; color: #888; }
+.stat .value { font-size: 1.5em; font-weight: bold; }
+.stat .value.w { color: #ffd700; }
+.stat .value.k { color: #00d4aa; }
+.heaps {
+  display: flex;
+  gap: 14px;
+  margin: 14px 0;
+  align-items: stretch;
+}
+.heap {
+  flex: 1;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 150px;
+  background: #11112099;
+}
+.heap h4 { font-size: 0.82em; margin-bottom: 8px; text-align: center; font-weight: 600; }
+.heap.locked h4 { color: #ff6b6b; }
+.heap.available h4 { color: #76b900; }
+.cards { display: flex; flex-direction: column; gap: 6px; }
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 2px solid #444;
+  font-size: 0.9em;
+  transition: all 0.25s;
+}
+.card .cap { color: #ff8a8a; font-weight: bold; }
+.card .pro { color: #aee571; font-weight: bold; }
+.card .arrow { color: #555; }
+.card.top { border-color: #76b900; background: rgba(118,185,0,0.12); }
+.card.locked-top { border-color: #ff6b6b; background: rgba(255,107,107,0.10); }
+.card.flash { border-color: #ffd700; background: rgba(255,215,0,0.18); }
+.card.profit-only { justify-content: center; }
+.pick-tag { font-size: 0.7em; color: #76b900; margin-left: 8px; }
+.empty { color: #555; text-align: center; font-size: 0.85em; padding: 18px 0; }
+.status-line {
+  text-align: center;
+  margin: 10px 0 4px;
+  font-size: 0.95em;
+  min-height: 40px;
+}
+.btn {
+  background: #76b900;
+  color: #0f0f23;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: bold;
+  margin: 4px;
+  transition: background 0.2s;
+}
+.btn:hover { background: #8dd600; }
+.btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+.btn-secondary { background: #00d4aa; }
+.btn-secondary:hover { background: #00eebb; }
+.controls { text-align: center; margin-top: 8px; }
+#indicator { color: #888; font-size: 0.85em; min-width: 70px; display: inline-block; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="animation-container">
+  <h3>IPO — 单调阈值喂双堆</h3>
+  <p style="font-size:0.85em;color:#aaa;">项目 <code>(门槛 capital → 利润 profit)</code>：(0→1)(1→2)(2→3)(3→5)，初始 w=0，最多做 k=3 个</p>
+
+  <div class="topbar">
+    <div class="stat"><div class="label">当前资金 w</div><div class="value w" id="stat-w">0</div></div>
+    <div class="stat"><div class="label">已做 / 上限</div><div class="value k" id="stat-k">0 / 3</div></div>
+  </div>
+
+  <div class="heaps">
+    <div class="heap locked">
+      <h4>locked（小根堆 · 按 capital）</h4>
+      <div class="cards" id="locked-cards"></div>
+    </div>
+    <div class="heap available">
+      <h4>available（大根堆 · 按 profit）</h4>
+      <div class="cards" id="available-cards"></div>
+    </div>
+  </div>
+
+  <div class="status-line" id="status">点击“下一步”开始演示</div>
+
+  <div class="controls">
+    <button class="btn" id="prev" onclick="nav(-1)">&#8592; 上一步</button>
+    <span id="indicator">0 / 0</span>
+    <button class="btn" id="next" onclick="nav(1)">下一步 &#8594;</button>
+    <button class="btn btn-secondary" id="auto" onclick="auto()">&#9654; 自动播放</button>
+    <button class="btn btn-secondary" onclick="reset()">&#8635; 重置</button>
+  </div>
+</div>
+
+<script>
+const PROJECTS = [ {cap:0, pro:1, id:0}, {cap:1, pro:2, id:1}, {cap:2, pro:3, id:2}, {cap:3, pro:5, id:3} ];
+const K = 3;
+const W0 = 0;
+
+// 预先把整段动画拆成"原子动作"帧:每帧是一次 解锁 / 选取 后的完整状态。
+function buildFrames() {
+  const frames = [];
+  let w = W0, done = 0;
+  const locked = PROJECTS.map(p => ({...p})).sort((a, b) => a.cap - b.cap);
+  let i = 0;                 // locked 中第一个还没解锁的下标
+  let available = [];        // 已解锁、未做的项目
+
+  const snap = (action, msg, hiId) => frames.push({
+    w, done,
+    locked: locked.slice(i).map(p => ({...p})),
+    available: available.slice().sort((a, b) => b.pro - a.pro),
+    action, msg, hiId: (hiId === undefined ? null : hiId)
+  });
+
+  snap('init', `初始：资金 <b>w=${w}</b>，最多做 <b>k=${K}</b> 个项目。`);
+
+  for (let round = 0; round < K; round++) {
+    // ① 解锁:把所有 capital ≤ w 的项目搬进 available
+    while (i < locked.length && locked[i].cap <= w) {
+      const p = locked[i];
+      available.push(p);
+      i++;
+      snap('unlock', `资金 ${w} ≥ 门槛 ${p.cap}：解锁项目（利润 <b class="hl-pro">${p.pro}</b>），搬进 available。`, p.id);
+    }
+    // ② 没得选,提前结束
+    if (available.length === 0) {
+      snap('stop', `available 空了，买不起任何项目，提前结束。`);
+      return frames;
+    }
+    // ③ 选 available 里利润最大的做掉
+    available.sort((a, b) => b.pro - a.pro);
+    const best = available.shift();
+    const prev = w;
+    w += best.pro;
+    done++;
+    snap('pick', `选利润最大的 <b class="hl-pro">${best.pro}</b> 做掉：w = ${prev} + ${best.pro} = <b class="hl-w">${w}</b>（已做 ${done}/${K}）。`, best.id);
+  }
+  snap('done', `做满 ${K} 个项目，最终资金 <b class="hl-w">w = ${w}</b>。注意 available 里还剩没做的项目——我们每轮只挑利润最大的。`);
+  return frames;
+}
+
+const FRAMES = buildFrames();
+const N = FRAMES.length - 1;
+let idx = 0;
+let timer = null;
+
+function cardHTML(p, cls, tag) {
+  return `<div class="card ${cls}" data-id="${p.id}">`
+       + `<span class="cap">需 ${p.cap}</span>`
+       + `<span class="arrow">→</span>`
+       + `<span class="pro">赚 ${p.pro}</span>`
+       + (tag ? `<span class="pick-tag">${tag}</span>` : '')
+       + `</div>`;
+}
+
+function render() {
+  const f = FRAMES[idx];
+  document.getElementById('stat-w').textContent = f.w;
+  document.getElementById('stat-k').textContent = `${f.done} / ${K}`;
+
+  // locked:已按 capital 升序,堆顶(门槛最低)在最上面
+  const lockedEl = document.getElementById('locked-cards');
+  if (f.locked.length === 0) {
+    lockedEl.innerHTML = '<div class="empty">（空）</div>';
+  } else {
+    lockedEl.innerHTML = f.locked.map((p, k) => {
+      let cls = (k === 0) ? 'locked-top' : '';
+      if (f.action === 'unlock' && p.id === f.hiId) cls = 'flash';
+      return cardHTML(p, cls, k === 0 ? '门槛最低' : '');
+    }).join('');
+  }
+
+  // available:已按 profit 降序,堆顶(利润最大)在最上面
+  const availEl = document.getElementById('available-cards');
+  if (f.available.length === 0) {
+    availEl.innerHTML = '<div class="empty">（空）</div>';
+  } else {
+    availEl.innerHTML = f.available.map((p, k) => {
+      let cls = (k === 0) ? 'top' : '';
+      if (f.action === 'unlock' && p.id === f.hiId) cls = 'flash';
+      return cardHTML(p, cls, k === 0 ? '↑ 下个选它' : '');
+    }).join('');
+  }
+
+  document.getElementById('status').innerHTML = f.msg;
+  document.getElementById('indicator').textContent = `${idx} / ${N}`;
+  document.getElementById('prev').disabled = (idx === 0);
+  document.getElementById('next').disabled = (idx === N);
+  document.getElementById('auto').disabled = (idx === N);
+}
+
+function nav(d) {
+  stopAuto();
+  const t = idx + d;
+  if (t < 0 || t > N) return;
+  idx = t;
+  render();
+}
+
+function stopAuto() {
+  if (timer !== null) { clearInterval(timer); timer = null; document.getElementById('auto').innerHTML = '&#9654; 自动播放'; }
+}
+
+function auto() {
+  if (timer !== null) { stopAuto(); return; }
+  if (idx >= N) return;
+  document.getElementById('auto').innerHTML = '&#9208; 暂停';
+  timer = setInterval(() => {
+    if (idx >= N) { stopAuto(); return; }
+    idx++;
+    render();
+    if (idx >= N) stopAuto();
+  }, 1100);
+}
+
+function reset() { stopAuto(); idx = 0; render(); }
+
+render();
+</script>
+
+<script>
+(function () {
+  function reportHeight() { parent.postMessage({ type: 'tc-anim-height', height: document.documentElement.scrollHeight }, '*'); }
+  window.addEventListener('load', reportHeight);
+  if (window.ResizeObserver) { new ResizeObserver(reportHeight).observe(document.body); } else { setInterval(reportHeight, 500); }
+})();
+</script>
+</body>
+</html>
