@@ -457,25 +457,25 @@ mjx-container[display="true"] + br {
 <h3 id="带权并查集"><a href="#带权并查集" class="headerlink" title="带权并查集"></a>带权并查集</h3><p>边上带权,代表两点的关系 (差、比、距离…)。find 时把路径权值累加,union 时根据已知关系推出新边权。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 维护 w[x] = x 到 p[x] 的权值</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">find</span>(<span class="hljs-params">self, x</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.p[x] != x:<br>        root = <span class="hljs-variable language_">self</span>.find(<span class="hljs-variable language_">self</span>.p[x])<br>        <span class="hljs-variable language_">self</span>.w[x] += <span class="hljs-variable language_">self</span>.w[<span class="hljs-variable language_">self</span>.p[x]]      <span class="hljs-comment"># 累加到根的权值</span><br>        <span class="hljs-variable language_">self</span>.p[x] = root<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.p[x]<br></code></pre></td></tr></table></figure>
 
-<p>经典题: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">LC 399. 除法求值</a> — <code>a/b = 2, b/c = 3</code> 推 <code>a/c</code>。把”比值”当边权,find 时连乘。</p>
+<p>经典题: <a target="_blank" rel="noopener" href="https://leetcode.com/problems/evaluate-division/">LC 399. 除法求值</a> — <code>a/b = 2, b/c = 3</code> 推 <code>a/c</code>。把”比值”当边权,find 时连乘。</p>
 <h2 id="三类场景-—-判连通-数分量-离线时光倒流"><a href="#三类场景-—-判连通-数分量-离线时光倒流" class="headerlink" title="三类场景 — 判连通 / 数分量 / 离线时光倒流"></a>三类场景 — 判连通 / 数分量 / 离线时光倒流</h2><p><strong>1. 判连通</strong>: 两点 find 同根 → 连通。冗余连接 (LC 684) 就是边一条条加,撞上同根的就是多余的。</p>
 <p><strong>2. 数连通分量</strong>: 最后 <code>uf.cnt</code> 就是答案。省份数量 (LC 547)、岛屿数量 (LC 200) 直接套。</p>
-<p><strong>3. 离线”时光倒流”</strong>: 并查集只支持合并,不支持拆分。题目要你<strong>删边/拆点</strong>?读完所有操作,从最终状态<strong>倒着加边</strong>就行 — 删变加。经典题 <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bricks-falling-when-hit/">LC 803. 打砖块</a>。</p>
+<p><strong>3. 离线”时光倒流”</strong>: 并查集只支持合并,不支持拆分。题目要你<strong>删边/拆点</strong>?读完所有操作,从最终状态<strong>倒着加边</strong>就行 — 删变加。经典题 <a target="_blank" rel="noopener" href="https://leetcode.com/problems/bricks-falling-when-hit/">LC 803. 打砖块</a>。</p>
 <p>第三类是面试出”难题”的钥匙,看到”按顺序删除”先想能不能离线倒着做。</p>
 <h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身 (会一个会一类)</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-provinces/">LC 547. 省份数量</a> — 数分量裸题</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-islands/">LC 200. 岛屿数量</a> — 二维网格转一维 id (<code>i*n+j</code>)</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection/">LC 684. 冗余连接</a> — 加边遇同根即是答案</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/satisfiability-of-equality-equations/">LC 990. 等式方程的可满足性</a> — 先 = 后 !=</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/number-of-provinces/">LC 547. 省份数量</a> — 数分量裸题</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/number-of-islands/">LC 200. 岛屿数量</a> — 二维网格转一维 id (<code>i*n+j</code>)</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/redundant-connection/">LC 684. 冗余连接</a> — 加边遇同根即是答案</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/satisfiability-of-equality-equations/">LC 990. 等式方程的可满足性</a> — 先 = 后 !=</li>
 </ul>
 <p><strong>进阶</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-consecutive-sequence/">LC 128. 最长连续序列</a> — 把 <code>x</code> 和 <code>x+1</code> union</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">LC 399. 除法求值</a> — 带权并查集模板</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/accounts-merge/">LC 721. 账户合并</a> — 邮箱当节点,同账户内两两 union</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bricks-falling-when-hit/">LC 803. 打砖块</a> — 时光倒流经典</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection-ii/">LC 685. 冗余连接 II</a> — 有向图变种,需分类讨论</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/longest-consecutive-sequence/">LC 128. 最长连续序列</a> — 把 <code>x</code> 和 <code>x+1</code> union</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/evaluate-division/">LC 399. 除法求值</a> — 带权并查集模板</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/accounts-merge/">LC 721. 账户合并</a> — 邮箱当节点,同账户内两两 union</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/bricks-falling-when-hit/">LC 803. 打砖块</a> — 时光倒流经典</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/redundant-connection-ii/">LC 685. 冗余连接 II</a> — 有向图变种,需分类讨论</li>
 </ul>
 <h2 id="记忆法"><a href="#记忆法" class="headerlink" title="记忆法"></a>记忆法</h2><p>一句话: <strong>集合即树,根即代表;find 找根,union 接根。</strong></p>
 <p>三件事必背:</p>

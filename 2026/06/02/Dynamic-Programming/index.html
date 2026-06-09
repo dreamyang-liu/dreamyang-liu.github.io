@@ -510,7 +510,58 @@ mjx-container[display="true"] + br {
 <li>0/1 背包：<code>j</code> <strong>倒序</strong>，引用的 <code>dp[j-w]</code> 还是上一轮的值（”i 没选过”）。</li>
 <li>完全背包：<code>j</code> <strong>正序</strong>，引用的 <code>dp[j-w]</code> 已经是本轮更新过的（”i 可以反复选”）。</li>
 </ul>
-<p>顺序错了，物品就被选了多次或一次都没选。这是背包最高频的 bug。</p>
+<p>顺序错了，物品就被选了多次或一次都没选。这是背包最高频的 bug。下面把它彻底讲透。</p>
+<p><strong>为什么方向能决定语义?</strong> 回到二维就一目了然。两者一维更新式都写成 <code>dp[j] = max(dp[j], dp[j-w] + v)</code>，差别藏在二维的下标里：</p>
+<ul>
+<li>0/1：<code>dp[i][j] = max(dp[i-1][j], dp[i-1][j-w] + v)</code> —— 选了第 <code>i</code> 件后，<code>j-w</code> 去<strong>上一行 <code>i-1</code></strong> 取（这件已用掉，不能再用）。</li>
+<li>完全：<code>dp[i][j] = max(dp[i-1][j], dp[i][j-w] + v)</code> —— 选了第 <code>i</code> 件后，<code>j-w</code> 去<strong>本行 <code>i</code></strong> 取（这件还能接着选）。</li>
+</ul>
+<p>唯一区别就是 <code>dp[j-w]</code> 该用 <code>i-1</code> 还是 <code>i</code>。压成一维后只剩一行 <code>dp</code>，于是”算 <code>dp[j]</code> 时 <code>dp[j-w]</code> 是旧值还是新值”就由遍历方向决定：</p>
+<ul>
+<li><strong>倒序</strong>：算 <code>dp[j]</code> 时更小的下标 <code>j-w</code> 这轮还没轮到 → <code>dp[j-w]</code> 是旧值 = <code>dp[i-1][j-w]</code> = 第 <code>i</code> 件<strong>没选过</strong> → 每件最多用一次。</li>
+<li><strong>正序</strong>：<code>j-w</code> 本轮已被更新 → <code>dp[j-w]</code> 是新值 = <code>dp[i][j-w]</code> = 第 <code>i</code> 件<strong>可能已选</strong> → 同件反复用。</li>
+</ul>
+<p><strong>一个跑得通的小例子</strong>：物品重 2、值 3，容量 5，<code>dp</code> 初始全 0。</p>
+<p>0/1 倒序 <code>j = 5→2</code>，每次 <code>dp[j-2]+3</code> 用的都是<strong>旧值 0</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>j</th>
+<th>5</th>
+<th>4</th>
+<th>3</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dp[j]</code></td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>→ <code>[0,0,3,3,3,3]</code>，最大价值 <strong>3</strong>（只用一次）。</p>
+<p>完全正序 <code>j = 2→5</code>，到 <code>j=4</code> 时 <code>dp[2]</code> 已是本轮新值 3：</p>
+<table>
+<thead>
+<tr>
+<th>j</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dp[j]</code></td>
+<td>3</td>
+<td>3</td>
+<td><strong>6</strong></td>
+<td><strong>6</strong></td>
+</tr>
+</tbody></table>
+<p>→ <code>[0,0,3,3,6,6]</code>，容量 4 时价值 <strong>6</strong>（用了两次）。同一份代码、同一个数组，方向反过来，”用一次”就变成”用无数次”——<code>j=4</code> 那个 <code>6</code> 就是”引用了本轮新值”的铁证。</p>
 <h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><p><strong>三句口诀</strong>：</p>
 <ul>
 <li>状态先定义，转移再写式。</li>
@@ -549,8 +600,8 @@ mjx-container[display="true"] + br {
 </details>
 </div>
 
-<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/climbing-stairs/">70. 爬楼梯</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/house-robber/">198. 打家劫舍</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-subarray/">53. 最大子数组</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-subsequence/">300. LIS</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/coin-change/">322. 零钱兑换</a></p>
-<p><strong>进阶</strong>：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-common-subsequence/">1143. LCS</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/edit-distance/">72. 编辑距离</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/partition-equal-subset-sum/">416. 分割等和子集</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/target-sum/">494. 目标和</a>、<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/coin-change-ii/">518. 零钱兑换 II</a></p>
+<h2 id="LeetCode-练习"><a href="#LeetCode-练习" class="headerlink" title="LeetCode 练习"></a>LeetCode 练习</h2><p><strong>热身</strong>：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/climbing-stairs/">70. 爬楼梯</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/house-robber/">198. 打家劫舍</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/maximum-subarray/">53. 最大子数组</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/longest-increasing-subsequence/">300. LIS</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/coin-change/">322. 零钱兑换</a></p>
+<p><strong>进阶</strong>：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/longest-common-subsequence/">1143. LCS</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/edit-distance/">72. 编辑距离</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/partition-equal-subset-sum/">416. 分割等和子集</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/target-sum/">494. 目标和</a>、<a target="_blank" rel="noopener" href="https://leetcode.com/problems/coin-change-ii/">518. 零钱兑换 II</a></p>
 
         </div>
         

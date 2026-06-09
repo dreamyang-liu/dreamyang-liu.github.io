@@ -501,17 +501,17 @@ mjx-container[display="true"] + br {
 <p>记住骨架:<strong>“用什么数据结构维护待扩展节点”</strong>——FIFO 是 BFS,小顶堆是 Dijkstra,deque 是 0-1 BFS,全扫一遍是 Bellman-Ford。</p>
 <h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><p><strong>热身</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/network-delay-time/">743. 网络延迟时间</a> —— 模板</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a> —— “路径权”改成 max 而非 sum</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cheapest-flights-within-k-stops/">787. K 站中转内最便宜的航班</a> —— 状态扩维 <code>(node, stops)</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/network-delay-time/">743. 网络延迟时间</a> —— 模板</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a> —— “路径权”改成 max 而非 sum</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/cheapest-flights-within-k-stops/">787. K 站中转内最便宜的航班</a> —— 状态扩维 <code>(node, stops)</code></li>
 </ul>
 <p><strong>进阶</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-maximum-probability/">1514. 概率最大的路径</a> —— 大顶堆 + log 转化(乘法变加法)</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-cost-to-reach-destination-in-time/">1928. 规定时间内到达终点的最小花费</a> —— <code>(cost, time, node)</code> 双维度</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/second-minimum-time-to-reach-destination/">2045. 到达目的地的第二短时间</a> —— 维护前两小距离</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-ways-to-arrive-at-destination/">1976. 到达目的地的方案数</a> —— Dijkstra 顺便数路径</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/trapping-rain-water-ii/">407. 接雨水 II</a> —— 堆 + 从边界向内”灌水”</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/path-with-maximum-probability/">1514. 概率最大的路径</a> —— 大顶堆 + log 转化(乘法变加法)</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/minimum-cost-to-reach-destination-in-time/">1928. 规定时间内到达终点的最小花费</a> —— <code>(cost, time, node)</code> 双维度</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/second-minimum-time-to-reach-destination/">2045. 到达目的地的第二短时间</a> —— 维护前两小距离</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/number-of-ways-to-arrive-at-destination/">1976. 到达目的地的方案数</a> —— Dijkstra 顺便数路径</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/trapping-rain-water-ii/">407. 接雨水 II</a> —— 堆 + 从边界向内”灌水”</li>
 </ul>
 <h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><p><strong>记忆法</strong>:一句话——“挑最近的未确定节点,扩它的邻居”。看到”非负边权 + 单源最短路”,立刻条件反射 heapq。</p>
 <p><strong>易错点</strong>:</p>

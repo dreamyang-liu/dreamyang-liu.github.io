@@ -303,12 +303,12 @@
 <p><strong>Classic trap</strong>: edge direction. The problem says “you must take b before a”, meaning b is the prerequisite for a, so the graph edge should be <code>b → a</code> (b before a). Reversing the direction and getting WA is a rite of passage.</p>
 <p>Other must-solve problems:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-eventual-safe-states/">LC 802. Find Eventual Safe States</a> — reverse graph + topological sort; safe &#x3D; all paths terminate</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/alien-dictionary/">LC 269. Alien Dictionary</a> — build edges from the first differing character of adjacent words, run topo sort</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-height-trees/">LC 310. Minimum Height Trees</a> — topo-sort-like, peel leaf nodes (degree&#x3D;1) each round; the last 1–2 nodes are the answer</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-path-in-a-matrix/">LC 329. Longest Increasing Path in a Matrix</a> — DP on a DAG, can use memoized DFS or topological DP</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/">LC 2192. All Ancestors of a Node in a Directed Acyclic Graph</a> — merge ancestor sets in topological order</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/largest-color-value-in-a-directed-graph/">LC 1857. Largest Color Value in a Directed Graph</a> — topological order + color-count DP, cycle detection included</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/find-eventual-safe-states/">LC 802. Find Eventual Safe States</a> — reverse graph + topological sort; safe &#x3D; all paths terminate</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/alien-dictionary/">LC 269. Alien Dictionary</a> — build edges from the first differing character of adjacent words, run topo sort</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/minimum-height-trees/">LC 310. Minimum Height Trees</a> — topo-sort-like, peel leaf nodes (degree&#x3D;1) each round; the last 1–2 nodes are the answer</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/longest-increasing-path-in-a-matrix/">LC 329. Longest Increasing Path in a Matrix</a> — DP on a DAG, can use memoized DFS or topological DP</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/">LC 2192. All Ancestors of a Node in a Directed Acyclic Graph</a> — merge ancestor sets in topological order</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/largest-color-value-in-a-directed-graph/">LC 1857. Largest Color Value in a Directed Graph</a> — topological order + color-count DP, cycle detection included</li>
 </ul>
 <h2 id="Memory-Aid"><a href="#Memory-Aid" class="headerlink" title="Memory Aid"></a>Memory Aid</h2><p>One sentence: <strong>zero in-degree goes first; each departure trims one edge</strong>.</p>
 <p>Three contrasts:</p>

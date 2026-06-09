@@ -490,14 +490,14 @@ mjx-container[display="true"] + br {
 
 <p>完全同一个模板，只是 <code>pred</code> 换成了 <code>can_finish</code>。识别二分答案的信号：题目问”最小的 X，使得 Y 成立”，且 X 越大越容易满足 Y（或反过来）。</p>
 <h2 id="经典题"><a href="#经典题" class="headerlink" title="经典题"></a>经典题</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-search/">704. 二分查找</a> —— 模板入门</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-insert-position/">35. 搜索插入位置</a> —— 就是 <code>lower_bound</code>，直接返回 <code>lo</code></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/">34. 在排序数组中查找元素的第一个和最后一个位置</a> —— 跑两次，分别用 <code>&gt;= x</code> 和 <code>&gt; x</code></li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array/">153. 寻找旋转排序数组中的最小值</a> —— 上文模板直接套</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-in-rotated-sorted-array/">33. 搜索旋转排序数组</a> —— 先找最小值定位旋转点，再对其中一段做标准二分</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sqrtx/">69. x 的平方根</a> —— 二分答案：第一个 <code>mid*mid &gt; x</code> 的位置减一</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/koko-eating-bananas/">875. 爱吃香蕉的珂珂</a> —— 二分答案模板题</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/median-of-two-sorted-arrays/">4. 寻找两个正序数组的中位数</a> —— 高难度，对分割点二分</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/binary-search/">704. 二分查找</a> —— 模板入门</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/search-insert-position/">35. 搜索插入位置</a> —— 就是 <code>lower_bound</code>，直接返回 <code>lo</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/">34. 在排序数组中查找元素的第一个和最后一个位置</a> —— 跑两次，分别用 <code>&gt;= x</code> 和 <code>&gt; x</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/">153. 寻找旋转排序数组中的最小值</a> —— 上文模板直接套</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/search-in-rotated-sorted-array/">33. 搜索旋转排序数组</a> —— 先找最小值定位旋转点，再对其中一段做标准二分</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/sqrtx/">69. x 的平方根</a> —— 二分答案：第一个 <code>mid*mid &gt; x</code> 的位置减一</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/koko-eating-bananas/">875. 爱吃香蕉的珂珂</a> —— 二分答案模板题</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/median-of-two-sorted-arrays/">4. 寻找两个正序数组的中位数</a> —— 高难度，对分割点二分</li>
 </ul>
 <h2 id="记忆法-易错点"><a href="#记忆法-易错点" class="headerlink" title="记忆法 / 易错点"></a>记忆法 / 易错点</h2><ul>
 <li><strong>第一条铁律：写代码前先口头说出 <code>pred(i)</code> 是什么、单调方向是哪边。</strong> 说不清楚就别动手，必错。</li>

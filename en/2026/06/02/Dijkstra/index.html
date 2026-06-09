@@ -419,17 +419,17 @@ mjx-container[display="true"] + br {
 <p>Remember the skeleton: <strong>“what data structure maintains the frontier”</strong> — FIFO is BFS, min-heap is Dijkstra, deque is 0-1 BFS, scan-all is Bellman-Ford.</p>
 <h2 id="Classic-Problems"><a href="#Classic-Problems" class="headerlink" title="Classic Problems"></a>Classic Problems</h2><p><strong>Warm-up</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/network-delay-time/">743. Network Delay Time</a> — template</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. Path With Minimum Effort</a> — path weight becomes max rather than sum</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cheapest-flights-within-k-stops/">787. Cheapest Flights Within K Stops</a> — state expansion <code>(node, stops)</code></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/network-delay-time/">743. Network Delay Time</a> — template</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/path-with-minimum-effort/">1631. Path With Minimum Effort</a> — path weight becomes max rather than sum</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/cheapest-flights-within-k-stops/">787. Cheapest Flights Within K Stops</a> — state expansion <code>(node, stops)</code></li>
 </ul>
 <p><strong>Advanced</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-maximum-probability/">1514. Path with Maximum Probability</a> — max-heap + log transform (product becomes sum)</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-cost-to-reach-destination-in-time/">1928. Minimum Cost to Reach Destination in Time</a> — <code>(cost, time, node)</code> dual-dimension state</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/second-minimum-time-to-reach-destination/">2045. Second Minimum Time to Reach Destination</a> — maintain the two smallest distances</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-ways-to-arrive-at-destination/">1976. Number of Ways to Arrive at Destination</a> — Dijkstra while counting paths</li>
-<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/trapping-rain-water-ii/">407. Trapping Rain Water II</a> — heap + “pour water inward” from the boundary</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/path-with-maximum-probability/">1514. Path with Maximum Probability</a> — max-heap + log transform (product becomes sum)</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/minimum-cost-to-reach-destination-in-time/">1928. Minimum Cost to Reach Destination in Time</a> — <code>(cost, time, node)</code> dual-dimension state</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/second-minimum-time-to-reach-destination/">2045. Second Minimum Time to Reach Destination</a> — maintain the two smallest distances</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/number-of-ways-to-arrive-at-destination/">1976. Number of Ways to Arrive at Destination</a> — Dijkstra while counting paths</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/trapping-rain-water-ii/">407. Trapping Rain Water II</a> — heap + “pour water inward” from the boundary</li>
 </ul>
 <h2 id="Mnemonics-Common-Pitfalls"><a href="#Mnemonics-Common-Pitfalls" class="headerlink" title="Mnemonics / Common Pitfalls"></a>Mnemonics / Common Pitfalls</h2><p><strong>Mnemonic</strong>: one sentence — “pick the nearest unfinalized node, relax its neighbors.” Whenever you see “non-negative weights + single-source shortest path,” your reflex should be heapq.</p>
 <p><strong>Common pitfalls</strong>:</p>
